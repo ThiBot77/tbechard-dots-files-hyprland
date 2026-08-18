@@ -9,7 +9,7 @@
 
     "modules-left": ["hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["cpu", "memory", "pulseaudio", "network", "tray", "custom/power"],
+    "modules-right": ["cpu", "memory", "pulseaudio", "custom/wifi", "custom/vpn", "network", "tray", "custom/power"],
 
     "hyprland/workspaces": {
         "format": "{icon}",
@@ -53,6 +53,20 @@
             "default": "󰕾"
         },
         "on-click": "pavucontrol"
+    },
+
+    "custom/wifi": {
+        "exec": "$HOME/.local/bin/wifi-status.sh",
+        "return-type": "json",
+        "interval": 5,
+        "on-click": "networkmanager_dmenu"
+    },
+
+    "custom/vpn": {
+        "exec": "$HOME/.local/bin/vpn-status.sh",
+        "return-type": "json",
+        "interval": 5,
+        "on-click": "networkmanager_dmenu"
     },
 
     "network": {

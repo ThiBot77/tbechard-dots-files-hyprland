@@ -35,12 +35,20 @@ window#waybar {
 
 #window,
 #clock,
+#cpu,
+#memory,
 #pulseaudio,
+#custom-wifi,
+#custom-vpn,
 #network,
 #tray,
 #custom-power {
     color: #ffffff;
     padding: 0 10px;
+}
+
+#custom-vpn {
+    color: #cccccc;
 }
 
 #window {
