@@ -1,0 +1,30 @@
+# Official repo packages, one per line. Installed with: pacman -S --needed
+stow
+
+hyprland
+xdg-desktop-portal-hyprland
+hyprpolkitagent
+hypridle
+hyprlock
+waybar
+mako
+rofi
+cava
+
+wl-clipboard
+grim
+slurp
+brightnessctl
+playerctl
+pavucontrol
+qt5-wayland
+qt6-wayland
+jq
+awww
+thunar
+
+# Everyday apps
+discord
+firefox
+filezilla
+dbeaver

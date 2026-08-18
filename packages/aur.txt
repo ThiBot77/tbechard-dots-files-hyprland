@@ -1,0 +1,8 @@
+# AUR packages, one per line. Installed with: yay -S --needed
+wlogout
+
+# Everyday apps
+spotify
+google-chrome
+zen-browser-bin
+visual-studio-code-bin
