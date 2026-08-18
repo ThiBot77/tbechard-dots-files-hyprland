@@ -1,3 +1,5 @@
+@import url("colors.css");
+
 * {
     font-family: "FiraCode Nerd Font", monospace;
     font-size: 13px;
@@ -26,11 +28,11 @@ window#waybar {
 }
 
 #workspaces button.active {
-    color: #ffffff;
+    color: @accent;
 }
 
 #workspaces button:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: alpha(@accent, 0.2);
 }
 
 #window,
@@ -57,14 +59,14 @@ window#waybar {
 }
 
 #custom-arch {
-    color: #ffffff;
+    color: @accent;
     font-size: 16px;
     padding: 0 12px;
     border-radius: 8px;
 }
 
 #custom-arch:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: alpha(@accent, 0.2);
 }
 
 #custom-power {
@@ -73,5 +75,5 @@ window#waybar {
 }
 
 #custom-power:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: alpha(@accent, 0.2);
 }

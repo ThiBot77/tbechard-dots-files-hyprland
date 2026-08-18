@@ -56,12 +56,15 @@ stow/<package>/             un dossier par "package" GNU Stow, arbo miroir de $H
 | `SUPER + E`          | Fichiers (thunar)                |
 | `SUPER + V`          | Toggle widget visualiseur cava  |
 | `SUPER + SHIFT + W`  | Menu de sélection du wallpaper (rofi) |
+| `SUPER + SHIFT + T`  | Menu de sélection de la palette de couleur |
 | `SUPER + L`          | Verrouiller l'écran             |
 | `SUPER + SHIFT + M`  | Menu power (wlogout)            |
 | `SUPER + Q`          | Fermer la fenêtre active        |
 | `SUPER + 1..0`       | Aller au workspace N             |
 | `SUPER + SHIFT + 1..0` | Envoyer la fenêtre au workspace N |
-| `PRINT`              | Capture d'une zone (presse-papiers) |
+| `PRINT`              | Capture d'une zone, ouvre swappy pour annoter |
+| `SUPER + SHIFT + PRINT` | Capture plein écran instantanée (presse-papiers) |
+| `SUPER + PRINT`      | Capture de la fenêtre active     |
 
 Voir `stow/hypr/.config/hypr/conf.d/keybinds.conf` pour la liste complète.
 
@@ -78,6 +81,19 @@ Voir `stow/hypr/.config/hypr/conf.d/keybinds.conf` pour la liste complète.
 # éditer les fichiers dans stow/waybar/... puis :
 stow -d stow -t ~ -R waybar
 ```
+
+## Palette de couleur
+
+`SUPER + SHIFT + T` ouvre un menu rofi pour changer l'accent utilisé par
+Hyprland (bordure active), waybar (workspace actif, icônes), rofi (élément
+sélectionné) et mako (bordure des notifications) — le noir/blanc de base ne
+change pas, seul l'accent varie. Palettes livrées dans `themes/` :
+`mono` (blanc, défaut), `catppuccin-mocha`, `gruvbox`, `tokyo-night`.
+
+Ajouter une palette : crée `themes/<nom>/` avec `hypr-colors.conf`
+(`$accent`/`$accent_dim`), `waybar-colors.css` (`@define-color accent ...`),
+`rofi-colors.rasi` (`* { accent: ...; }`) et `mako-accent.txt` (juste le hex).
+Change ensuite via le menu ou `theme-switch.sh <nom>`.
 
 ## Wallpaper
 

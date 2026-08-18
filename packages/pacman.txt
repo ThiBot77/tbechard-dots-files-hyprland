@@ -24,6 +24,7 @@ qt6-wayland
 jq
 awww
 swappy
+hyprshot
 imagemagick
 pacman-contrib
 thunar
