@@ -54,7 +54,7 @@
     },
 
     "custom/power": {
-        "format": "⏻",
+        "format": "power",
         "tooltip-format": "Power menu",
         "on-click": "wlogout"
     }

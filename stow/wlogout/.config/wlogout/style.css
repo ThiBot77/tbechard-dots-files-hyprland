@@ -1,8 +1,3 @@
-* {
-    background-image: none;
-    font-family: "FiraCode Nerd Font";
-}
-
 window {
     background-color: rgba(0, 0, 0, 0.75);
 }
@@ -23,4 +18,24 @@ button:active,
 button:hover {
     background-color: rgba(255, 255, 255, 0.18);
     border-color: #ffffff;
+}
+
+#lock {
+    background-image: -gtk-icontheme("system-lock-screen-symbolic");
+}
+
+#logout {
+    background-image: -gtk-icontheme("system-log-out-symbolic");
+}
+
+#suspend {
+    background-image: -gtk-icontheme("system-suspend-symbolic");
+}
+
+#reboot {
+    background-image: -gtk-icontheme("system-reboot-symbolic");
+}
+
+#shutdown {
+    background-image: -gtk-icontheme("system-shutdown-symbolic");
 }

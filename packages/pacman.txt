@@ -1,5 +1,6 @@
 # Official repo packages, one per line. Installed with: pacman -S --needed
 stow
+zsh
 
 hyprland
 xdg-desktop-portal-hyprland
