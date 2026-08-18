@@ -48,7 +48,8 @@
         "format-ethernet": "󰈀  wired",
         "format-disconnected": "󰖪  offline",
         "tooltip-format": "{ifname} via {gwaddr}",
-        "on-click": "nm-connection-editor"
+        "on-click": "$HOME/.local/bin/network-menu.sh",
+        "on-click-right": "nm-connection-editor"
     },
 
     "tray": {
