@@ -35,15 +35,18 @@
     },
 
     "pulseaudio": {
-        "format": "{volume}%",
-        "format-muted": "muted",
+        "format": "{icon}  {volume}%",
+        "format-muted": "󰖁",
+        "format-icons": {
+            "default": "󰕾"
+        },
         "on-click": "pavucontrol"
     },
 
     "network": {
-        "format-wifi": "{signalStrength}%  {essid}",
-        "format-ethernet": "wired",
-        "format-disconnected": "offline",
+        "format-wifi": "󰖩  {signalStrength}%",
+        "format-ethernet": "󰈀  wired",
+        "format-disconnected": "󰖪  offline",
         "tooltip-format": "{ifname} via {gwaddr}",
         "on-click": "nm-connection-editor"
     },
@@ -54,7 +57,7 @@
     },
 
     "custom/power": {
-        "format": "power",
+        "format": "󰐥",
         "tooltip-format": "Power menu",
         "on-click": "wlogout"
     }
