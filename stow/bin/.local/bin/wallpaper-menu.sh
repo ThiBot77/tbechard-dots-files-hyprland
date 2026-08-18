@@ -30,7 +30,7 @@ for img in "${images[@]}"; do
     menu+="$name\0icon\x1f$thumb\n"
 done
 
-grid_theme="window {width: 70%;} listview {columns: $columns; lines: $(( (count + columns - 1) / columns )); spacing: 1.2em;} element {orientation: vertical; padding: 0.6em;} element-icon {size: 12em; border-radius: 12px;} element-text {horizontal-align: 0.5; padding: 0.4em 0 0 0;}"
+grid_theme="window {width: 60%; height: 65%;} listview {columns: $columns; spacing: 1.2em; fixed-height: true;} element {orientation: vertical; padding: 0.6em;} element-icon {size: 8em; border-radius: 12px;} element-text {horizontal-align: 0.5; padding: 0.4em 0 0 0;}"
 
 chosen="$(printf '%b' "$menu" | rofi -dmenu -i -show-icons -p "Wallpaper" -theme-str "$grid_theme")"
 
