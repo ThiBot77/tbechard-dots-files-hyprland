@@ -9,7 +9,7 @@
 
     "modules-left": ["hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["cpu", "memory", "pulseaudio", "custom/wifi", "custom/vpn", "network", "tray", "custom/power"],
+    "modules-right": ["cpu", "memory", "pulseaudio", "custom/vpn", "network", "tray", "custom/power"],
 
     "hyprland/workspaces": {
         "format": "{icon}",
@@ -55,13 +55,6 @@
         "on-click": "pavucontrol"
     },
 
-    "custom/wifi": {
-        "exec": "$HOME/.local/bin/wifi-status.sh",
-        "return-type": "json",
-        "interval": 5,
-        "on-click": "networkmanager_dmenu"
-    },
-
     "custom/vpn": {
         "exec": "$HOME/.local/bin/vpn-status.sh",
         "return-type": "json",
@@ -70,10 +63,13 @@
     },
 
     "network": {
-        "format-wifi": "󰖩  {signalStrength}%",
-        "format-ethernet": "󰈀  wired",
-        "format-disconnected": "󰖪  offline",
-        "tooltip-format": "{ifname} via {gwaddr}",
+        "format-wifi": "",
+        "format-ethernet": "󰈀",
+        "format-linked": "󰈀 {ifname} (no IP)",
+        "format-disconnected": "󰖪",
+        "tooltip-format": "Network: {essid}\nSignal: {signalStrength}% ({signaldBm}dBm)\nInterface: {ifname}\nIP: {ipaddr}/{cidr}\nGateway: {gwaddr}",
+        "tooltip-format-ethernet": "Interface: {ifname}\nIP: {ipaddr}/{cidr}\nGateway: {gwaddr}",
+        "tooltip-format-disconnected": "Disconnected",
         "on-click": "networkmanager_dmenu",
         "on-click-right": "nm-connection-editor"
     },
