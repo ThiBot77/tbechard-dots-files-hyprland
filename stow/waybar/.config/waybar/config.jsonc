@@ -9,7 +9,7 @@
 
     "modules-left": ["custom/arch", "hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["custom/updates", "cpu", "memory", "mpris", "pulseaudio", "pulseaudio#microphone", "tray", "custom/power"],
+    "modules-right": ["custom/updates", "cpu", "memory", "battery", "mpris", "pulseaudio", "pulseaudio#microphone", "tray", "custom/power"],
 
     "custom/arch": {
         "format": "",
@@ -69,6 +69,19 @@
         "format-c": " {used}GB",
         "format-alt": "󰾆 {percentage}%",
         "tooltip-format": "󰾆 Memory usage: {percentage}%\n Used: {used:0.2f}GB / {total:0.2f}GB\n󰍛 Available: {avail:0.2f}GB\n Swap used: {swapUsed:0.2f}GB / {swapTotal:0.2f}GB ({swapPercentage}%)"
+    },
+
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "󰁹 {capacity}%",
+        "format-charging": "󰢞 {capacity}%",
+        "format-warning": "󰟭 {capacity}%",
+        "format-critical": "󰂎 {capacity}%",
+        "format-full": "󰁹 Full",
+        "tooltip-format": "{time} remaining"
     },
 
     "mpris": {
