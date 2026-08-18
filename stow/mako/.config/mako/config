@@ -8,7 +8,7 @@ border-radius=14
 
 background-color=#000000b0
 text-color=#ffffff
-border-color=#7aa2f726
+border-color=#ffffff26
 progress-color=over #ffffff33
 
 default-timeout=6000
@@ -16,5 +16,5 @@ layer=overlay
 anchor=top-right
 
 [urgency=high]
-border-color=#7aa2f7
+border-color=#ffffff
 default-timeout=0
