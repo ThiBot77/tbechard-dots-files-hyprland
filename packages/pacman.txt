@@ -25,6 +25,7 @@ jq
 awww
 swappy
 imagemagick
+pacman-contrib
 thunar
 network-manager-applet
 

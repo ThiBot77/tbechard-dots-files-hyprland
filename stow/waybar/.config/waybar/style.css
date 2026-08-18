@@ -35,9 +35,11 @@ window#waybar {
 
 #window,
 #clock,
+#custom-updates,
 #cpu,
 #memory,
 #pulseaudio,
+#pulseaudio-microphone,
 #network,
 #tray,
 #custom-power {

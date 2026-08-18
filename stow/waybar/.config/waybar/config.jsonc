@@ -9,7 +9,7 @@
 
     "modules-left": ["hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["cpu", "memory", "pulseaudio", "pulseaudio#microphone", "network", "tray", "custom/power"],
+    "modules-right": ["custom/updates", "cpu", "memory", "pulseaudio", "pulseaudio#microphone", "network", "tray", "custom/power"],
 
     "hyprland/workspaces": {
         "format": "{icon}",
@@ -32,6 +32,15 @@
     "clock": {
         "format": "{:%H:%M   %a %d %b}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+
+    "custom/updates": {
+        "exec": "$HOME/.local/bin/check-updates.sh",
+        "return-type": "json",
+        "interval": 3600,
+        "format": "󰓽 {}",
+        "tooltip": true,
+        "on-click": "kitty --hold -e yay -Syu"
     },
 
     "cpu": {
