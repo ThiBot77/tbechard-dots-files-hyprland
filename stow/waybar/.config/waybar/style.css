@@ -38,9 +38,9 @@ window#waybar {
 #custom-updates,
 #cpu,
 #memory,
+#mpris,
 #pulseaudio,
 #pulseaudio-microphone,
-#network,
 #tray,
 #custom-power {
     color: #ffffff;
@@ -55,29 +55,22 @@ window#waybar {
     color: rgba(255, 255, 255, 0.4);
 }
 
+#custom-arch {
+    color: #ffffff;
+    font-size: 16px;
+    padding: 0 12px;
+    border-radius: 8px;
+}
+
+#custom-arch:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
 #custom-power {
     font-size: 15px;
     border-radius: 8px;
 }
 
 #custom-power:hover {
-    background: rgba(255, 255, 255, 0.15);
-}
-
-menu {
-    border-radius: 14px;
-    background: rgba(0, 0, 0, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: #ffffff;
-    padding: 6px;
-}
-
-menuitem {
-    border-radius: 8px;
-    padding: 6px 10px;
-    color: #ffffff;
-}
-
-menuitem:hover {
     background: rgba(255, 255, 255, 0.15);
 }
