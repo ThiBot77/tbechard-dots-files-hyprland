@@ -27,17 +27,23 @@ confirm() {
 }
 
 # Move an existing real file/dir out of the way before stow creates a symlink
-# there. Leaves already-correct symlinks alone. No-op if nothing exists.
+# there. Leaves already-correct symlinks alone (including files that are only
+# reachable *through* an already-symlinked ancestor directory — e.g. once
+# `~/.config/waybar` itself is a symlink into the repo, every file under it
+# resolves into $STOW_DIR even though the file itself isn't a symlink; back
+# it up anyway and you're moving the repo's own file out from under it).
+# No-op if nothing exists.
 backup_if_exists() {
     local target="$1"
     local backup_dir="$2"
 
-    if [[ -L "$target" ]]; then
-        # Already a symlink (likely from a previous run) — let stow handle it.
-        return 0
-    fi
+    if [[ -e "$target" || -L "$target" ]]; then
+        local resolved
+        resolved="$(readlink -f "$target" 2>/dev/null || true)"
+        if [[ -n "$resolved" && -n "${STOW_DIR:-}" && "$resolved" == "$STOW_DIR"/* ]]; then
+            return 0
+        fi
 
-    if [[ -e "$target" ]]; then
         local rel="${target#"$HOME"/}"
         local dest="$backup_dir/$rel"
         log_warn "backing up existing $target -> $dest"
