@@ -10,11 +10,13 @@ window {
 button {
     color: #ffffff;
     background-color: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     outline-style: none;
-    border: none;
     background-repeat: no-repeat;
     background-position: center;
     background-size: 22%;
+    border-radius: 24px;
+    margin: 24px 12px;
     box-shadow: none;
     text-shadow: none;
 }
@@ -22,48 +24,29 @@ button {
 button:focus,
 button:hover {
     background-color: rgba(255, 255, 255, 0.18);
-    background-size: 26%;
-    transition: all 0.2s cubic-bezier(.55, 0.0, .28, 1.682);
+    border-color: rgba(255, 255, 255, 0.4);
 }
 
 #lock {
     background-image: image(url("icons/lock.png"));
-    border-radius: 80px 0px 0px 80px;
-    margin: 40px 0px 40px 40px;
 }
 
 #logout {
     background-image: image(url("icons/logout.png"));
-    margin: 40px 0px 40px 0px;
 }
 
 #suspend {
     background-image: image(url("icons/suspend.png"));
-    margin: 40px 0px 40px 0px;
 }
 
 #hibernate {
     background-image: image(url("icons/hibernate.png"));
-    margin: 40px 0px 40px 0px;
 }
 
 #shutdown {
     background-image: image(url("icons/shutdown.png"));
-    margin: 40px 0px 40px 0px;
 }
 
 #reboot {
     background-image: image(url("icons/reboot.png"));
-    border-radius: 0px 80px 80px 0px;
-    margin: 40px 40px 40px 0px;
-}
-
-button:hover#lock,
-button:hover#logout,
-button:hover#suspend,
-button:hover#hibernate,
-button:hover#shutdown,
-button:hover#reboot {
-    border-radius: 50px;
-    margin: 20px;
 }
