@@ -23,6 +23,8 @@ qt5-wayland
 qt6-wayland
 jq
 awww
+swappy
+imagemagick
 thunar
 network-manager-applet
 
