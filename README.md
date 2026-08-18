@@ -43,6 +43,7 @@ stow/<package>/             un dossier par "package" GNU Stow, arbo miroir de $H
 | Terminal      | kitty                   |
 | Fichiers      | thunar                  |
 | Visualiseur   | cava                    |
+| Réseau        | networkmanager-dmenu    |
 | Wallpaper     | awww                    |
 | Power menu    | wlogout                 |
 

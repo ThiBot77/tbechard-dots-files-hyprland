@@ -27,6 +27,7 @@ swappy
 imagemagick
 thunar
 network-manager-applet
+networkmanager-dmenu
 
 # Everyday apps
 discord

@@ -60,7 +60,7 @@
         "format-ethernet": "󰈀  wired",
         "format-disconnected": "󰖪  offline",
         "tooltip-format": "{ifname} via {gwaddr}",
-        "on-click": "$HOME/.local/bin/network-menu.sh",
+        "on-click": "networkmanager_dmenu",
         "on-click-right": "nm-connection-editor"
     },
 
