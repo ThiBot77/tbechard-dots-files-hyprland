@@ -5,7 +5,7 @@ set -euo pipefail
 
 WALLPAPER_DIR="$HOME/.config/hypr/wallpapers"
 
-mapfile -t images < <(find "$WALLPAPER_DIR" -maxdepth 1 -type f \
+mapfile -t images < <(find -L "$WALLPAPER_DIR" -maxdepth 1 -type f \
     \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' \))
 
 if [[ ${#images[@]} -eq 0 ]]; then
