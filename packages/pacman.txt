@@ -22,6 +22,7 @@ qt6-wayland
 jq
 awww
 thunar
+network-manager-applet
 
 # Everyday apps
 discord

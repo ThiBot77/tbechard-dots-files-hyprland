@@ -41,17 +41,20 @@ stow/<package>/             un dossier par "package" GNU Stow, arbo miroir de $H
 | Notifications | mako                    |
 | Lock / idle   | hyprlock / hypridle     |
 | Terminal      | kitty                   |
+| Fichiers      | thunar                  |
 | Visualiseur   | cava                    |
+| Wallpaper     | awww                    |
 | Power menu    | wlogout                 |
 
 ## Raccourcis clavier principaux
 
 | Combo              | Action                          |
 |---------------------|----------------------------------|
-| `SUPER + T`          | Terminal (kitty)                |
-| `SUPER + R`          | Launcher (rofi)                 |
-| `SUPER + E`          | Fichiers (nautilus)             |
+| `SUPER + T` / `RETURN` | Terminal (kitty)              |
+| `SUPER + R` / `A`    | Launcher (rofi)                 |
+| `SUPER + E`          | Fichiers (thunar)                |
 | `SUPER + V`          | Toggle widget visualiseur cava  |
+| `SUPER + SHIFT + W`  | Wallpaper aléatoire suivant      |
 | `SUPER + L`          | Verrouiller l'écran             |
 | `SUPER + SHIFT + M`  | Menu power (wlogout)            |
 | `SUPER + Q`          | Fermer la fenêtre active        |
@@ -75,15 +78,15 @@ Voir `stow/hypr/.config/hypr/conf.d/keybinds.conf` pour la liste complète.
 stow -d stow -t ~ -R waybar
 ```
 
-## Ajouter un wallpaper
+## Wallpaper
 
-Par défaut Hyprland affiche un fond noir uni (cohérent avec le thème, pas
-d'image versionnée). Pour en ajouter un :
+`awww-daemon` est lancé au démarrage et applique un fond au hasard depuis
+`~/.config/hypr/wallpapers/` (package stow `wallpaper`, quelques fonds manga
+livrés en 2560x1440). `SUPER + SHIFT + W` en tire un nouveau au hasard.
+
+Pour ajouter les tiens :
 
 ```sh
-mkdir -p ~/.config/hypr/wallpapers
-cp mon-fond.png ~/.config/hypr/wallpapers/
+cp mon-fond.png stow/wallpaper/.config/hypr/wallpapers/
+stow -d stow -t ~ -R wallpaper
 ```
-
-puis installe `hyprpaper`, ajoute une config le pointant vers l'image, et un
-`exec-once = hyprpaper` dans `conf.d/env.conf`.

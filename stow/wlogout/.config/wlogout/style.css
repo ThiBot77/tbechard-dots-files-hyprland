@@ -1,0 +1,26 @@
+* {
+    background-image: none;
+    font-family: "FiraCode Nerd Font";
+}
+
+window {
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+button {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 25%;
+    margin: 10px;
+}
+
+button:focus,
+button:active,
+button:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+    border-color: #ffffff;
+}
