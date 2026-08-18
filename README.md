@@ -43,9 +43,9 @@ stow/<package>/             un dossier par "package" GNU Stow, arbo miroir de $H
 | Terminal      | kitty                   |
 | Fichiers      | thunar                  |
 | Visualiseur   | cava                    |
-| Réseau        | networkmanager-dmenu    |
+| Réseau        | nm-applet (icône tray)  |
 | Wallpaper     | awww                    |
-| Power menu    | wlogout                 |
+| Power menu    | menu natif waybar (clic droit) / wlogout (clavier) |
 
 ## Raccourcis clavier principaux
 

@@ -9,7 +9,7 @@
 
     "modules-left": ["hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["cpu", "memory", "pulseaudio", "custom/vpn", "network", "tray", "custom/power"],
+    "modules-right": ["cpu", "memory", "pulseaudio", "network", "tray", "custom/power"],
 
     "hyprland/workspaces": {
         "format": "{icon}",
@@ -65,23 +65,14 @@
         "on-click": "pavucontrol"
     },
 
-    "custom/vpn": {
-        "exec": "$HOME/.local/bin/vpn-status.sh",
-        "return-type": "json",
-        "interval": 5,
-        "on-click": "networkmanager_dmenu"
-    },
-
-    "network": {
+        "network": {
         "format-wifi": "",
         "format-ethernet": "󰈀",
         "format-linked": "󰈀 {ifname} (no IP)",
         "format-disconnected": "󰖪",
         "tooltip-format": "Network: {essid}\nSignal: {signalStrength}% ({signaldBm}dBm)\nInterface: {ifname}\nIP: {ipaddr}/{cidr}\nGateway: {gwaddr}",
         "tooltip-format-ethernet": "Interface: {ifname}\nIP: {ipaddr}/{cidr}\nGateway: {gwaddr}",
-        "tooltip-format-disconnected": "Disconnected",
-        "on-click": "networkmanager_dmenu",
-        "on-click-right": "nm-connection-editor"
+        "tooltip-format-disconnected": "Disconnected"
     },
 
     "tray": {
@@ -90,8 +81,20 @@
     },
 
     "custom/power": {
-        "format": "󰐥",
-        "tooltip-format": "Power menu",
-        "on-click": "wlogout"
+        "format": "⏻",
+        "tooltip": false,
+        "menu": "on-click-right",
+        "menu-file": "~/.config/waybar/menus/power.xml",
+        "menu-actions": {
+            "lock": "hyprlock",
+            "logout": "hyprctl dispatch exit 0",
+            "shutdown-now": "systemctl poweroff",
+            "shutdown-wait": "shutdown +1",
+            "reboot-now": "systemctl reboot",
+            "reboot-firmware": "systemctl reboot --firmware-setup",
+            "suspend": "systemctl suspend",
+            "hibernate": "systemctl hibernate"
+        }
     }
+
 }

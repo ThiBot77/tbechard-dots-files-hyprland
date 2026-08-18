@@ -38,16 +38,11 @@ window#waybar {
 #cpu,
 #memory,
 #pulseaudio,
-#custom-vpn,
 #network,
 #tray,
 #custom-power {
     color: #ffffff;
     padding: 0 10px;
-}
-
-#custom-vpn {
-    color: #cccccc;
 }
 
 #window {
@@ -64,5 +59,23 @@ window#waybar {
 }
 
 #custom-power:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+menu {
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    padding: 6px;
+}
+
+menuitem {
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: #ffffff;
+}
+
+menuitem:hover {
     background: rgba(255, 255, 255, 0.15);
 }
