@@ -9,6 +9,8 @@ plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
 
+PROMPT='%F{white}%B%n@%m%b%f '"$PROMPT"
+
 export PATH="$HOME/.local/bin:$PATH"
 
 alias ll="ls -lah"

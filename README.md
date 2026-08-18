@@ -54,7 +54,7 @@ stow/<package>/             un dossier par "package" GNU Stow, arbo miroir de $H
 | `SUPER + R` / `A`    | Launcher (rofi)                 |
 | `SUPER + E`          | Fichiers (thunar)                |
 | `SUPER + V`          | Toggle widget visualiseur cava  |
-| `SUPER + SHIFT + W`  | Wallpaper aléatoire suivant      |
+| `SUPER + SHIFT + W`  | Menu de sélection du wallpaper (rofi) |
 | `SUPER + L`          | Verrouiller l'écran             |
 | `SUPER + SHIFT + M`  | Menu power (wlogout)            |
 | `SUPER + Q`          | Fermer la fenêtre active        |
@@ -81,8 +81,9 @@ stow -d stow -t ~ -R waybar
 ## Wallpaper
 
 `awww-daemon` est lancé au démarrage et applique un fond au hasard depuis
-`~/.config/hypr/wallpapers/` (package stow `wallpaper`, quelques fonds manga
-livrés en 2560x1440). `SUPER + SHIFT + W` en tire un nouveau au hasard.
+`~/.config/hypr/wallpapers/` (package stow `wallpaper`, fonds manga +
+IT/pro livrés en 2560x1440). `SUPER + SHIFT + W` ouvre un menu rofi pour
+en choisir un précisément.
 
 Pour ajouter les tiens :
 
