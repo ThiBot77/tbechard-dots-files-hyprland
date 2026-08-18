@@ -9,7 +9,7 @@
 
     "modules-left": ["hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["cpu", "memory", "pulseaudio", "network", "tray", "custom/power"],
+    "modules-right": ["cpu", "memory", "pulseaudio", "pulseaudio#microphone", "network", "tray", "custom/power"],
 
     "hyprland/workspaces": {
         "format": "{icon}",
@@ -57,15 +57,38 @@
     },
 
     "pulseaudio": {
-        "format": "{icon}  {volume}%",
+        "format": "{icon} {volume}%",
         "format-muted": "󰖁",
+        "on-click": "pavucontrol",
+        "on-click-middle": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-",
+        "tooltip-format": "{icon} {desc} // {volume}%",
+        "scroll-step": 5,
         "format-icons": {
-            "default": "󰕾"
-        },
-        "on-click": "pavucontrol"
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        }
     },
 
-        "network": {
+    "pulseaudio#microphone": {
+        "format": "{format_source}",
+        "format-source": "󰍬",
+        "format-source-muted": "",
+        "on-click": "pavucontrol",
+        "on-click-middle": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
+        "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%+",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%-",
+        "tooltip-format": "{format_source} {source_desc} // {source_volume}%",
+        "scroll-step": 5
+    },
+
+    "network": {
         "format-wifi": "",
         "format-ethernet": "󰈀",
         "format-linked": "󰈀 {ifname} (no IP)",
