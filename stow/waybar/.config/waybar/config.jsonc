@@ -9,7 +9,7 @@
 
     "modules-left": ["custom/arch", "hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["custom/updates", "cpu", "memory", "battery", "mpris", "pulseaudio", "pulseaudio#microphone", "tray", "custom/power"],
+    "modules-right": ["custom/updates", "cpu", "memory", "battery", "bluetooth", "mpris", "pulseaudio", "pulseaudio#microphone", "tray", "custom/power"],
 
     "custom/arch": {
         "format": "",
@@ -82,6 +82,20 @@
         "format-critical": "󰂎 {capacity}%",
         "format-full": "󰁹 Full",
         "tooltip-format": "{time} remaining"
+    },
+
+    "bluetooth": {
+        "format": "󰂯",
+        "format-disabled": "",
+        "format-off": "",
+        "format-connected": " {num_connections}",
+        "format-connected-battery": " {num_connections}",
+        "format-icons": ["󰥇", "󰤾", "󰤿", "󰥀", "󰥁", "󰥂", "󰥃", "󰥄", "󰥅", "󰥆", "󰥈"],
+        "tooltip-format": "{controller_alias}\n{num_connections} connected",
+        "tooltip-format-connected": "{controller_alias}\n{num_connections} connected\n\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}",
+        "tooltip-format-enumerate-connected-battery": "{device_alias}\t{icon} {device_battery_percentage}%",
+        "on-click": "blueman-manager"
     },
 
     "mpris": {

@@ -41,6 +41,7 @@ window#waybar {
 #cpu,
 #memory,
 #battery,
+#bluetooth,
 #mpris,
 #pulseaudio,
 #pulseaudio-microphone,

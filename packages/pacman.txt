@@ -29,6 +29,7 @@ imagemagick
 pacman-contrib
 thunar
 network-manager-applet
+blueman
 
 # Everyday apps
 discord

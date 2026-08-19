@@ -28,14 +28,7 @@ fi
 cat <<'EOF'
 
 ==================================================================
- Hyprland is installed alongside GNOME.
-
- - Log out, and on the GDM login screen pick the "Hyprland"
-   session from the gear/session menu next to the password field.
- - GNOME remains the default and untouched.
- - Toggle the cava audio visualizer widget with SUPER + V.
- - Open the launcher with SUPER + R, lock the screen with
-   SUPER + L.
+ Hyprland is installed
 
  See README.md for the full keybind list and how to restow a
  single package after editing it.

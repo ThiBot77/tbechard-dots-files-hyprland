@@ -18,8 +18,6 @@ if ! command -v stow >/dev/null 2>&1; then
     fi
 fi
 
-# Back up every real (non-symlink) file/dir that a package would overwrite,
-# so stow can lay its symlinks down cleanly. Safe to re-run.
 backup_package_targets() {
     local package="$1"
     local package_dir="$STOW_DIR/$package"

@@ -10,7 +10,6 @@ log_warn()  { echo "$(_color 33 '[warn]')  $*"; }
 log_error() { echo "$(_color 31 '[error]') $*" >&2; }
 log_step()  { echo; echo "$(_color 35 '==>') $(_color 1 "$*")"; }
 
-# Run a command, or just print it under --dry-run.
 run() {
     if [[ "$DRY_RUN" == "1" ]]; then
         echo "  $ $*"
@@ -26,13 +25,6 @@ confirm() {
     [[ "$reply" =~ ^[Yy]$ ]]
 }
 
-# Move an existing real file/dir out of the way before stow creates a symlink
-# there. Leaves already-correct symlinks alone (including files that are only
-# reachable *through* an already-symlinked ancestor directory — e.g. once
-# `~/.config/waybar` itself is a symlink into the repo, every file under it
-# resolves into $STOW_DIR even though the file itself isn't a symlink; back
-# it up anyway and you're moving the repo's own file out from under it).
-# No-op if nothing exists.
 backup_if_exists() {
     local target="$1"
     local backup_dir="$2"
