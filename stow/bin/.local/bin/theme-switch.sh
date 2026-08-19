@@ -36,6 +36,7 @@ cat > "$HOME/.config/hypr/colors.conf" <<EOF
 \$accent = rgba(${ACCENT}ee)
 \$accent_dim = rgba(${ACCENT_DIM}ee)
 \$border_inactive = rgba(${BORDER}aa)
+\$bg_hex = 0x$BG
 EOF
 
 # --- waybar ----------------------------------------------------------------

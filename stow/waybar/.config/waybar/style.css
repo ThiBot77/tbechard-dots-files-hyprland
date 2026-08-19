@@ -27,7 +27,9 @@ window#waybar {
 }
 
 #workspaces button.active {
-    color: @accent;
+    color: @bg;
+    background: @accent;
+    padding: 0 12px;
 }
 
 #workspaces button:hover {
@@ -41,6 +43,7 @@ window#waybar {
 #memory,
 #battery,
 #bluetooth,
+#idle_inhibitor,
 #mpris,
 #pulseaudio,
 #custom-notifications,

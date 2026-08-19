@@ -9,7 +9,7 @@
 
     "modules-left": ["custom/arch", "hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["custom/updates", "cpu", "memory", "battery", "mpris", "pulseaudio", "bluetooth", "tray", "custom/notifications", "custom/power"],
+    "modules-right": ["custom/updates", "cpu", "memory", "battery", "mpris", "pulseaudio", "idle_inhibitor", "bluetooth", "tray", "custom/notifications", "custom/power"],
 
     "custom/arch": {
         "format": "",
@@ -82,6 +82,16 @@
         "format-critical": "󰂎 {capacity}%",
         "format-full": "󰁹 Full",
         "tooltip-format": "{time} remaining"
+    },
+
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "󰅶",
+            "deactivated": "󰒲"
+        },
+        "tooltip-format-activated": "Veille bloquée — clic pour réactiver",
+        "tooltip-format-deactivated": "Veille active — clic pour bloquer"
     },
 
     "bluetooth": {
