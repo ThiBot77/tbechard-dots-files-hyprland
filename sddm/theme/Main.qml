@@ -148,19 +148,26 @@ Rectangle {
             font.pixelSize: 14
             text: ""
         }
-    }
 
-    // --- bas: session + alimentation ---------------------------------------
-    Row {
-        anchors.bottom: parent.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottomMargin: 32
-        spacing: 20
+        Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: 320
+            horizontalAlignment: Text.AlignLeft
+            color: config.foregroundDim
+            font.family: config.font
+            font.pixelSize: 13
+            text: textConstants.session
+        }
 
+        // Kept in the centre column, not down with the power buttons:
+        // SddmComponents.ComboBox anchors its dropdown to its own bottom edge
+        // with no way to flip it, so near the screen edge the list opened
+        // off-screen and the sessions were unreachable.
         ComboBox {
             id: sessionBox
-            width: 240
-            height: 36
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: 320
+            height: 40
             model: sessionModel
             index: sessionModel.lastIndex
             color: config.surface
@@ -174,6 +181,14 @@ Rectangle {
             font.family: config.font
             font.pixelSize: 14
         }
+    }
+
+    // --- bas: alimentation --------------------------------------------------
+    Row {
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottomMargin: 32
+        spacing: 20
 
         // Hand-rolled instead of SddmComponents.Button: that one exposes no
         // radius, so its corners can't be rounded.
