@@ -38,7 +38,7 @@ stow/<package>/             un dossier par "package" GNU Stow, arbo miroir de $H
 | Compositor    | Hyprland                |
 | Barre         | waybar                  |
 | Launcher      | rofi                    |
-| Notifications | mako                    |
+| Notifications | swaync (centre + historique) |
 | Lock / idle   | hyprlock / hypridle     |
 | Terminal      | kitty                   |
 | Fichiers      | thunar                  |
@@ -59,6 +59,7 @@ stow/<package>/             un dossier par "package" GNU Stow, arbo miroir de $H
 | `SUPER + SHIFT + T`  | Menu de sélection de la palette de couleur |
 | `SUPER + L`          | Verrouiller l'écran             |
 | `SUPER + SHIFT + M`  | Menu power (wlogout)            |
+| `SUPER + N`          | Centre de notifications (swaync) |
 | `SUPER + Q`          | Fermer la fenêtre active        |
 | `SUPER + 1..0`       | Aller au workspace N             |
 | `SUPER + SHIFT + 1..0` | Envoyer la fenêtre au workspace N |
@@ -86,7 +87,7 @@ stow -d stow -t ~ -R waybar
 
 `SUPER + SHIFT + T` ouvre un menu rofi pour changer de thème. Toutes les
 couleurs changent : fond, texte, accent et palette du terminal, dans
-Hyprland, hyprlock, waybar, rofi, mako, kitty, cava, les applis GTK
+Hyprland, hyprlock, waybar, rofi, swaync, kitty, cava, les applis GTK
 (Thunar…) et les applis Qt.
 
 Thèmes livrés dans `themes/` :
@@ -108,7 +109,7 @@ appli puis recharge tout à chaud :
 | Hyprland + hyprlock | `~/.config/hypr/colors.conf` |
 | waybar   | `~/.config/waybar/colors.css`          |
 | rofi     | `~/.config/rofi/colors.rasi`           |
-| mako     | `~/.config/mako/colors`                |
+| swaync   | `~/.config/swaync/colors.css`          |
 | kitty    | `~/.config/kitty/theme.conf`           |
 | cava     | `~/.config/cava/themes/current`        |
 | GTK 3/4  | `~/.config/gtk-{3,4}.0/gtk.css`        |
@@ -117,7 +118,7 @@ appli puis recharge tout à chaud :
 Les configs des applis ne contiennent aucune couleur en dur : elles
 importent seulement ces fichiers générés.
 
-Rechargement à chaud pour Hyprland, waybar, mako et kitty. Les applis
+Rechargement à chaud pour Hyprland, waybar, swaync et kitty. Les applis
 GTK/Qt déjà ouvertes doivent être relancées ; un widget cava ouvert
 garde ses couleurs jusqu'à réouverture (`SUPER + V` deux fois) ou la
 touche `c`.
@@ -127,7 +128,7 @@ Pour créer un thème : copie un dossier existant, change les valeurs de
 
 ## Polices
 
-- **Interface** (waybar, rofi, mako, hyprlock) : `Adwaita Sans`, une
+- **Interface** (waybar, rofi, swaync, hyprlock) : `Adwaita Sans`, une
   sans-serif — plus lisible qu'une chasse fixe pour de l'UI.
 - **Terminal** (kitty) et visualiseur : `FiraCode Nerd Font`.
 

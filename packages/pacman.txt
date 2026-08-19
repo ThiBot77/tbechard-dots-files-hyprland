@@ -9,7 +9,7 @@ hyprpolkitagent
 hypridle
 hyprlock
 waybar
-mako
+swaync
 rofi
 cava
 

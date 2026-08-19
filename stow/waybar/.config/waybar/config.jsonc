@@ -9,7 +9,7 @@
 
     "modules-left": ["custom/arch", "hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["custom/updates", "cpu", "memory", "battery", "bluetooth", "mpris", "pulseaudio", "pulseaudio#microphone", "tray", "custom/power"],
+    "modules-right": ["custom/updates", "cpu", "memory", "battery", "bluetooth", "mpris", "pulseaudio", "pulseaudio#microphone", "custom/notifications", "tray", "custom/power"],
 
     "custom/arch": {
         "format": "",
@@ -160,6 +160,27 @@
         "tray": {
         "icon-size": 16,
         "spacing": 10
+    },
+
+    "custom/notifications": {
+        "exec": "swaync-client -swb",
+        "return-type": "json",
+        "escape": true,
+        "exec-if": "which swaync-client",
+        "format": "{icon}",
+        "format-icons": {
+            "notification": "󰾄",
+            "none": "󰃲",
+            "dnd-notification": "󰃷",
+            "dnd-none": "󰃷",
+            "inhibited-notification": "󰾄",
+            "inhibited-none": "󰃲",
+            "dnd-inhibited-notification": "󰃷",
+            "dnd-inhibited-none": "󰃷"
+        },
+        "tooltip": true,
+        "on-click": "swaync-client -t -sw",
+        "on-click-right": "swaync-client -d -sw"
     },
 
     "custom/power": {

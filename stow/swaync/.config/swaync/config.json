@@ -1,0 +1,52 @@
+{
+    "$schema": "https://raw.githubusercontent.com/ErikReider/SwayNotificationCenter/main/src/configSchema.json",
+    "positionX": "right",
+    "positionY": "top",
+    "layer": "overlay",
+    "control-center-layer": "overlay",
+    "cssPriority": "user",
+    "ignore-gtk-theme": true,
+    "control-center-width": 420,
+    "control-center-height": 600,
+    "control-center-margin-top": 8,
+    "control-center-margin-bottom": 8,
+    "control-center-margin-right": 8,
+    "control-center-margin-left": 0,
+    "notification-window-width": 400,
+    "notification-icon-size": 48,
+    "notification-body-image-height": 160,
+    "notification-body-image-width": 200,
+    "timeout": 6,
+    "timeout-low": 4,
+    "timeout-critical": 0,
+    "keyboard-shortcuts": true,
+    "image-visibility": "when-available",
+    "transition-time": 200,
+    "hide-on-clear": true,
+    "hide-on-action": true,
+    "widgets": [
+        "title",
+        "dnd",
+        "mpris",
+        "volume",
+        "notifications"
+    ],
+    "widget-config": {
+        "title": {
+            "text": "Notifications",
+            "clear-all-button": true,
+            "button-text": "Tout effacer"
+        },
+        "dnd": {
+            "text": "Ne pas déranger"
+        },
+        "mpris": {
+            "image-size": 88,
+            "image-radius": 10
+        },
+        "volume": {
+            "label": "󰕾",
+            "show-per-app": true
+        }
+    }
+}

@@ -44,6 +44,7 @@ window#waybar {
 #mpris,
 #pulseaudio,
 #pulseaudio-microphone,
+#custom-notifications,
 #tray,
 #custom-power {
     color: @fg;
