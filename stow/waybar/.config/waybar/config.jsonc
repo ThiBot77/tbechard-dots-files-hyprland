@@ -86,8 +86,8 @@
 
     "bluetooth": {
         "format": "󰂯",
-        "format-disabled": "",
-        "format-off": "",
+        "format-disabled": "󰂲",
+        "format-off": "󰂲",
         "format-connected": " {num_connections}",
         "format-connected-battery": " {num_connections}",
         "format-icons": ["󰥇", "󰤾", "󰤿", "󰥀", "󰥁", "󰥂", "󰥃", "󰥄", "󰥅", "󰥆", "󰥈"],

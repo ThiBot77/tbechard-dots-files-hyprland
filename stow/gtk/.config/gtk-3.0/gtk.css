@@ -7,3 +7,91 @@
 @define-color theme_selected_fg_color #000000;
 @define-color insensitive_fg_color #808080;
 @define-color borders #2a2a2a;
+
+window, dialog, .background, .view, notebook, paned {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+headerbar, .titlebar, toolbar, .toolbar, actionbar {
+    background-color: #1a1a1a;
+    background-image: none;
+    color: #ffffff;
+    border-color: #2a2a2a;
+}
+
+.sidebar, placessidebar, placessidebar list, stacksidebar {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+
+treeview.view, list, list row {
+    background-color: transparent;
+    color: #ffffff;
+}
+
+treeview.view:selected, list row:selected, .view:selected,
+placessidebar row:selected, menuitem:hover, .menuitem:hover {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+entry, spinbutton, searchbar entry {
+    background-color: #1a1a1a;
+    background-image: none;
+    color: #ffffff;
+    border-color: #2a2a2a;
+    caret-color: #ffffff;
+}
+
+button, button.flat:hover {
+    background-color: #1a1a1a;
+    background-image: none;
+    color: #ffffff;
+    border-color: #2a2a2a;
+    text-shadow: none;
+}
+
+button:hover {
+    background-color: #2a2a2a;
+}
+
+button:checked, button:active {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+menu, popover, popover.background, .popup, .menu, .context-menu {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    border: 1px solid #2a2a2a;
+}
+
+scrollbar, scrollbar trough {
+    background-color: #000000;
+    border: none;
+}
+
+scrollbar slider {
+    background-color: #808080;
+}
+
+scrollbar slider:hover {
+    background-color: #ffffff;
+}
+
+label, .dim-label {
+    color: #ffffff;
+}
+
+.dim-label, label.dim-label {
+    color: #808080;
+}
+
+separator {
+    background-color: #2a2a2a;
+}
+
+progressbar progress, levelbar block.filled {
+    background-color: #ffffff;
+}
