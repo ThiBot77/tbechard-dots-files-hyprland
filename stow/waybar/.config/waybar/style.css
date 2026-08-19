@@ -7,18 +7,18 @@
 }
 
 window#waybar {
-    background: rgba(0, 0, 0, 0.85);
+    background: alpha(@bg, 0.85);
 }
 
 #waybar > box {
     background: transparent;
     border-radius: 0;
     padding: 0 12px;
-    color: #ffffff;
+    color: @fg;
 }
 
 #workspaces button {
-    color: rgba(255, 255, 255, 0.5);
+    color: @fg_dim;
     padding: 0 6px;
     margin: 4px 2px;
     border-radius: 8px;
@@ -46,16 +46,21 @@ window#waybar {
 #pulseaudio-microphone,
 #tray,
 #custom-power {
-    color: #ffffff;
+    color: @fg;
     padding: 0 10px;
 }
 
 #window {
-    color: rgba(255, 255, 255, 0.7);
+    color: @fg_dim;
 }
 
 #pulseaudio.muted {
-    color: rgba(255, 255, 255, 0.4);
+    color: @fg_dim;
+}
+
+#battery.warning,
+#battery.critical {
+    color: @accent;
 }
 
 #custom-arch {

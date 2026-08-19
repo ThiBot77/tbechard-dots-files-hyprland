@@ -1,11 +1,6 @@
 @import "colors"
 
 * {
-    bg:      rgba(0, 0, 0, 65%);
-    bg-alt:  rgba(255, 255, 255, 10%);
-    fg:      #ffffff;
-    fg-dim:  rgba(255, 255, 255, 55%);
-
     background-color: transparent;
     text-color: @fg;
 }
@@ -14,7 +9,7 @@ window {
     width: 32%;
     background-color: @bg;
     border: 1px;
-    border-color: rgba(255, 255, 255, 15%);
+    border-color: @accent;
     border-radius: 16px;
     padding: 12px;
 }
@@ -54,7 +49,7 @@ element {
 
 element selected {
     background-color: @accent;
-    text-color: #000000;
+    text-color: @bg;
 }
 
 element-icon {
