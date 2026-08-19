@@ -44,7 +44,7 @@
         "exec": "$HOME/.local/bin/check-updates.sh",
         "return-type": "json",
         "interval": 3600,
-        "format": "󰓽 {}",
+        "format": "{}",
         "tooltip": true,
         "on-click": "kitty --hold -e yay -Syu"
     },
@@ -126,7 +126,7 @@
     },
 
     "pulseaudio": {
-        "format": "{icon} {volume}%",
+        "format": "{icon}   {volume}%",
         "format-muted": "󰖁",
         "on-click": "pavucontrol",
         "on-click-middle": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
