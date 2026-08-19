@@ -8,8 +8,8 @@
     "spacing": 4,
 
     "modules-left": ["custom/arch", "hyprland/workspaces", "hyprland/window"],
-    "modules-center": ["clock"],
-    "modules-right": ["custom/updates", "cpu", "memory", "battery", "mpris", "pulseaudio", "idle_inhibitor", "bluetooth", "tray", "custom/notifications", "custom/power"],
+    "modules-center": ["clock", "custom/weather"],
+    "modules-right": ["custom/updates", "cpu", "memory", "user", "battery", "mpris", "pulseaudio", "idle_inhibitor", "bluetooth", "tray", "custom/notifications", "custom/power"],
 
     "custom/arch": {
         "format": "",
@@ -37,7 +37,22 @@
 
     "clock": {
         "format": "{:%H:%M   %a %d %b}",
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "on-click": "gsimplecal"
+    },
+
+    "custom/weather": {
+        "exec": "wttrbar --nerd --lang fr",
+        "return-type": "json",
+        "interval": 1800,
+        "format": "{}",
+        "tooltip": true
+    },
+
+    "user": {
+        "interval": 60,
+        "format": " {work_H}:{work_M}",
+        "tooltip-format": "Uptime: {work_H}h {work_M}m {work_S}s"
     },
 
     "custom/updates": {

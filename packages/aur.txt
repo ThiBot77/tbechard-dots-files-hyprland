@@ -1,6 +1,7 @@
 # AUR packages, one per line. Installed with: yay -S --needed
 wlogout
 tela-icon-theme-git
+wttrbar
 
 # Everyday apps
 spotify
