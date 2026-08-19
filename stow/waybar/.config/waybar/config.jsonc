@@ -9,7 +9,7 @@
 
     "modules-left": ["custom/arch", "hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["custom/updates", "cpu", "memory", "battery", "bluetooth", "mpris", "pulseaudio", "pulseaudio#microphone", "custom/notifications", "tray", "custom/power"],
+    "modules-right": ["custom/updates", "cpu", "memory", "battery", "mpris", "pulseaudio", "bluetooth", "tray", "custom/notifications", "custom/power"],
 
     "custom/arch": {
         "format": "",
@@ -143,18 +143,6 @@
             "car": "",
             "default": ["", "", ""]
         }
-    },
-
-    "pulseaudio#microphone": {
-        "format": "{format_source}",
-        "format-source": "󰍬",
-        "format-source-muted": "",
-        "on-click": "pavucontrol",
-        "on-click-middle": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
-        "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%+",
-        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%-",
-        "tooltip-format": "{format_source} {source_desc} // {source_volume}%",
-        "scroll-step": 5
     },
 
         "tray": {
