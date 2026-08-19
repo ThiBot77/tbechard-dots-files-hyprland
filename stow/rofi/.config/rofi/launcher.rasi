@@ -13,9 +13,9 @@
 configuration {
     modi:                "drun,run,window";
     show-icons:          true;
-    display-drun:        " ";
-    display-run:         " ";
-    display-window:      " ";
+    display-drun:        " ";
+    display-run:         " ";
+    display-window:      " ";
     drun-display-format: "{name}";
     window-format:       "{w}{t}";
     font:                "Adwaita Sans 11";
@@ -72,6 +72,7 @@ button {
     border-radius:       2em;
     background-color:    @bg;
     text-color:          @fg;
+    font:                "FiraCode Nerd Font 14";
 }
 
 button selected {
