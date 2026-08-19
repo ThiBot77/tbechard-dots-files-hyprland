@@ -6,7 +6,7 @@ configuration {
     display-run: "Run";
     display-window: "Windows";
     drun-display-format: "{name}";
-    font: "FiraCode Nerd Font 12";
+    font: "Adwaita Sans 12";
 }
 
 @theme "theme"

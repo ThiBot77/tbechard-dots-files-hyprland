@@ -45,7 +45,7 @@ stow/<package>/             un dossier par "package" GNU Stow, arbo miroir de $H
 | Visualiseur   | cava                    |
 | Réseau        | nm-applet (icône tray)  |
 | Wallpaper     | awww                    |
-| Power menu    | menu natif waybar (clic droit) / wlogout (clavier) |
+| Power menu    | wlogout (bouton barre ou `SUPER+SHIFT+M`) |
 
 ## Raccourcis clavier principaux
 
@@ -89,8 +89,13 @@ couleurs changent : fond, texte, accent et palette du terminal, dans
 Hyprland, hyprlock, waybar, rofi, mako, kitty, cava, les applis GTK
 (Thunar…) et les applis Qt.
 
-Thèmes livrés dans `themes/` : `mono` (noir & blanc, défaut) et
-`cyberpunk` (violet profond, accent rose néon, secondaire cyan).
+Thèmes livrés dans `themes/` :
+
+| Thème | Look |
+|-------|------|
+| `mono` | noir & blanc, défaut |
+| `graphite` | ardoise sombre, accent bleu acier désaturé — sobre / pro |
+| `cyberpunk` | violet profond, accent rose néon, secondaire cyan |
 
 Chaque thème est **un seul fichier**, `themes/<nom>/palette.sh`, qui
 définit les couleurs de base (`BG`, `BG_ALT`, `FG`, `FG_DIM`, `ACCENT`,
@@ -119,6 +124,16 @@ touche `c`.
 
 Pour créer un thème : copie un dossier existant, change les valeurs de
 `palette.sh`, c'est tout.
+
+## Polices
+
+- **Interface** (waybar, rofi, mako, hyprlock) : `Adwaita Sans`, une
+  sans-serif — plus lisible qu'une chasse fixe pour de l'UI.
+- **Terminal** (kitty) et visualiseur : `FiraCode Nerd Font`.
+
+Les icônes de la barre et des menus sont des glyphes Nerd Font : elles
+restent affichées grâce au fallback fontconfig, qui les résout vers
+FiraCode même quand la police principale est Adwaita Sans.
 
 ## Wallpaper
 

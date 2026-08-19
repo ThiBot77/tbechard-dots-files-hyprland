@@ -1,7 +1,7 @@
 @import url("colors.css");
 
 * {
-    font-family: "FiraCode Nerd Font", monospace;
+    font-family: "Adwaita Sans", "FiraCode Nerd Font", sans-serif;
     font-size: 13px;
     min-height: 0;
 }
