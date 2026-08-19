@@ -1,4 +1,4 @@
-fastfetch
+fastfetch --color "$(cat ~/.config/fastfetch/accent 2>/dev/null || echo white)"
 
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"

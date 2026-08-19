@@ -82,3 +82,17 @@ window#waybar {
 #custom-power:hover {
     background: alpha(@accent, 0.2);
 }
+
+/* Tooltips: cpu, memory, mpris, bluetooth and the updates module all put
+   real content in here, so they shouldn't fall back to the default GTK look. */
+tooltip {
+    background: alpha(@bg, 0.96);
+    border: 1px solid @border;
+    border-radius: 10px;
+    padding: 4px;
+}
+
+tooltip label {
+    color: @fg;
+    padding: 4px 6px;
+}

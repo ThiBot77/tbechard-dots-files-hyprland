@@ -7,6 +7,26 @@ log_step "Post-install"
 
 run chmod +x "$HOME/.local/bin/toggle-cava-widget.sh" "$HOME/.local/bin/set-wallpaper.sh"
 
+# monitors.conf / workspaces.conf are machine-local (written by nwg-displays,
+# SUPER+SHIFT+D). Hyprland errors on a missing `source`, so seed them once with
+# a catch-all that works on any screen setup.
+if [[ ! -f "$HOME/.config/hypr/monitors.conf" ]]; then
+    log_info "Seeding ~/.config/hypr/monitors.conf (edit with nwg-displays)"
+    run mkdir -p "$HOME/.config/hypr"
+    if [[ "$DRY_RUN" != "1" ]]; then
+        printf '# Written by nwg-displays (SUPER+SHIFT+D). Machine-local.\nmonitor = , preferred, auto, 1\n' \
+            > "$HOME/.config/hypr/monitors.conf"
+    fi
+fi
+
+if [[ ! -f "$HOME/.config/hypr/workspaces.conf" ]]; then
+    log_info "Seeding ~/.config/hypr/workspaces.conf (edit with nwg-displays)"
+    if [[ "$DRY_RUN" != "1" ]]; then
+        printf '# Written by nwg-displays (SUPER+SHIFT+D). Machine-local.\n' \
+            > "$HOME/.config/hypr/workspaces.conf"
+    fi
+fi
+
 run fc-cache -f
 
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then

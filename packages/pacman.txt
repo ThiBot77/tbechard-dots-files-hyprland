@@ -30,6 +30,7 @@ pacman-contrib
 thunar
 network-manager-applet
 blueman
+nwg-displays
 qt5ct
 qt6ct
 tumbler

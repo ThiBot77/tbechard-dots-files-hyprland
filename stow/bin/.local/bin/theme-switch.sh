@@ -47,6 +47,7 @@ cat > "$HOME/.config/waybar/colors.css" <<EOF
 @define-color fg_dim #$FG_DIM;
 @define-color accent #$ACCENT;
 @define-color accent_dim #$ACCENT_DIM;
+@define-color border #$BORDER;
 EOF
 
 # --- rofi ------------------------------------------------------------------
@@ -101,6 +102,10 @@ color14 #$T_BR_CYAN
 color7  #$T_WHITE
 color15 #$T_BR_WHITE
 EOF
+
+# --- fastfetch --------------------------------------------------------------
+# fastfetch has no include; .zshrc passes this file's contents to --color.
+printf '#%s\n' "$ACCENT" > "$HOME/.config/fastfetch/accent"
 
 # --- cava ------------------------------------------------------------------
 # cava has no include, but its config takes `theme = '<name>'`, loaded from
@@ -277,7 +282,9 @@ done
 # --- reload running apps ---------------------------------------------------
 hyprctl reload >/dev/null 2>&1 || true
 pkill -SIGUSR2 waybar 2>/dev/null || true
-swaync-client --reload-css >/dev/null 2>&1 || true
+# -sw (skip-wait): without it the client blocks forever when the swaync
+# daemon isn't running.
+swaync-client --reload-css -sw >/dev/null 2>&1 || true
 # Live-reload every running kitty instance (kitty's own
 # reload_conf_in_all_kitties() uses SIGUSR1).
 pkill -SIGUSR1 kitty 2>/dev/null || true
