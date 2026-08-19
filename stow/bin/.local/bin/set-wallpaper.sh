@@ -14,4 +14,4 @@ if [[ ${#images[@]} -eq 0 ]]; then
 fi
 
 pick="${images[RANDOM % ${#images[@]}]}"
-awww img "$pick"
+"$HOME/.local/bin/apply-wallpaper.sh" "$pick"

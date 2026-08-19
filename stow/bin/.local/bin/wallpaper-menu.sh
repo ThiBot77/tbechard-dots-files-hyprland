@@ -35,5 +35,5 @@ grid_theme="window {width: 60%; height: 65%;} listview {columns: $columns; spaci
 chosen="$(printf '%b' "$menu" | rofi -dmenu -i -show-icons -p "Wallpaper" -theme-str "$grid_theme")"
 
 if [[ -n "$chosen" ]]; then
-    awww img "$WALLPAPER_DIR/$chosen"
+    "$HOME/.local/bin/apply-wallpaper.sh" "$WALLPAPER_DIR/$chosen"
 fi
