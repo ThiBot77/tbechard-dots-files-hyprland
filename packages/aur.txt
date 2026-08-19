@@ -7,3 +7,4 @@ spotify
 google-chrome
 zen-browser-bin
 visual-studio-code-bin
+forticlient-vpn
