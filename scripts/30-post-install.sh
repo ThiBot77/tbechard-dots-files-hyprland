@@ -7,9 +7,6 @@ log_step "Post-install"
 
 run chmod +x "$HOME/.local/bin/toggle-cava-widget.sh" "$HOME/.local/bin/set-wallpaper.sh"
 
-# monitors.conf / workspaces.conf are machine-local (written by nwg-displays,
-# SUPER+SHIFT+D). Hyprland errors on a missing `source`, so seed them once with
-# a catch-all that works on any screen setup.
 if [[ ! -f "$HOME/.config/hypr/monitors.conf" ]]; then
     log_info "Seeding ~/.config/hypr/monitors.conf (edit with nwg-displays)"
     run mkdir -p "$HOME/.config/hypr"
@@ -48,11 +45,9 @@ fi
 cat <<'EOF'
 
 ==================================================================
- Hyprland is installed alongside GNOME.
+ Hyprland is installed. SDDM (scripts/40-sddm.sh) is the display
+ manager — log in and pick the "Hyprland" session if prompted.
 
- - Log out, and on the GDM login screen pick the "Hyprland"
-   session from the gear/session menu next to the password field.
- - GNOME remains the default and untouched.
  - Toggle the cava audio visualizer widget with SUPER + V.
  - Open the launcher with SUPER + R, lock the screen with
    SUPER + L.

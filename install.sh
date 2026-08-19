@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-# Entry point: installs Hyprland + this rice alongside the existing GNOME
-# session, then symlinks all dotfiles in place with GNU Stow.
-#
-# Usage: ./install.sh [--dry-run]
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 

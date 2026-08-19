@@ -6,7 +6,6 @@ source "$SCRIPT_DIR/lib/common.sh"
 
 log_step "Installing packages"
 
-# Strip comments/blank lines from a package list file.
 read_list() {
     grep -vE '^\s*(#|$)' "$1"
 }

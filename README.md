@@ -1,11 +1,9 @@
 # tbe-dots-files
 
-Dotfiles + install script pour ajouter **Hyprland** à côté d'une session **GNOME**
-existante sur Arch Linux, avec un rice noir & blanc / glassmorphism, et un
-visualiseur audio `cava` en widget toggleable.
-
-GNOME n'est ni modifié ni supprimé : Hyprland est installé en plus, sélectionnable
-au login depuis GDM.
+Dotfiles + install script pour une session **Hyprland** sur Arch Linux, avec un
+rice noir & blanc / glassmorphism, et un visualiseur audio `cava` en widget
+toggleable. SDDM (thème custom, voir `scripts/40-sddm.sh`) est le display
+manager.
 
 ## Installation
 
@@ -75,9 +73,8 @@ Voir `stow/hypr/.config/hypr/conf.d/keybinds.conf` pour la liste complète.
 ## Après l'install
 
 1. Se déconnecter.
-2. Sur l'écran GDM, choisir la session **Hyprland** (icône engrenage à côté du
-   champ mot de passe).
-3. GNOME reste le choix par défaut si tu ne changes rien.
+2. Sur l'écran SDDM, choisir la session **Hyprland** si elle n'est pas déjà
+   présélectionnée.
 
 ## Modifier / re-stow un seul package
 
