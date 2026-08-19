@@ -5,8 +5,6 @@ source "$SCRIPT_DIR/lib/common.sh"
 
 log_step "Post-install"
 
-run chmod +x "$HOME/.local/bin/toggle-cava-widget.sh" "$HOME/.local/bin/set-wallpaper.sh"
-
 if [[ ! -f "$HOME/.config/hypr/monitors.conf" ]]; then
     log_info "Seeding ~/.config/hypr/monitors.conf (edit with nwg-displays)"
     run mkdir -p "$HOME/.config/hypr"

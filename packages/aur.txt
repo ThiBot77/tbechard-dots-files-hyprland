@@ -2,6 +2,7 @@
 wlogout
 tela-icon-theme-git
 wttrbar
+bibata-cursor-theme-bin
 
 # Everyday apps
 spotify

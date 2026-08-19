@@ -44,6 +44,11 @@ stow/<package>/             un dossier par "package" GNU Stow, arbo miroir de $H
 | Réseau        | nm-applet (icône tray)  |
 | Wallpaper     | awww                    |
 | Power menu    | wlogout (bouton barre ou `SUPER+SHIFT+M`) |
+| Calendrier    | gsimplecal (clic sur l'heure) |
+| Météo         | wttrbar (barre, à côté de l'heure) |
+| OSD volume/luminosité | swayosd            |
+| Presse-papiers | cliphist (`SUPER+SHIFT+V`) |
+| Screen recording | wf-recorder (`SUPER+SHIFT+R`) |
 
 ## Raccourcis clavier principaux
 
@@ -61,6 +66,8 @@ stow/<package>/             un dossier par "package" GNU Stow, arbo miroir de $H
 | `SUPER + S`          | Terminal scratchpad (afficher/masquer) |
 | `SUPER + SHIFT + S`  | Envoyer la fenêtre au scratchpad |
 | `SUPER + SHIFT + D`  | Config des écrans (nwg-displays) |
+| `SUPER + SHIFT + R`  | Toggle enregistrement d'écran (wf-recorder) |
+| `SUPER + SHIFT + V`  | Presse-papiers (cliphist)       |
 | `SUPER + Q`          | Fermer la fenêtre active        |
 | `SUPER + 1..0`       | Aller au workspace N             |
 | `SUPER + SHIFT + 1..0` | Envoyer la fenêtre au workspace N |
@@ -130,33 +137,36 @@ Pour créer un thème : copie un dossier existant, change les valeurs de
 
 - **Interface** (waybar, rofi, swaync, hyprlock) : `Adwaita Sans`, une
   sans-serif — plus lisible qu'une chasse fixe pour de l'UI.
-- **Terminal** (kitty) et visualiseur : `FiraCode Nerd Font`.
+- **Terminal** (kitty) et visualiseur : `FiraCode Nerd Font`
+  (`ttf-firacode-nerd`).
 
 Les icônes de la barre et des menus sont des glyphes Nerd Font : elles
 restent affichées grâce au fallback fontconfig, qui les résout vers
 FiraCode même quand la police principale est Adwaita Sans.
 
+Curseur : `Bibata-Modern-Ice` (`bibata-cursor-theme-bin`, AUR).
+
 ## Écran de connexion (SDDM)
 
-Un thème SDDM assorti au rice est fourni dans `sddm/`. `install.sh`
-l'installe dans `/usr/share/sddm/themes/tbe` mais **n'active pas**
-SDDM : un greeter cassé empêcherait de se connecter. GDM reste donc
-actif tant que tu ne bascules pas toi-même.
+Un thème SDDM assorti au rice est fourni dans `sddm/`. `scripts/40-sddm.sh`
+l'installe dans `/usr/share/sddm/themes/tbe` et active SDDM directement.
 
 ```sh
 # prévisualiser sans risque (s'ouvre dans une fenêtre)
-sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/tbe
-
-# basculer
-sudo systemctl disable gdm && sudo systemctl enable sddm
-
-# revenir en arrière
-sudo systemctl disable sddm && sudo systemctl enable gdm
+sddm-greeter --test-mode --theme /usr/share/sddm/themes/tbe
 ```
 
 Ses couleurs sont figées dans `sddm/theme/theme.conf` (palette
 `graphite`) : le greeter tourne avant toute session utilisateur, donc
 `theme-switch.sh` ne peut pas l'atteindre.
+
+`Main.qml` doit rester compatible `QtQuick 2.0` strict (imports versionnés
+uniquement, pas de `QtQuick.Controls`/`QtQuick.Layouts`, pas de propriétés
+introduites après 2.0 comme `Text.topPadding`/`bottomPadding`) : le greeter
+réel (`sddm-greeter`, backend X11) rejette le document entier au moindre
+usage non supporté et retombe silencieusement sur son thème par défaut,
+alors que `sddm-greeter-qt6 --test-mode` est plus tolérant et ne le
+détecte pas — toujours valider avec le premier, pas le second.
 
 ## Wallpaper
 

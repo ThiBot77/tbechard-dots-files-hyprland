@@ -2,6 +2,8 @@
 stow
 zsh
 fastfetch
+ttf-firacode-nerd
+gnome-themes-extra
 
 hyprland
 xdg-desktop-portal-hyprland
