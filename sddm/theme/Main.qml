@@ -159,27 +159,104 @@ Rectangle {
             text: textConstants.session
         }
 
-        // Kept in the centre column, not down with the power buttons:
-        // SddmComponents.ComboBox anchors its dropdown to its own bottom edge
-        // with no way to flip it, so near the screen edge the list opened
-        // off-screen and the sessions were unreachable.
-        ComboBox {
+        // Hand-rolled dropdown rather than SddmComponents.ComboBox: that one
+        // has no radius property, and it anchors its list to its own bottom
+        // edge with no way to flip it (so at the bottom of the screen the
+        // sessions opened off-screen). This one is rounded and lives in the
+        // centre column, where there's room below it to expand.
+        Item {
             id: sessionBox
             anchors.horizontalCenter: parent.horizontalCenter
             width: 320
             height: 40
-            model: sessionModel
-            index: sessionModel.lastIndex
-            color: config.surface
-            textColor: config.foreground
-            borderColor: config.border
-            focusColor: config.accent
-            hoverColor: config.accent
-            menuColor: config.surface
-            // Without this the arrow box renders as a white block.
-            arrowColor: config.surface
-            font.family: config.font
-            font.pixelSize: 14
+            property alias index: sessionList.currentIndex
+
+            Rectangle {
+                id: sessionHeader
+                anchors.fill: parent
+                radius: 12
+                color: config.surface
+                border.width: 1
+                border.color: sessionPopup.visible ? config.accent : config.border
+
+                Text {
+                    anchors.left: parent.left
+                    anchors.leftMargin: 14
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: config.foreground
+                    font.family: config.font
+                    font.pixelSize: 14
+                    text: sessionList.currentItem ? sessionList.currentItem.sessionName : ""
+                }
+
+                Text {
+                    anchors.right: parent.right
+                    anchors.rightMargin: 14
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: config.foregroundDim
+                    font.pixelSize: 10
+                    text: sessionPopup.visible ? "▲" : "▼"
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: sessionPopup.visible = !sessionPopup.visible
+                }
+            }
+
+            Rectangle {
+                id: sessionPopup
+                visible: false
+                z: 10
+                anchors.top: sessionHeader.bottom
+                anchors.topMargin: 6
+                width: parent.width
+                height: Math.min(sessionList.contentHeight + 8, 220)
+                radius: 12
+                color: config.surface
+                border.width: 1
+                border.color: config.border
+                clip: true
+
+                ListView {
+                    id: sessionList
+                    anchors.fill: parent
+                    anchors.margins: 4
+                    model: sessionModel
+                    currentIndex: sessionModel.lastIndex
+                    clip: true
+
+                    delegate: Rectangle {
+                        property string sessionName: model.name
+                        width: sessionList.width
+                        height: 32
+                        radius: 8
+                        color: itemArea.containsMouse ? config.accent : "transparent"
+
+                        Text {
+                            anchors.left: parent.left
+                            anchors.leftMargin: 10
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: model.name
+                            color: itemArea.containsMouse ? config.background : config.foreground
+                            font.family: config.font
+                            font.pixelSize: 14
+                        }
+
+                        MouseArea {
+                            id: itemArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                sessionList.currentIndex = index
+                                sessionPopup.visible = false
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
