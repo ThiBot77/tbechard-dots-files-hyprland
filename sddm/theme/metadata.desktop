@@ -2,7 +2,9 @@
 Name=tbe
 Description=Minimal dark greeter matching the tbe-dots-files rice
 Author=tbe-dots-files
-Type=qml
+Theme-Id=tbe
+Theme-API=2.0
+Type=sddm-theme
 Version=1.0
 MainScript=Main.qml
 ConfigFile=theme.conf
