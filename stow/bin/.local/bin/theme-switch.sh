@@ -129,35 +129,47 @@ cat > "$HOME/.config/gtk-3.0/gtk.css" <<EOF
 @define-color insensitive_fg_color #$FG_DIM;
 @define-color borders #$BORDER;
 
-window, dialog, .background, .view, notebook, paned {
+/* Everything below is scoped with window:not(#waybar) on purpose: waybar is
+   a GTK3 app too, and a bare \`button\` rule here outranks waybar's own
+   style.css, drawing boxes around its workspace dots. Popup windows (menus,
+   popovers) are separate toplevels, so they stay unscoped — that is what
+   colors the tray menus. */
+
+window:not(#waybar), dialog, window:not(#waybar) .view,
+window:not(#waybar) notebook, window:not(#waybar) paned {
     background-color: #$BG;
     color: #$FG;
 }
 
-headerbar, .titlebar, toolbar, .toolbar, actionbar {
+window:not(#waybar) headerbar, window:not(#waybar) .titlebar,
+window:not(#waybar) toolbar, window:not(#waybar) actionbar {
     background-color: #$BG_ALT;
     background-image: none;
     color: #$FG;
     border-color: #$BORDER;
 }
 
-.sidebar, placessidebar, placessidebar list, stacksidebar {
+window:not(#waybar) .sidebar, window:not(#waybar) placessidebar,
+window:not(#waybar) placessidebar list, window:not(#waybar) stacksidebar {
     background-color: #$BG_ALT;
     color: #$FG;
 }
 
-treeview.view, list, list row {
+window:not(#waybar) treeview.view, window:not(#waybar) list,
+window:not(#waybar) list row {
     background-color: transparent;
     color: #$FG;
 }
 
-treeview.view:selected, list row:selected, .view:selected,
-placessidebar row:selected, menuitem:hover, .menuitem:hover {
+window:not(#waybar) treeview.view:selected,
+window:not(#waybar) list row:selected,
+window:not(#waybar) .view:selected,
+window:not(#waybar) placessidebar row:selected {
     background-color: #$ACCENT;
     color: #$BG;
 }
 
-entry, spinbutton, searchbar entry {
+window:not(#waybar) entry, window:not(#waybar) spinbutton {
     background-color: #$BG_ALT;
     background-image: none;
     color: #$FG;
@@ -165,7 +177,7 @@ entry, spinbutton, searchbar entry {
     caret-color: #$ACCENT;
 }
 
-button, button.flat:hover {
+window:not(#waybar) button {
     background-color: #$BG_ALT;
     background-image: none;
     color: #$FG;
@@ -173,48 +185,55 @@ button, button.flat:hover {
     text-shadow: none;
 }
 
-button:hover {
+window:not(#waybar) button:hover {
     background-color: #$BORDER;
 }
 
-button:checked, button:active {
+window:not(#waybar) button:checked, window:not(#waybar) button:active {
     background-color: #$ACCENT;
     color: #$BG;
 }
 
-menu, popover, popover.background, .popup, .menu, .context-menu {
+window:not(#waybar) scrollbar, window:not(#waybar) scrollbar trough {
+    background-color: #$BG;
+    border: none;
+}
+
+window:not(#waybar) scrollbar slider {
+    background-color: #$FG_DIM;
+}
+
+window:not(#waybar) scrollbar slider:hover {
+    background-color: #$ACCENT;
+}
+
+window:not(#waybar) separator {
+    background-color: #$BORDER;
+}
+
+window:not(#waybar) progressbar progress,
+window:not(#waybar) levelbar block.filled {
+    background-color: #$ACCENT;
+}
+
+window:not(#waybar) label.dim-label {
+    color: #$FG_DIM;
+}
+
+/* Popup toplevels: tray menus, context menus, popovers. */
+menu, popover, popover.background, .context-menu {
     background-color: #$BG_ALT;
     color: #$FG;
     border: 1px solid #$BORDER;
 }
 
-scrollbar, scrollbar trough {
-    background-color: #$BG;
-    border: none;
-}
-
-scrollbar slider {
-    background-color: #$FG_DIM;
-}
-
-scrollbar slider:hover {
-    background-color: #$ACCENT;
-}
-
-label, .dim-label {
+menu menuitem, .context-menu menuitem {
     color: #$FG;
 }
 
-.dim-label, label.dim-label {
-    color: #$FG_DIM;
-}
-
-separator {
-    background-color: #$BORDER;
-}
-
-progressbar progress, levelbar block.filled {
+menu menuitem:hover, .context-menu menuitem:hover {
     background-color: #$ACCENT;
+    color: #$BG;
 }
 EOF
 
@@ -267,5 +286,14 @@ pkill -SIGUSR1 kitty 2>/dev/null || true
 # No signal for cava: it has no SIGUSR handler, so sending one would kill it.
 # An already-open cava widget keeps its old colors until reopened (SUPER+V
 # twice), or press 'c' inside it to reload colors.
+
+# GTK reads ~/.config/gtk-3.0/gtk.css once at startup and never re-reads it,
+# so long-lived tray apps we own keep the old palette until restarted —
+# that's why nm-applet's menu stayed the previous theme's color.
+if pgrep -x nm-applet >/dev/null 2>&1; then
+    pkill -x nm-applet 2>/dev/null || true
+    sleep 0.2
+    setsid nm-applet --indicator >/dev/null 2>&1 &
+fi
 
 notify-send "Theme" "Switched to $palette" 2>/dev/null || true

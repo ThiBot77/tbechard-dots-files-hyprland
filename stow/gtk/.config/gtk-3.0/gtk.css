@@ -8,35 +8,47 @@
 @define-color insensitive_fg_color #808080;
 @define-color borders #2a2a2a;
 
-window, dialog, .background, .view, notebook, paned {
+/* Everything below is scoped with window:not(#waybar) on purpose: waybar is
+   a GTK3 app too, and a bare `button` rule here outranks waybar's own
+   style.css, drawing boxes around its workspace dots. Popup windows (menus,
+   popovers) are separate toplevels, so they stay unscoped — that is what
+   colors the tray menus. */
+
+window:not(#waybar), dialog, window:not(#waybar) .view,
+window:not(#waybar) notebook, window:not(#waybar) paned {
     background-color: #000000;
     color: #ffffff;
 }
 
-headerbar, .titlebar, toolbar, .toolbar, actionbar {
+window:not(#waybar) headerbar, window:not(#waybar) .titlebar,
+window:not(#waybar) toolbar, window:not(#waybar) actionbar {
     background-color: #1a1a1a;
     background-image: none;
     color: #ffffff;
     border-color: #2a2a2a;
 }
 
-.sidebar, placessidebar, placessidebar list, stacksidebar {
+window:not(#waybar) .sidebar, window:not(#waybar) placessidebar,
+window:not(#waybar) placessidebar list, window:not(#waybar) stacksidebar {
     background-color: #1a1a1a;
     color: #ffffff;
 }
 
-treeview.view, list, list row {
+window:not(#waybar) treeview.view, window:not(#waybar) list,
+window:not(#waybar) list row {
     background-color: transparent;
     color: #ffffff;
 }
 
-treeview.view:selected, list row:selected, .view:selected,
-placessidebar row:selected, menuitem:hover, .menuitem:hover {
+window:not(#waybar) treeview.view:selected,
+window:not(#waybar) list row:selected,
+window:not(#waybar) .view:selected,
+window:not(#waybar) placessidebar row:selected {
     background-color: #ffffff;
     color: #000000;
 }
 
-entry, spinbutton, searchbar entry {
+window:not(#waybar) entry, window:not(#waybar) spinbutton {
     background-color: #1a1a1a;
     background-image: none;
     color: #ffffff;
@@ -44,7 +56,7 @@ entry, spinbutton, searchbar entry {
     caret-color: #ffffff;
 }
 
-button, button.flat:hover {
+window:not(#waybar) button {
     background-color: #1a1a1a;
     background-image: none;
     color: #ffffff;
@@ -52,46 +64,53 @@ button, button.flat:hover {
     text-shadow: none;
 }
 
-button:hover {
+window:not(#waybar) button:hover {
     background-color: #2a2a2a;
 }
 
-button:checked, button:active {
+window:not(#waybar) button:checked, window:not(#waybar) button:active {
     background-color: #ffffff;
     color: #000000;
 }
 
-menu, popover, popover.background, .popup, .menu, .context-menu {
+window:not(#waybar) scrollbar, window:not(#waybar) scrollbar trough {
+    background-color: #000000;
+    border: none;
+}
+
+window:not(#waybar) scrollbar slider {
+    background-color: #808080;
+}
+
+window:not(#waybar) scrollbar slider:hover {
+    background-color: #ffffff;
+}
+
+window:not(#waybar) separator {
+    background-color: #2a2a2a;
+}
+
+window:not(#waybar) progressbar progress,
+window:not(#waybar) levelbar block.filled {
+    background-color: #ffffff;
+}
+
+window:not(#waybar) label.dim-label {
+    color: #808080;
+}
+
+/* Popup toplevels: tray menus, context menus, popovers. */
+menu, popover, popover.background, .context-menu {
     background-color: #1a1a1a;
     color: #ffffff;
     border: 1px solid #2a2a2a;
 }
 
-scrollbar, scrollbar trough {
-    background-color: #000000;
-    border: none;
-}
-
-scrollbar slider {
-    background-color: #808080;
-}
-
-scrollbar slider:hover {
-    background-color: #ffffff;
-}
-
-label, .dim-label {
+menu menuitem, .context-menu menuitem {
     color: #ffffff;
 }
 
-.dim-label, label.dim-label {
-    color: #808080;
-}
-
-separator {
-    background-color: #2a2a2a;
-}
-
-progressbar progress, levelbar block.filled {
+menu menuitem:hover, .context-menu menuitem:hover {
     background-color: #ffffff;
+    color: #000000;
 }
