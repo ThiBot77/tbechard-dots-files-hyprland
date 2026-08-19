@@ -63,8 +63,9 @@ Rectangle {
             font.family: config.font
             font.pixelSize: 20
             text: new Date().toLocaleDateString(Qt.locale(), "dddd d MMMM")
-            bottomPadding: 24
         }
+
+        Item { width: 1; height: 24 }
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -104,6 +105,8 @@ Rectangle {
             }
         }
 
+        Item { width: 1; height: 6 }
+
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             width: 320
@@ -112,7 +115,6 @@ Rectangle {
             font.family: config.font
             font.pixelSize: 13
             text: textConstants.password
-            topPadding: 6
         }
 
         PasswordBox {
