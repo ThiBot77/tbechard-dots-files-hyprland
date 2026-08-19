@@ -60,6 +60,9 @@ stow/<package>/             un dossier par "package" GNU Stow, arbo miroir de $H
 | `SUPER + L`          | Verrouiller l'écran             |
 | `SUPER + SHIFT + M`  | Menu power (wlogout)            |
 | `SUPER + N`          | Centre de notifications (swaync) |
+| `SUPER + S`          | Terminal scratchpad (afficher/masquer) |
+| `SUPER + SHIFT + S`  | Envoyer la fenêtre au scratchpad |
+| `SUPER + SHIFT + D`  | Config des écrans (nwg-displays) |
 | `SUPER + Q`          | Fermer la fenêtre active        |
 | `SUPER + 1..0`       | Aller au workspace N             |
 | `SUPER + SHIFT + 1..0` | Envoyer la fenêtre au workspace N |
@@ -135,6 +138,28 @@ Pour créer un thème : copie un dossier existant, change les valeurs de
 Les icônes de la barre et des menus sont des glyphes Nerd Font : elles
 restent affichées grâce au fallback fontconfig, qui les résout vers
 FiraCode même quand la police principale est Adwaita Sans.
+
+## Écran de connexion (SDDM)
+
+Un thème SDDM assorti au rice est fourni dans `sddm/`. `install.sh`
+l'installe dans `/usr/share/sddm/themes/tbe` mais **n'active pas**
+SDDM : un greeter cassé empêcherait de se connecter. GDM reste donc
+actif tant que tu ne bascules pas toi-même.
+
+```sh
+# prévisualiser sans risque (s'ouvre dans une fenêtre)
+sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/tbe
+
+# basculer
+sudo systemctl disable gdm && sudo systemctl enable sddm
+
+# revenir en arrière
+sudo systemctl disable sddm && sudo systemctl enable gdm
+```
+
+Ses couleurs sont figées dans `sddm/theme/theme.conf` (palette
+`graphite`) : le greeter tourne avant toute session utilisateur, donc
+`theme-switch.sh` ne peut pas l'atteindre.
 
 ## Wallpaper
 
