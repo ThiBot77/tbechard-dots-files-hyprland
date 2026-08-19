@@ -86,7 +86,8 @@ stow -d stow -t ~ -R waybar
 
 `SUPER + SHIFT + T` ouvre un menu rofi pour changer de thème. Toutes les
 couleurs changent : fond, texte, accent et palette du terminal, dans
-Hyprland, hyprlock, waybar, rofi, mako et kitty.
+Hyprland, hyprlock, waybar, rofi, mako, kitty, cava, les applis GTK
+(Thunar…) et les applis Qt.
 
 Thèmes livrés dans `themes/` : `mono` (noir & blanc, défaut) et
 `cyberpunk` (violet profond, accent rose néon, secondaire cyan).
@@ -95,10 +96,26 @@ Chaque thème est **un seul fichier**, `themes/<nom>/palette.sh`, qui
 définit les couleurs de base (`BG`, `BG_ALT`, `FG`, `FG_DIM`, `ACCENT`,
 `ACCENT_DIM`, `BORDER`) et les 16 couleurs du terminal (`T_*`).
 `theme-switch.sh <nom>` en génère les fichiers de couleurs de chaque
-appli (`~/.config/hypr/colors.conf`, `waybar/colors.css`,
-`rofi/colors.rasi`, `mako/colors`, `kitty/theme.conf`) puis recharge
-tout à chaud. Les configs des applis ne contiennent aucune couleur en
-dur : elles importent seulement ces fichiers générés.
+appli puis recharge tout à chaud :
+
+| Appli    | Fichier généré                        |
+|----------|----------------------------------------|
+| Hyprland + hyprlock | `~/.config/hypr/colors.conf` |
+| waybar   | `~/.config/waybar/colors.css`          |
+| rofi     | `~/.config/rofi/colors.rasi`           |
+| mako     | `~/.config/mako/colors`                |
+| kitty    | `~/.config/kitty/theme.conf`           |
+| cava     | `~/.config/cava/themes/current`        |
+| GTK 3/4  | `~/.config/gtk-{3,4}.0/gtk.css`        |
+| Qt 5/6   | `~/.config/qt{5,6}ct/colors/current.conf` |
+
+Les configs des applis ne contiennent aucune couleur en dur : elles
+importent seulement ces fichiers générés.
+
+Rechargement à chaud pour Hyprland, waybar, mako et kitty. Les applis
+GTK/Qt déjà ouvertes doivent être relancées ; un widget cava ouvert
+garde ses couleurs jusqu'à réouverture (`SUPER + V` deux fois) ou la
+touche `c`.
 
 Pour créer un thème : copie un dossier existant, change les valeurs de
 `palette.sh`, c'est tout.

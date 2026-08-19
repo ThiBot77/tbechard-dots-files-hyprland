@@ -14,8 +14,9 @@ method = ncurses
 channels = mono
 
 [color]
-background = '#000000'
-foreground = '#ffffff'
+# Colors come from themes/<palette>/palette.sh via theme-switch.sh, which
+# regenerates ~/.config/cava/themes/current.
+theme = 'current'
 
 [smoothing]
 noise_reduction = 60

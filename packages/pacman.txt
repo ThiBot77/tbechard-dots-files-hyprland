@@ -30,6 +30,10 @@ pacman-contrib
 thunar
 network-manager-applet
 blueman
+qt5ct
+qt6ct
+tumbler
+thunar-volman
 
 # Everyday apps
 discord
