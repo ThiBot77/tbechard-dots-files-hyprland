@@ -24,14 +24,32 @@ fi
 
 run fc-cache -f
 
+# --keep-zshrc est indispensable : sans lui KEEP_ZSHRC vaut "no" et
+# l'installeur remplace ~/.zshrc par son propre modele. A ce stade c'est
+# deja un lien stow, il serait donc casse et le prompt starship perdu.
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
     log_info "Installing Oh My Zsh"
-    run sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh) \"\" --unattended"
+    run sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh) \"\" --unattended --keep-zshrc"
 fi
 
 if [[ "$SHELL" != */zsh ]]; then
     log_info "Setting zsh as the default shell"
     run chsh -s "$(command -v zsh)" "$USER"
+fi
+
+# Spicetify patche le client Spotify dans /opt/spotify, qui appartient a
+# root. On prend possession du dossier plutot que le chmod a+wr conseille
+# par la doc : inscriptible par le seul utilisateur suffit, et evite un
+# dossier inscriptible par tout le monde.
+if command -v spicetify >/dev/null 2>&1 && [[ -d /opt/spotify ]]; then
+    if [[ ! -w /opt/spotify ]]; then
+        log_info "Taking ownership of /opt/spotify for spicetify"
+        run sudo chown -R "$USER":"$USER" /opt/spotify
+    fi
+    log_info "Applying the graphite Spicetify theme"
+    run spicetify config current_theme graphite color_scheme graphite
+    run spicetify backup apply
+    log_warn "Re-run 'spicetify apply' after each Spotify update: the patch is undone by it."
 fi
 
 if ! id -nG "$USER" | grep -qw video; then
