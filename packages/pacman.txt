@@ -4,6 +4,7 @@ zsh
 fastfetch
 ttf-firacode-nerd
 gnome-themes-extra
+noto-fonts-emoji
 
 hyprland
 xdg-desktop-portal-hyprland
