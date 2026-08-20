@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+L#!/usr/bin/env bash
 # Prints a local image path for the current MPRIS track's cover art, used as
 # hyprlock's image reload_cmd. Falls back to a 1x1 transparent PNG rather than
 # an empty string: hyprlock keeps the previous path when reload_cmd prints
