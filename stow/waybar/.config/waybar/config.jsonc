@@ -207,7 +207,7 @@
     "custom/power": {
         "format": "⏻",
         "tooltip-format": "Power menu",
-        "on-click": "wlogout"
+        "on-click": "wlogout -b 3"
     }
 
 }

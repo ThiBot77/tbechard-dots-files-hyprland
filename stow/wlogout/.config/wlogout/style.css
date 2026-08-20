@@ -1,52 +1,45 @@
+/* Tuiles facon github.com/elifouts/Dotfiles, recolorees en graphite :
+   grille de grandes cases qui s'agrandissent vers le centre au survol.
+   L'effet vient d'une marge qui se reduit au focus, pas d'un scale. */
+
 * {
     background-image: none;
-    font-size: 14px;
+    font-family: "Adwaita Sans", sans-serif;
+    font-size: 15px;
+    transition: 200ms cubic-bezier(0.2, 0, 0.2, 1);
 }
 
 window {
-    background-color: rgba(0, 0, 0, 0.75);
+    background-color: rgba(10, 10, 11, 0.86);
 }
 
+/* Voile clair plutot qu'un gris opaque : sur le fond assombri de la fenetre,
+   #141417 ne se detache que d'une dizaine de niveaux et les tuiles
+   disparaissent. */
 button {
-    color: #ffffff;
-    background-color: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #d6d6d8;
+    background-color: rgba(214, 214, 216, 0.05);
+    border: 1px solid rgba(214, 214, 216, 0.14);
+    border-radius: 18px;
     outline-style: none;
     background-repeat: no-repeat;
-    background-position: center;
-    background-size: 16%;
-    border-radius: 20px;
-    margin: 90px 40px;
-    box-shadow: none;
-    text-shadow: none;
+    background-position: center 38%;
+    background-size: 22%;
+    margin: 24px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 button:focus,
 button:hover {
-    background-color: rgba(255, 255, 255, 0.18);
-    border-color: rgba(255, 255, 255, 0.4);
+    color: #0a0a0b;
+    background-color: #b9b9be;
+    border-color: #b9b9be;
+    margin: 12px;
 }
 
-#lock {
-    background-image: image(url("icons/lock.png"));
-}
-
-#logout {
-    background-image: image(url("icons/logout.png"));
-}
-
-#suspend {
-    background-image: image(url("icons/suspend.png"));
-}
-
-#hibernate {
-    background-image: image(url("icons/hibernate.png"));
-}
-
-#shutdown {
-    background-image: image(url("icons/shutdown.png"));
-}
-
-#reboot {
-    background-image: image(url("icons/reboot.png"));
-}
+#lock      { background-image: image(url("icons/lock.png")); }
+#logout    { background-image: image(url("icons/logout.png")); }
+#suspend   { background-image: image(url("icons/suspend.png")); }
+#hibernate { background-image: image(url("icons/hibernate.png")); }
+#shutdown  { background-image: image(url("icons/shutdown.png")); }
+#reboot    { background-image: image(url("icons/reboot.png")); }
