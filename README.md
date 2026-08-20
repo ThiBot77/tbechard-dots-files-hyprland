@@ -1,32 +1,11 @@
 # tbe-dots-files
 
-Dotfiles + install script pour une session **Hyprland** sur Arch Linux, avec un
-rice noir & blanc / glassmorphism, et un visualiseur audio `cava` en widget
-toggleable. SDDM (thème custom, voir `scripts/40-sddm.sh`) est le display
-manager.
-
 ## Installation
 
 ```sh
 git clone <ce repo> ~/Documents/tbe-dots-files
 cd ~/Documents/tbe-dots-files
 ./install.sh
-```
-
-- `./install.sh --dry-run` affiche toutes les actions (paquets, symlinks) sans rien
-  exécuter.
-- Le script est idempotent : relançable sans risque après une modif.
-- Toute config déjà présente sur ta machine et qui serait écrasée par un des
-  packages ci-dessous est d'abord déplacée dans `~/.dotfiles-backup-<date>/`.
-
-## Structure
-
-```
-install.sh                 point d'entrée, orchestre scripts/*.sh dans l'ordre
-packages/pacman.txt         paquets dépôts officiels
-packages/aur.txt            paquets AUR (installés via yay)
-scripts/                    étapes numérotées (system check, packages, stow, post-install)
-stow/<package>/             un dossier par "package" GNU Stow, arbo miroir de $HOME
 ```
 
 ## Packages / composants
@@ -75,20 +54,6 @@ stow/<package>/             un dossier par "package" GNU Stow, arbo miroir de $H
 | `SUPER + SHIFT + PRINT` | Capture plein écran instantanée (presse-papiers) |
 | `SUPER + PRINT`      | Capture de la fenêtre active     |
 
-Voir `stow/hypr/.config/hypr/conf.d/keybinds.conf` pour la liste complète.
-
-## Après l'install
-
-1. Se déconnecter.
-2. Sur l'écran SDDM, choisir la session **Hyprland** si elle n'est pas déjà
-   présélectionnée.
-
-## Modifier / re-stow un seul package
-
-```sh
-# éditer les fichiers dans stow/waybar/... puis :
-stow -d stow -t ~ -R waybar
-```
 
 ## Palette de couleur
 
@@ -125,11 +90,6 @@ appli puis recharge tout à chaud :
 Les configs des applis ne contiennent aucune couleur en dur : elles
 importent seulement ces fichiers générés.
 
-Rechargement à chaud pour Hyprland, waybar, swaync et kitty. Les applis
-GTK/Qt déjà ouvertes doivent être relancées ; un widget cava ouvert
-garde ses couleurs jusqu'à réouverture (`SUPER + V` deux fois) ou la
-touche `c`.
-
 Pour créer un thème : copie un dossier existant, change les valeurs de
 `palette.sh`, c'est tout.
 
@@ -148,25 +108,47 @@ Curseur : `Bibata-Modern-Ice` (`bibata-cursor-theme-bin`, AUR).
 
 ## Écran de connexion (SDDM)
 
-Un thème SDDM assorti au rice est fourni dans `sddm/`. `scripts/40-sddm.sh`
-l'installe dans `/usr/share/sddm/themes/tbe` et active SDDM directement.
+Le thème SDDM (`sddm/theme/`) reprend la mise en page de `hyprlock.conf` pour
+que l'écran de connexion et l'écran de verrouillage forment un seul design :
+horloge fine, date en majuscules espacées, avatar cerclé, champs en pastille,
+et une barre basse (session / clavier / hôte / alimentation).
+
+`scripts/40-sddm.sh` l'installe dans `/usr/share/sddm/themes/tbe` et active
+SDDM.
 
 ```sh
-# prévisualiser sans risque (s'ouvre dans une fenêtre)
+# prévisualiser sans risque — s'ouvre dans une fenêtre, ne verrouille rien
 sddm-greeter --test-mode --theme /usr/share/sddm/themes/tbe
 ```
 
-Ses couleurs sont figées dans `sddm/theme/theme.conf` (palette
-`graphite`) : le greeter tourne avant toute session utilisateur, donc
-`theme-switch.sh` ne peut pas l'atteindre.
+Valider avec `sddm-greeter` (le binaire Qt5 réellement utilisé), **pas**
+`sddm-greeter-qt6` : ce dernier est plus tolérant et laisse passer des erreurs
+qui, en vrai, font retomber SDDM sur son thème par défaut sans rien afficher.
 
-`Main.qml` doit rester compatible `QtQuick 2.0` strict (imports versionnés
-uniquement, pas de `QtQuick.Controls`/`QtQuick.Layouts`, pas de propriétés
-introduites après 2.0 comme `Text.topPadding`/`bottomPadding`) : le greeter
-réel (`sddm-greeter`, backend X11) rejette le document entier au moindre
-usage non supporté et retombe silencieusement sur son thème par défaut,
-alors que `sddm-greeter-qt6 --test-mode` est plus tolérant et ne le
-détecte pas — toujours valider avec le premier, pas le second.
+`QtQuick.Controls 2` et `QtGraphicalEffects` ne sont **pas** installés : les
+importer fait échouer tout le document. D'où l'avatar livré déjà détouré en
+cercle (seul son anneau est dessiné en QML, pour suivre la couleur d'accent).
+
+Couleurs, nom affiché et chemins d'assets sont dans `sddm/theme/theme.conf` :
+le greeter tourne avant toute session utilisateur, donc `theme-switch.sh` ne
+peut pas l'atteindre — synchro manuelle avec `themes/graphite/palette.sh`.
+
+Pour régénérer les assets (nouveau fond ou nouvel avatar) :
+
+```sh
+magick stow/wallpaper/.config/hypr/wallpapers/<fond>.png \
+  -resize '2560x1440^' -gravity center -extent 2560x1440 \
+  -blur 0x30 -modulate 34,90,100 -quality 88 sddm/theme/assets/background.jpg
+
+magick stow/hypr/.config/hypr/avatar.png -resize '320x320^' \
+  -gravity center -extent 320x320 \
+  \( +clone -alpha extract -draw 'fill black polygon 0,0 0,320 320,320 320,0' \
+     -draw 'fill white circle 160,160 160,1' \) \
+  -alpha off -compose copyopacity -composite PNG32:sddm/theme/assets/avatar.png
+```
+
+`PNG32:` est nécessaire : sans lui le PNG retombe en niveaux de gris 1 bit,
+sans couche alpha, et les coins du cercle s'affichent en noir opaque.
 
 ## Wallpaper
 
