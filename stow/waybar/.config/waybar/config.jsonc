@@ -1,15 +1,29 @@
 {
     "layer": "top",
     "position": "top",
-    "height": 34,
-    "margin-top": 0,
-    "margin-left": 0,
-    "margin-right": 0,
     "spacing": 4,
+    "reload_style_on_change": true,
 
-    "modules-left": ["custom/arch", "hyprland/workspaces", "hyprland/window"],
-    "modules-center": ["clock", "custom/weather"],
-    "modules-right": ["custom/updates", "cpu", "memory", "user", "battery", "mpris", "pulseaudio", "idle_inhibitor", "bluetooth", "tray", "custom/notifications", "custom/power"],
+    "modules-left": ["custom/arch", "clock", "custom/weather", "custom/updates", "tray"],
+    "modules-center": ["hyprland/workspaces"],
+    "modules-right": ["mpris", "group/expand", "pulseaudio", "idle_inhibitor", "bluetooth", "battery", "custom/notifications", "custom/power"],
+
+    // Tiroir natif waybar : seul "custom/expand" reste visible, le reste se
+    // deplie vers la gauche au clic. Aucun script, c'est un module "group".
+    "group/expand": {
+        "orientation": "horizontal",
+        "drawer": {
+            "transition-duration": 400,
+            "transition-to-left": true,
+            "click-to-reveal": true
+        },
+        "modules": ["custom/expand", "cpu", "memory", "user"]
+    },
+
+    "custom/expand": {
+        "format": "",
+        "tooltip": false
+    },
 
     "custom/arch": {
         "format": "",
@@ -20,19 +34,13 @@
     "hyprland/workspaces": {
         "format": "{icon}",
         "format-icons": {
-            "default": "○",
-            "active": "●",
-            "empty": "○"
+            "default": "",
+            "active": "",
+            "empty": ""
         },
         "persistent-workspaces": {
             "*": 5
         }
-    },
-
-    "hyprland/window": {
-        "format": "{title}",
-        "max-length": 40,
-        "separate-outputs": true
     },
 
     "clock": {

@@ -1,5 +1,9 @@
 @import url("colors.css");
 
+/* Trois ilots flottants (mise en page reprise de github.com/elifouts/Dotfiles),
+   recolores en graphite. La barre elle-meme est transparente : ce sont les
+   conteneurs .modules-* qui portent le fond, l'arrondi et la marge. */
+
 * {
     font-family: "Adwaita Sans", "FiraCode Nerd Font", sans-serif;
     font-size: 13px;
@@ -7,33 +11,64 @@
 }
 
 window#waybar {
-    background: alpha(@bg, 0.85);
+    background: transparent;
 }
 
-#waybar > box {
-    background: transparent;
-    border-radius: 0;
-    padding: 0 12px;
+.modules-left,
+.modules-center,
+.modules-right {
+    background: alpha(@bg, 0.82);
+    border: 1px solid @border;
+    border-radius: 14px;
+    padding: 2px 10px;
+    margin: 8px 0 4px 0;
+    color: @fg;
+}
+
+.modules-left  { margin-left: 10px; }
+.modules-right { margin-right: 10px; }
+
+tooltip {
+    background: @bg_alt;
+    border: 1px solid @border;
+    border-radius: 10px;
     color: @fg;
 }
 
 #workspaces button {
-    color: @fg_dim;
-    padding: 0 6px;
-    margin: 4px 2px;
-    border-radius: 8px;
+    color: @accent_dim;
+    padding: 0 5px;
+    margin: 0;
     background: transparent;
-    font-size: 10px;
+    border: none;
+    box-shadow: none;
+    font-size: 9px;
+    transition: color .2s ease;
 }
 
-#workspaces button.active {
-    color: @bg;
-    background: @accent;
-    padding: 0 12px;
+#workspaces button.empty {
+    color: @border;
+}
+
+/* .visible : affiche sur un moniteur non focalise. waybar ne pose .active
+   que sur le moniteur qui a le focus, sans quoi les autres ecrans
+   n'indiqueraient nulle part ou l'on se trouve. */
+#workspaces button.visible {
+    color: @fg_dim;
 }
 
 #workspaces button:hover {
-    background: alpha(@accent, 0.2);
+    color: @fg;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+#workspaces button.active {
+    color: @accent;
+    background: transparent;
+    border: none;
+    box-shadow: none;
 }
 
 #window,
@@ -98,4 +133,22 @@ tooltip {
 tooltip label {
     color: @fg;
     padding: 4px 6px;
+}
+
+/* Tiroir : la poignee tourne quand il est deplie. */
+#custom-expand {
+    color: @fg_dim;
+    padding: 0 6px;
+    transition: color .2s ease;
+}
+
+#custom-expand:hover {
+    color: @accent;
+}
+
+#cpu,
+#memory,
+#user {
+    color: @fg_dim;
+    padding: 0 6px;
 }
