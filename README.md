@@ -38,7 +38,6 @@ cd ~/Documents/tbe-dots-files
 | `SUPER + E`          | Fichiers (thunar)                |
 | `SUPER + V`          | Toggle widget visualiseur cava  |
 | `SUPER + SHIFT + W`  | Menu de sélection du wallpaper (rofi) |
-| `SUPER + SHIFT + T`  | Menu de sélection de la palette de couleur |
 | `SUPER + L`          | Verrouiller l'écran             |
 | `SUPER + SHIFT + M`  | Menu power (wlogout)            |
 | `SUPER + N`          | Centre de notifications (swaync) |
@@ -55,24 +54,12 @@ cd ~/Documents/tbe-dots-files
 | `SUPER + PRINT`      | Capture de la fenêtre active     |
 
 
-## Palette de couleur
+## Palette
 
-`SUPER + SHIFT + T` ouvre un menu rofi pour changer de thème. 
+Le rice est monochrome **graphite**, sans système de bascule : les couleurs
+vivent directement dans les fichiers de chaque appli.
 
-Thèmes livrés dans `themes/` :
-
-| Thème | Look |
-|-------|------|
-| `mono` | noir & blanc |
-| `graphite` | ardoise sombre, accent bleu acier désaturé
-| `cyberpunk` | violet profond, accent rose néon, secondaire cyan |
-
-Chaque thème est **un seul fichier**, `themes/<nom>/palette.sh`, qui
-définit les couleurs de base.
-Le script `theme-switch.sh <nom>` en génère les fichiers de couleurs de chaque
-appli puis recharge tout à chaud :
-
-| Appli    | Fichier généré                        |
+| Appli    | Fichier                                |
 |----------|----------------------------------------|
 | Hyprland + hyprlock | `~/.config/hypr/colors.conf` |
 | waybar   | `~/.config/waybar/colors.css`          |
@@ -82,6 +69,11 @@ appli puis recharge tout à chaud :
 | cava     | `~/.config/cava/themes/current`        |
 | GTK 3/4  | `~/.config/gtk-{3,4}.0/gtk.css`        |
 | Qt 5/6   | `~/.config/qt{5,6}ct/colors/current.conf` |
+| starship | `~/.config/starship.toml` (couleurs *nommées*, héritées du terminal) |
+
+Les valeurs du greeter SDDM sont volontairement dupliquées dans
+`sddm/theme/theme.conf` : il tourne avant toute session utilisateur et ne
+peut rien lire sous `$HOME`.
 
 ## Polices
 

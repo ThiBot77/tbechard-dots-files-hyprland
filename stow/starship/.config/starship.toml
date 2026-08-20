@@ -1,8 +1,8 @@
 # Prompt powerline arrondi, inspiré de github.com/elifouts/Dotfiles.
 #
 # Les couleurs sont *nommées* (white / bright-black / black…) et non en hex :
-# elles se résolvent depuis la palette du terminal, donc le prompt suit
-# automatiquement theme-switch.sh sans fichier généré supplémentaire.
+# elles se résolvent depuis la palette du terminal (kitty/theme.conf), donc
+# le prompt reste cohérent si la palette bouge, sans duplication de valeurs.
 #
 # Convention des séparateurs : bg = segment précédent, fg = segment suivant.
 # L'inverse produit une encoche au lieu d'un fondu.
