@@ -1,0 +1,65 @@
+# Prompt powerline arrondi, inspiré de github.com/elifouts/Dotfiles.
+#
+# Les couleurs sont *nommées* (white / bright-black / black…) et non en hex :
+# elles se résolvent depuis la palette du terminal, donc le prompt suit
+# automatiquement theme-switch.sh sans fichier généré supplémentaire.
+#
+# Convention des séparateurs : bg = segment précédent, fg = segment suivant.
+# L'inverse produit une encoche au lieu d'un fondu.
+
+format = """\
+[](fg:white)\
+$os\
+[](bg:white fg:bright-black)\
+$username\
+[](bg:bright-black fg:black)\
+$directory\
+[](fg:black)\
+$git_branch\
+$git_status\
+$cmd_duration\
+$character"""
+
+add_newline = true
+
+[os]
+disabled = false
+style = "bg:white fg:black"
+[os.symbols]
+Arch = " "
+Linux = " "
+
+[username]
+show_always = true
+format = "[$user ](bg:bright-black fg:white)"
+disabled = false
+
+[directory]
+format = "[$path ](bg:black fg:white)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "\U000f0219 "
+"Downloads" = "\uf019 "
+"Music" = "\U000f075a "
+"Pictures" = "\uf03e "
+
+[git_branch]
+symbol = "  "
+format = "[$symbol$branch]($style)"
+style = "fg:bright-black"
+
+[git_status]
+format = "[ $all_status$ahead_behind]($style)"
+style = "fg:bright-black"
+
+[cmd_duration]
+min_time = 2000
+format = "[ $duration]($style)"
+style = "fg:bright-black"
+
+[character]
+success_symbol = "[❯](bold white)"
+error_symbol = "[❯](bold red)"
+disabled = false
