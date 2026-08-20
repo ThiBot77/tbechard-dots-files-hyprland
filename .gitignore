@@ -1,0 +1,8 @@
+# Etat genere par spicetify. Le paquet stow plie ~/.config/spicetify en un
+# lien vers ce depot, donc spicetify ecrit son etat directement ici. Ces
+# fichiers contiennent des chemins absolus propres a la machine
+# (spotify_path, prefs_path) : seul le theme graphite est versionne.
+stow/spicetify/.config/spicetify/config-xpui.ini
+stow/spicetify/.config/spicetify/Backup/
+stow/spicetify/.config/spicetify/CustomApps/
+stow/spicetify/.config/spicetify/Extensions/
