@@ -4,7 +4,7 @@
     "spacing": 4,
     "reload_style_on_change": true,
 
-    "modules-left": ["custom/arch", "clock", "custom/weather", "custom/updates", "tray"],
+    "modules-left": ["custom/arch", "clock", "custom/weather", "custom/updates", "hyprland/language", "tray"],
     "modules-center": ["hyprland/workspaces"],
     "modules-right": ["mpris", "group/expand", "pulseaudio", "idle_inhibitor", "bluetooth", "battery", "custom/notifications", "custom/power"],
 
@@ -18,6 +18,16 @@
             "click-to-reveal": true
         },
         "modules": ["custom/expand", "cpu", "memory", "user"]
+    },
+
+    // Indicateur de disposition clavier. Module natif : il suit le dispatcher
+    // switchxkblayout (SUPER+K) sans script ni sondage.
+    "hyprland/language": {
+        "format": "{}",
+        "format-fr": "FR",
+        "format-en": "US",
+        "tooltip-format": "Disposition clavier : {}",
+        "on-click": "hyprctl switchxkblayout all next"
     },
 
     "custom/expand": {

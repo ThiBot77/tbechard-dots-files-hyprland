@@ -46,6 +46,7 @@ cd ~/Documents/tbe-dots-files
 | `SUPER + SHIFT + D`  | Config des écrans (nwg-displays) |
 | `SUPER + SHIFT + R`  | Toggle enregistrement d'écran (wf-recorder) |
 | `SUPER + SHIFT + V`  | Presse-papiers (cliphist)       |
+| `SUPER + K`          | Bascule clavier azerty / qwerty (ou clic sur `FR`/`US` dans la barre) |
 | `SUPER + Q`          | Fermer la fenêtre active        |
 | `SUPER + 1..0`       | Aller au workspace N             |
 | `SUPER + SHIFT + 1..0` | Envoyer la fenêtre au workspace N |
