@@ -76,6 +76,7 @@ qt6-tools
 qt6-translations
 qt6-virtualkeyboard
 qt6-wayland
+quickshell
 ripgrep
 rsync
 slurp
