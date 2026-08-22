@@ -180,5 +180,3 @@ loaded last, so it wins over the defaults.
 | `scripts/` | The install steps |
 | `sddm/` | The login screen theme |
 | `vendor/` | Files taken from end-4 that the scripts use: the `kdeglobals` base and the Python requirements |
-
-end-4's code is GPL-3.0; their licence is kept at the root as `LICENSE-end4`.
