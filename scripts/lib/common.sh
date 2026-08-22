@@ -16,29 +16,3 @@ run() {
         "$@"
     fi
 }
-
-confirm() {
-    local prompt="${1:-Continue?}"
-    local reply
-    read -r -p "$prompt [y/N] " reply
-    [[ "$reply" =~ ^[Yy]$ ]]
-}
-
-backup_if_exists() {
-    local target="$1"
-    local backup_dir="$2"
-
-    if [[ -e "$target" || -L "$target" ]]; then
-        local resolved
-        resolved="$(readlink -f "$target" 2>/dev/null || true)"
-        if [[ -n "$resolved" && -n "${STOW_DIR:-}" && "$resolved" == "$STOW_DIR"/* ]]; then
-            return 0
-        fi
-
-        local rel="${target#"$HOME"/}"
-        local dest="$backup_dir/$rel"
-        log_warn "backing up existing $target -> $dest"
-        run mkdir -p "$(dirname "$dest")"
-        run mv "$target" "$dest"
-    fi
-}

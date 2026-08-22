@@ -1,120 +1,85 @@
 # tbe-dots-files
 
-Configuration Hyprland sur Arch Linux
+Hyprland setup for Arch Linux.
 
-Le shell — barre, notifications, launcher, panneau de réglages, écran de
-verrouillage — est celui d'end-4, rapatrié dans ce dépôt et installé par
-`install.sh`. On garde nos propres kitty, zsh, fastfetch et fonds d'écran.
+The shell — bar, notifications, launcher, settings panel, lock screen — is
+[end-4's dots-hyprland](https://github.com/end-4/dots-hyprland), vendored here
+and installed by `install.sh`. Kitty, zsh, fastfetch and the wallpapers are our
+own.
 
-## Installation
+## Install
 
 ```sh
-git clone <ce repo> ~/Documents/tbe-dots-files
+git clone <this repo> ~/Documents/tbe-dots-files
 cd ~/Documents/tbe-dots-files
-./install.sh          # --dry-run pour voir sans rien modifier
+./install.sh          # --dry-run to see what it would do
 ```
 
-Puis **se déconnecter et se reconnecter** : Hyprland ne lit sa config qu'au
-démarrage, et les nouveaux groupes utilisateur ne s'appliquent qu'à
-l'ouverture de session.
+Then **log out and back in**: Hyprland only reads its config at startup, and
+new user groups apply at session start.
 
-## Qui fait quoi
+## Layout
 
-Chaque dossier de `stow/` est un paquet GNU Stow : son arborescence est
-recopiée en liens symboliques dans `$HOME`.
+Each directory under `config/` is a package: its tree mirrors `$HOME` and is
+copied there by the installer.
 
-### Le bureau
+**Desktop** — `hypr` (Hyprland config, in Lua: `hyprland.lua`, not
+`hyprland.conf`; personal overrides go in `custom/*.lua`), `quickshell` (the
+shell itself, ~586 QML files), `matugen` (Material You colours derived from the
+wallpaper), `portal` (XDG portal choice — needed for screen sharing).
 
-| Paquet | Installe dans | Rôle |
-|---|---|---|
-| `hypr` | `~/.config/hypr` | Config **Hyprland** d'end-4, en **Lua** (`hyprland.lua`, pas `hyprland.conf`). Raccourcis, règles de fenêtres, animations, lancement du shell. Tes réglages perso vont dans `custom/*.lua`, chargés en dernier. |
-| `quickshell` | `~/.config/quickshell` | **Le shell lui-même** : barre, notifications, launcher, panneau de réglages, sidebars, dock, écran de verrouillage. ~586 fichiers QML d'end-4. Quickshell n'est que le moteur ; toute l'interface vient d'ici. |
-| `matugen` | `~/.config/matugen`, `~/.config/kde-material-you-colors` | **Génération des couleurs.** Extrait une palette Material You du fond d'écran et la décline vers Hyprland, hyprlock, fuzzel, GTK et Qt. C'est lui qui rend le thème monochrome. |
-| `portal` | `~/.config/xdg-desktop-portal` | Choix du portail XDG. Indispensable au **partage d'écran** (Discord, visios) sous Wayland. |
+**Themed apps** — `kde`, `kvantum`, `fuzzel`, `wlogout`, `mpv`, `swappy`,
+`browsers`, `spicetify`.
 
-### Applications habillées par le thème
+**Ours** — `kitty`, `zsh`, `starship`, `fastfetch`, `wallpaper` (installs to
+`~/Images/Wallpapers`, where end-4's picker looks for them).
 
-| Paquet | Installe dans | Rôle |
-|---|---|---|
-| `kde` | `~/.config/{dolphinrc,konsolerc,darklyrc,fontconfig}`, `~/.local/share` | Réglages des applis **KDE** (Dolphin, Konsole) et style Darkly. Le rendu sous-pixel est désactivé via fontconfig. |
-| `kvantum` | `~/.config/Kvantum` | Moteur de thème **Qt**. Habille les applis Qt qui ne suivent pas kdeglobals. |
-| `fuzzel` | `~/.config/fuzzel` | Launcher de secours. `fuzzel_theme.ini` est **généré par matugen** (donc non versionné). |
-| `wlogout` | `~/.config/wlogout` | Menu d'extinction. |
-| `mpv` | `~/.config/mpv` | Lecteur vidéo. |
-| `swappy` | `~/.config/swappy` | Annotation de captures d'écran. |
-| `browsers` | `~/.config/*-flags.conf` | Options de lancement de Chrome, VS Code et Thorium (Wayland natif, trousseau GNOME). |
-| `spicetify` | `~/.config/spicetify` | Thème graphite pour le client **Spotify**. |
+Reinstall a single package after editing it:
 
-### Ce qu'on garde à nous
+```sh
+scripts/20-copy-configs.sh quickshell     # no argument installs everything
+```
 
-| Paquet | Installe dans | Rôle |
-|---|---|---|
-| `kitty` | `~/.config/kitty` | Terminal. Config et couleurs maison, indépendantes d'end-4. |
-| `zsh` | `~/.zshrc` | Shell : Oh My Zsh pour le plugin git, prompt délégué à starship. |
-| `starship` | `~/.config/starship.toml` | Prompt powerline arrondi. Couleurs **nommées**, donc héritées de la palette du terminal. |
-| `fastfetch` | `~/.config/fastfetch` | Résumé système à l'ouverture d'un terminal. |
-| `wallpaper` | `~/Images/Wallpapers` | Les fonds d'écran. Ce chemin n'est pas décoratif : c'est là que le sélecteur d'end-4 va les chercher. |
+Configs are copied, not symlinked, so an edit in `~/.config` does not reach the
+repo: change the file here and re-run the command above. The copy overwrites
+whatever is at the target, so back up anything you care about first.
 
 ## Palette
 
-Le graphite ne vient pas de couleurs écrites en dur : c'est le schéma
-Material You **`scheme-monochrome`** avec le mode sombre forcé, défini dans
-`quickshell/ii/modules/common/Config.qml`. matugen produit donc une palette
-en niveaux de gris à partir de n'importe quel fond d'écran.
+The graphite look isn't hardcoded: it's the Material You `scheme-monochrome`
+scheme with dark mode forced, set in
+`quickshell/ii/modules/common/Config.qml`. Semantic colours (links, success,
+error) stay tinted on purpose.
 
-Les couleurs sémantiques (liens, succès, erreur) restent teintées — c'est
-voulu par Material You, un lien doit rester reconnaissable.
+The settings panel (`SUPER + I`) writes to
+`~/.config/illogical-impulse/config.json`; the QML files only provide the
+first-run defaults.
 
-Le panneau de réglages (`SUPER + I`) écrit dans
-`~/.config/illogical-impulse/config.json`, pas dans les fichiers QML : ceux-ci
-ne fournissent que les valeurs par défaut au premier lancement.
+## Generated files
 
-## Fichiers générés, volontairement non versionnés
+matugen rewrites `hypr/hyprland/colors.lua`, `hypr/hyprlock/colors.conf` and
+`fuzzel/fuzzel_theme.ini` on every wallpaper change. The copies in `config/` are
+only the first-run seed; the live ones live in `~/.config` and are never copied
+back.
 
-matugen et kde-material-you-colors réécrivent des fichiers de couleurs à
-chaque changement de fond. Comme stow replie ces dossiers en liens vers le
-dépôt, ces outils écrivent **droit dans l'arbre de travail** : sans
-précaution, chaque wallpaper produirait un diff.
+Two more files are seeded outside `config/`, because a reinstall would otherwise
+overwrite machine state: `~/.config/kdeglobals` (from
+`vendor/end4/kdeglobals.default`, rewritten by kde-material-you-colors) and
+`~/.config/hypr/monitors.lua` (nwg-displays).
 
-| Fichier | Écrit par |
-|---|---|
-| `hypr/hyprland/colors.lua`, `hypr/hyprlock/colors.conf` | matugen (dans `.gitignore`) |
-| `fuzzel/fuzzel_theme.ini` | matugen (dans `.gitignore`) |
-| `~/.config/kdeglobals` | kde-material-you-colors — **hors stow**, semé depuis `vendor/end4/kdeglobals.default` |
-| `~/.config/hypr/monitors.lua` | nwg-displays — machine-local, semé à l'install |
+## Notes
 
-## Environnement Python
-
-Une partie de l'outillage d'end-4 n'est pas installée en paquets système mais
-dans un venv, à `~/.local/state/quickshell/.venv`, désigné par
-`$ILLOGICAL_IMPULSE_VIRTUAL_ENV`. **`kde-material-you-colors` en fait partie** :
-sans ce venv, Dolphin et les dialogues KDE gardent leurs couleurs par défaut.
-`install.sh` le construit avec `uv` depuis `vendor/end4/requirements.txt`.
-
-## Écran de connexion (SDDM)
-
-Thème maison dans `sddm/`, installé par `scripts/40-sddm.sh`. Il reprend la
-mise en page de l'écran de verrouillage. Ses couleurs sont dupliquées dans
-`sddm/theme/theme.conf` : le greeter tourne avant toute session utilisateur et
-ne peut rien lire sous `$HOME`.
-
-Valider avec `sddm-greeter` (le binaire Qt5 réellement utilisé), **pas**
-`sddm-greeter-qt6`, plus permissif : il laisse passer des erreurs qui, en
-vrai, font retomber SDDM sur son thème par défaut sans rien afficher.
-
-## Divers
-
-- **Clavier** : end-4 force `kb_layout = "us"`. L'override AZERTY est dans
-  `hypr/custom/general.lua`, le fichier qu'ils prévoient pour ça.
-- **Hyprland régénère un `hyprland.conf` bidon** dès qu'il n'en trouve pas, et
-  ce stub masque `hyprland.lua`. `install.sh` le supprime.
-- **Spotify** : relancer `spicetify apply` après chaque mise à jour, le patch
-  saute.
-- Le code d'end-4 est sous **GPL-3.0** ; leur licence est conservée à la
-  racine (`LICENSE-end4`).
-
-## Modifier / re-stow un paquet
-
-```sh
-stow -d stow -t ~ -R quickshell     # -n pour simuler, -D pour retirer
-```
+- Part of end-4's tooling lives in a venv at `~/.local/state/quickshell/.venv`
+  (`$ILLOGICAL_IMPULSE_VIRTUAL_ENV`), built by `install.sh` with `uv`.
+  `kde-material-you-colors` is in there — without it, KDE apps keep their
+  default colours.
+- **SDDM**: theme in `sddm/`, installed by `scripts/40-sddm.sh`. Its colours are
+  duplicated in `sddm/theme/theme.conf` since the greeter runs before any user
+  session. Test with `sddm-greeter` (the Qt5 binary actually used), not
+  `sddm-greeter-qt6`.
+- **Keyboard**: end-4 forces `kb_layout = "us"`; the AZERTY override is in
+  `hypr/custom/general.lua`.
+- Hyprland regenerates a stub `hyprland.conf` when it finds none, which shadows
+  `hyprland.lua`. `install.sh` deletes it.
+- **Spotify**: re-run `spicetify apply` after each update.
+- end-4's code is GPL-3.0; their licence is kept at the root as `LICENSE-end4`.

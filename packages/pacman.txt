@@ -1,11 +1,10 @@
 # Official repo packages, one per line. Installed with: pacman -S --needed
 
-# Base du rice : stow, shell, greeter, polices
+# Base du rice : shell, greeter, polices
 fastfetch
 noto-fonts-emoji
 nwg-displays
 sddm
-stow
 ttf-firacode-nerd
 zsh
 

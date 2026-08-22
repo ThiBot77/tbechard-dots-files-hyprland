@@ -1,16 +1,7 @@
-# Etat genere par spicetify. Le paquet stow plie ~/.config/spicetify en un
-# lien vers ce depot, donc spicetify ecrit son etat directement ici. Ces
-# fichiers contiennent des chemins absolus propres a la machine
-# (spotify_path, prefs_path) : seul le theme graphite est versionne.
-stow/spicetify/.config/spicetify/config-xpui.ini
-stow/spicetify/.config/spicetify/Backup/
-stow/spicetify/.config/spicetify/CustomApps/
-stow/spicetify/.config/spicetify/Extensions/
-
-# Couleurs regenerees par matugen a chaque changement de fond d'ecran.
-# Comme stow plie ces dossiers en liens vers le depot, matugen ecrit droit
-# dans l'arbre de travail : on garde les fichiers (le shell en a besoin) mais
-# on ne les suit pas, sinon chaque wallpaper produit un diff.
-stow/hypr/.config/hypr/hyprland/colors.lua
-stow/hypr/.config/hypr/hyprlock/colors.conf
-stow/fuzzel/.config/fuzzel/fuzzel_theme.ini
+# Etat genere par spicetify dans ~/.config/spicetify. Ces fichiers contiennent
+# des chemins absolus propres a la machine (spotify_path, prefs_path) : seul le
+# theme graphite est versionne.
+config/spicetify/.config/spicetify/config-xpui.ini
+config/spicetify/.config/spicetify/Backup/
+config/spicetify/.config/spicetify/CustomApps/
+config/spicetify/.config/spicetify/Extensions/
