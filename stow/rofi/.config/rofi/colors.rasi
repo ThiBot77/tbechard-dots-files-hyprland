@@ -1,8 +1,0 @@
-/* Palette graphite — source unique des couleurs du rice, éditer ici. */
-* {
-    bg:      #0a0a0b;
-    bg-alt:  #141417;
-    fg:      #d6d6d8;
-    fg-dim:  #6b6b70;
-    accent:  #b9b9be;
-}

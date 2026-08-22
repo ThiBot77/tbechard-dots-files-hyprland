@@ -1,45 +1,26 @@
-/* Tuiles facon github.com/elifouts/Dotfiles, recolorees en graphite :
-   grille de grandes cases qui s'agrandissent vers le centre au survol.
-   L'effet vient d'une marge qui se reduit au focus, pas d'un scale. */
-
 * {
-    background-image: none;
-    font-family: "Adwaita Sans", sans-serif;
-    font-size: 15px;
-    transition: 200ms cubic-bezier(0.2, 0, 0.2, 1);
+	all: unset;
+	background-image: none;
+	transition: 400ms cubic-bezier(0.05, 0.7, 0.1, 1);
 }
 
 window {
-    background-color: rgba(10, 10, 11, 0.86);
+	background: rgba(0, 0, 0, 0.5);
 }
 
-/* Voile clair plutot qu'un gris opaque : sur le fond assombri de la fenetre,
-   #141417 ne se detache que d'une dizaine de niveaux et les tuiles
-   disparaissent. */
 button {
-    color: #d6d6d8;
-    background-color: rgba(214, 214, 216, 0.05);
-    border: 1px solid rgba(214, 214, 216, 0.14);
-    border-radius: 18px;
-    outline-style: none;
-    background-repeat: no-repeat;
-    background-position: center 38%;
-    background-size: 22%;
-    margin: 24px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	font-family: 'Material Symbols Outlined';
+	font-size: 10rem;
+	background-color: rgba(11, 11, 11, 0.4);
+	color: #FFFFFF;
+	margin: 2rem;
+	border-radius: 2rem;
+	padding: 3rem;
 }
 
 button:focus,
+button:active,
 button:hover {
-    color: #0a0a0b;
-    background-color: #b9b9be;
-    border-color: #b9b9be;
-    margin: 12px;
+	background-color: rgba(51, 51, 51, 0.5);
+	border-radius: 4rem;
 }
-
-#lock      { background-image: image(url("icons/lock.png")); }
-#logout    { background-image: image(url("icons/logout.png")); }
-#suspend   { background-image: image(url("icons/suspend.png")); }
-#hibernate { background-image: image(url("icons/hibernate.png")); }
-#shutdown  { background-image: image(url("icons/shutdown.png")); }
-#reboot    { background-image: image(url("icons/reboot.png")); }
