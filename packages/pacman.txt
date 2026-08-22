@@ -41,6 +41,7 @@ tumbler
 thunar-volman
 gsimplecal
 starship
+quickshell
 wf-recorder
 swayosd
 cliphist
