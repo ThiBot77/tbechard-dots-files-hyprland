@@ -6,3 +6,11 @@ stow/spicetify/.config/spicetify/config-xpui.ini
 stow/spicetify/.config/spicetify/Backup/
 stow/spicetify/.config/spicetify/CustomApps/
 stow/spicetify/.config/spicetify/Extensions/
+
+# Couleurs regenerees par matugen a chaque changement de fond d'ecran.
+# Comme stow plie ces dossiers en liens vers le depot, matugen ecrit droit
+# dans l'arbre de travail : on garde les fichiers (le shell en a besoin) mais
+# on ne les suit pas, sinon chaque wallpaper produit un diff.
+stow/hypr/.config/hypr/hyprland/colors.lua
+stow/hypr/.config/hypr/hyprlock/colors.conf
+stow/fuzzel/.config/fuzzel/fuzzel_theme.ini
