@@ -1,120 +1,182 @@
 # tbe-dots-files
 
-Configuration Hyprland sur Arch Linux
+Hyprland desktop for Arch Linux, based on [end-4's dots-hyprland](https://github.com/end-4/dots-hyprland),
+themed in graphite.
 
-Le shell — barre, notifications, launcher, panneau de réglages, écran de
-verrouillage — est celui d'end-4, rapatrié dans ce dépôt et installé par
-`install.sh`. On garde nos propres kitty, zsh, fastfetch et fonds d'écran.
+## Install
 
-## Installation
+On a fresh Arch install:
 
 ```sh
-git clone <ce repo> ~/Documents/tbe-dots-files
+git clone <this repo> ~/Documents/tbe-dots-files
 cd ~/Documents/tbe-dots-files
-./install.sh          # --dry-run pour voir sans rien modifier
+./install.sh              # --dry-run to see what it would do first
 ```
 
-Puis **se déconnecter et se reconnecter** : Hyprland ne lit sa config qu'au
-démarrage, et les nouveaux groupes utilisateur ne s'appliquent qu'à
-l'ouverture de session.
+Then **log out and back in**. Hyprland reads its config at startup, and the
+new user groups only apply at session start.
 
-## Qui fait quoi
+The installer runs four steps, in order:
 
-Chaque dossier de `stow/` est un paquet GNU Stow : son arborescence est
-recopiée en liens symboliques dans `$HOME`.
-
-### Le bureau
-
-| Paquet | Installe dans | Rôle |
-|---|---|---|
-| `hypr` | `~/.config/hypr` | Config **Hyprland** d'end-4, en **Lua** (`hyprland.lua`, pas `hyprland.conf`). Raccourcis, règles de fenêtres, animations, lancement du shell. Tes réglages perso vont dans `custom/*.lua`, chargés en dernier. |
-| `quickshell` | `~/.config/quickshell` | **Le shell lui-même** : barre, notifications, launcher, panneau de réglages, sidebars, dock, écran de verrouillage. ~586 fichiers QML d'end-4. Quickshell n'est que le moteur ; toute l'interface vient d'ici. |
-| `matugen` | `~/.config/matugen`, `~/.config/kde-material-you-colors` | **Génération des couleurs.** Extrait une palette Material You du fond d'écran et la décline vers Hyprland, hyprlock, fuzzel, GTK et Qt. C'est lui qui rend le thème monochrome. |
-| `portal` | `~/.config/xdg-desktop-portal` | Choix du portail XDG. Indispensable au **partage d'écran** (Discord, visios) sous Wayland. |
-
-### Applications habillées par le thème
-
-| Paquet | Installe dans | Rôle |
-|---|---|---|
-| `kde` | `~/.config/{dolphinrc,konsolerc,darklyrc,fontconfig}`, `~/.local/share` | Réglages des applis **KDE** (Dolphin, Konsole) et style Darkly. Le rendu sous-pixel est désactivé via fontconfig. |
-| `kvantum` | `~/.config/Kvantum` | Moteur de thème **Qt**. Habille les applis Qt qui ne suivent pas kdeglobals. |
-| `fuzzel` | `~/.config/fuzzel` | Launcher de secours. `fuzzel_theme.ini` est **généré par matugen** (donc non versionné). |
-| `wlogout` | `~/.config/wlogout` | Menu d'extinction. |
-| `mpv` | `~/.config/mpv` | Lecteur vidéo. |
-| `swappy` | `~/.config/swappy` | Annotation de captures d'écran. |
-| `browsers` | `~/.config/*-flags.conf` | Options de lancement de Chrome, VS Code et Thorium (Wayland natif, trousseau GNOME). |
-| `spicetify` | `~/.config/spicetify` | Thème graphite pour le client **Spotify**. |
-
-### Ce qu'on garde à nous
-
-| Paquet | Installe dans | Rôle |
-|---|---|---|
-| `kitty` | `~/.config/kitty` | Terminal. Config et couleurs maison, indépendantes d'end-4. |
-| `zsh` | `~/.zshrc` | Shell : Oh My Zsh pour le plugin git, prompt délégué à starship. |
-| `starship` | `~/.config/starship.toml` | Prompt powerline arrondi. Couleurs **nommées**, donc héritées de la palette du terminal. |
-| `fastfetch` | `~/.config/fastfetch` | Résumé système à l'ouverture d'un terminal. |
-| `wallpaper` | `~/Images/Wallpapers` | Les fonds d'écran. Ce chemin n'est pas décoratif : c'est là que le sélecteur d'end-4 va les chercher. |
-
-## Palette
-
-Le graphite ne vient pas de couleurs écrites en dur : c'est le schéma
-Material You **`scheme-monochrome`** avec le mode sombre forcé, défini dans
-`quickshell/ii/modules/common/Config.qml`. matugen produit donc une palette
-en niveaux de gris à partir de n'importe quel fond d'écran.
-
-Les couleurs sémantiques (liens, succès, erreur) restent teintées — c'est
-voulu par Material You, un lien doit rester reconnaissable.
-
-Le panneau de réglages (`SUPER + I`) écrit dans
-`~/.config/illogical-impulse/config.json`, pas dans les fichiers QML : ceux-ci
-ne fournissent que les valeurs par défaut au premier lancement.
-
-## Fichiers générés, volontairement non versionnés
-
-matugen et kde-material-you-colors réécrivent des fichiers de couleurs à
-chaque changement de fond. Comme stow replie ces dossiers en liens vers le
-dépôt, ces outils écrivent **droit dans l'arbre de travail** : sans
-précaution, chaque wallpaper produirait un diff.
-
-| Fichier | Écrit par |
+| Step | What it does |
 |---|---|
-| `hypr/hyprland/colors.lua`, `hypr/hyprlock/colors.conf` | matugen (dans `.gitignore`) |
-| `fuzzel/fuzzel_theme.ini` | matugen (dans `.gitignore`) |
-| `~/.config/kdeglobals` | kde-material-you-colors — **hors stow**, semé depuis `vendor/end4/kdeglobals.default` |
-| `~/.config/hypr/monitors.lua` | nwg-displays — machine-local, semé à l'install |
+| `scripts/00-check-system.sh` | Checks it is Arch, installs `yay` if missing |
+| `scripts/10-install-packages.sh` | Installs everything in `packages/pacman.txt` and `packages/aur.txt` |
+| `scripts/20-copy-configs.sh` | Copies each package in `config/` into `$HOME` |
+| `scripts/30-post-install.sh` | Oh My Zsh, Python venv, spicetify, user groups |
+| `scripts/40-sddm.sh` | Installs and enables the SDDM login theme |
 
-## Environnement Python
-
-Une partie de l'outillage d'end-4 n'est pas installée en paquets système mais
-dans un venv, à `~/.local/state/quickshell/.venv`, désigné par
-`$ILLOGICAL_IMPULSE_VIRTUAL_ENV`. **`kde-material-you-colors` en fait partie** :
-sans ce venv, Dolphin et les dialogues KDE gardent leurs couleurs par défaut.
-`install.sh` le construit avec `uv` depuis `vendor/end4/requirements.txt`.
-
-## Écran de connexion (SDDM)
-
-Thème maison dans `sddm/`, installé par `scripts/40-sddm.sh`. Il reprend la
-mise en page de l'écran de verrouillage. Ses couleurs sont dupliquées dans
-`sddm/theme/theme.conf` : le greeter tourne avant toute session utilisateur et
-ne peut rien lire sous `$HOME`.
-
-Valider avec `sddm-greeter` (le binaire Qt5 réellement utilisé), **pas**
-`sddm-greeter-qt6`, plus permissif : il laisse passer des erreurs qui, en
-vrai, font retomber SDDM sur son thème par défaut sans rien afficher.
-
-## Divers
-
-- **Clavier** : end-4 force `kb_layout = "us"`. L'override AZERTY est dans
-  `hypr/custom/general.lua`, le fichier qu'ils prévoient pour ça.
-- **Hyprland régénère un `hyprland.conf` bidon** dès qu'il n'en trouve pas, et
-  ce stub masque `hyprland.lua`. `install.sh` le supprime.
-- **Spotify** : relancer `spicetify apply` après chaque mise à jour, le patch
-  saute.
-- Le code d'end-4 est sous **GPL-3.0** ; leur licence est conservée à la
-  racine (`LICENSE-end4`).
-
-## Modifier / re-stow un paquet
+To reinstall a single config after editing it:
 
 ```sh
-stow -d stow -t ~ -R quickshell     # -n pour simuler, -D pour retirer
+scripts/20-copy-configs.sh kitty      # no argument installs everything
 ```
+
+Configs are copied, not symlinked: edit the file in `config/`, not in
+`~/.config`, then re-run the command above. The copy overwrites the target.
+
+## Main packages
+
+**Desktop**
+
+| Package | Role |
+|---|---|
+| `hyprland` | The Wayland compositor. Config is `~/.config/hypr/hyprland.lua` |
+| `quickshell` | The shell itself: bar, notifications, launcher, settings panel |
+| `hyprlock`, `hypridle` | Lock screen and idle daemon |
+| `matugen` | Generates the Material You palette from the wallpaper |
+| `sddm` | Login screen. Custom theme in `sddm/` |
+| `xdg-desktop-portal-hyprland`, `-gtk`, `-kde` | Screen sharing and file dialogs |
+| `pipewire-pulse`, `wireplumber` | Audio |
+| `polkit-kde-agent`, `gnome-keyring` | Authentication prompts and secrets |
+| `networkmanager`, `plasma-nm`, `bluedevil` | Network and Bluetooth |
+
+**Tools the shell calls**
+
+| Package | Role |
+|---|---|
+| `cliphist`, `wl-clipboard` | Clipboard history |
+| `hyprshot`, `slurp`, `swappy` | Screenshots and annotation |
+| `brightnessctl`, `ddcutil` | Brightness, including external monitors |
+| `playerctl`, `cava` | Media controls and audio visualiser |
+| `ydotool`, `wtype` | Virtual input |
+| `tesseract` | OCR from a screenshot |
+| `nwg-displays` | Monitor layout editor, writes `~/.config/hypr/monitors.lua` |
+| `uv` | Builds the Python venv end-4's tooling needs |
+
+**Terminal**
+
+| Package | Role |
+|---|---|
+| `kitty` | Terminal emulator |
+| `zsh` + Oh My Zsh | Shell |
+| `starship` | Prompt |
+| `fastfetch` | System summary on terminal start |
+| `eza`, `ripgrep`, `jq` | Everyday CLI tools |
+
+**Theming**
+
+| Package | Role |
+|---|---|
+| `darkly-bin`, `breeze-plus` | Qt/KDE widget style |
+| `adw-gtk-theme-git` | GTK theme |
+| `bibata-cursor-theme-bin` | Cursor |
+| `ttf-firacode-nerd`, `ttf-jetbrains-mono-nerd`, `otf-space-grotesk`, `ttf-material-symbols-variable` | Fonts and icons |
+
+**Apps**
+
+`firefox`, `google-chrome`, `zen-browser-bin`, `visual-studio-code-bin`,
+`discord`, `spotify` (+ `spicetify-cli` for the graphite theme), `dolphin`,
+`dbeaver`, `filezilla`, `forticlient-vpn`.
+
+## Keyboard shortcuts
+
+`SUPER + /` opens the full cheatsheet in the shell. The main ones:
+
+**Apps**
+
+| Shortcut | Action |
+|---|---|
+| `SUPER + Return` | Terminal (kitty) |
+| `SUPER + W` | Browser (Chrome) |
+| `SUPER + E` | File manager (Dolphin) |
+| `SUPER + C` | Code editor (VS Code) |
+| `SUPER + I` | Settings panel |
+| `CTRL + SHIFT + Escape` | Task manager |
+| `CTRL + SUPER + V` | Volume mixer |
+
+**Windows**
+
+| Shortcut | Action |
+|---|---|
+| `SUPER + Q` | Close window |
+| `SUPER + ←↑→↓` | Focus window in that direction |
+| `SUPER + SHIFT + ←↑→↓` | Move window in that direction |
+| `SUPER + F` | Fullscreen |
+| `SUPER + D` | Maximize |
+| `SUPER + ALT + Space` | Float / tile |
+| `SUPER + P` | Pin |
+| `SUPER + drag` | Move window (`SUPER + right-drag` to resize) |
+
+**Workspaces**
+
+| Shortcut | Action |
+|---|---|
+| `SUPER + 1..0` | Go to workspace |
+| `SUPER + ALT + 1..0` | Send window to workspace |
+| `CTRL + SUPER + ←/→` | Previous / next workspace |
+| `SUPER + scroll` | Previous / next workspace |
+| `SUPER + S` | Toggle scratchpad (`SUPER + ALT + S` sends the window there) |
+| `SUPER + Tab` | Overview |
+
+**Shell**
+
+| Shortcut | Action |
+|---|---|
+| `SUPER` (tap) | Search / launcher |
+| `SUPER + /` | Cheatsheet |
+| `SUPER + A` | Left sidebar |
+| `SUPER + N` | Right sidebar (notifications) |
+| `SUPER + V` | Clipboard history |
+| `SUPER + .` | Emoji picker |
+| `SUPER + M` | Media controls |
+| `SUPER + J` | Show / hide the bar |
+| `CTRL + SUPER + T` | Change wallpaper (`+ ALT` for a random one) |
+| `CTRL + SUPER + R` | Restart the shell |
+| `CTRL + ALT + Delete` | Session menu |
+
+**Utilities**
+
+| Shortcut | Action |
+|---|---|
+| `SUPER + SHIFT + S` | Region screenshot to clipboard |
+| `Print` | Full screenshot to clipboard (`CTRL + Print` also saves a file) |
+| `SUPER + SHIFT + R` | Record a region (`SUPER + SHIFT + ALT + R` full screen with sound) |
+| `SUPER + SHIFT + C` | Colour picker |
+| `SUPER + SHIFT + X` | OCR the screen to clipboard |
+| `SUPER + SHIFT + T` | Translate what is on screen |
+| `SUPER + SHIFT + A` | Search a region with Google Lens |
+| `SUPER + -` / `SUPER + =` | Zoom out / in |
+
+**Session and media**
+
+| Shortcut | Action |
+|---|---|
+| `SUPER + L` | Lock |
+| `SUPER + SHIFT + L` | Suspend |
+| `SUPER + SHIFT + P` | Play / pause |
+| `SUPER + SHIFT + N` / `SUPER + SHIFT + B` | Next / previous track |
+| `SUPER + SHIFT + M` | Mute (`SUPER + ALT + M` for the mic) |
+
+Add your own in `config/hypr/.config/hypr/custom/keybinds.lua`; that file is
+loaded last, so it wins over the defaults.
+
+## Repository layout
+
+| Directory | Contents |
+|---|---|
+| `config/` | One directory per config; each mirrors `$HOME` and is copied there |
+| `packages/` | The pacman and AUR package lists |
+| `scripts/` | The install steps |
+| `sddm/` | The login screen theme |
+| `vendor/` | Files taken from end-4 that the scripts use: the `kdeglobals` base and the Python requirements |
