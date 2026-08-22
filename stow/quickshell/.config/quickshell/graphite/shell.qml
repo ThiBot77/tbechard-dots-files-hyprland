@@ -1,73 +1,138 @@
 // Barre Quickshell, palette graphite. Lancement : quickshell -c graphite
 //
-// Composition reprise de end-4/dots-hyprland (modules/ii/bar/BarContent.qml) :
-// plusieurs petits ilots par cote plutot qu'un bloc par zone, titre de fenetre
-// et media a gauche, workspaces au centre, horloge et indicateurs a droite.
-// Le style est le notre (graphite) ; leur code depend de leur systeme Material
-// You et de leurs singletons, il n'est pas reutilisable tel quel.
+// Composition ET langage visuel repris de end-4/dots-hyprland (modules/ii/bar) :
+// ilots multiples, ressources et media a gauche, workspaces au centre, horloge
+// et indicateurs a droite, le tout en icones plutot qu'en libelles texte.
+// Seules les couleurs changent (graphite au lieu de Material You).
+//
+// Material Symbols fonctionne par LIGATURES : le texte est le nom de l'icone
+// ("wifi", "volume_up"), pas un codepoint. L'axe variable FILL passe d'une
+// icone evidee a pleine.
 //
 // L'API vient des .qmltypes livres par le paquet, pas du site : celui-ci est
 // rendu cote client et son index par defaut est celui de la v0.1.0, qui ne
 // liste ni Networking ni Bluetooth alors que la 0.3.1 les fournit.
 
 import Quickshell
+import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Services.SystemTray
 import Quickshell.Services.Pipewire
 import Quickshell.Services.UPower
 import Quickshell.Services.Mpris
 import Quickshell.Networking
+import Quickshell.Bluetooth
 import Quickshell.Widgets
 import QtQuick
 
 ShellRoot {
     id: root
 
-    readonly property color cBg:        "#0a0a0b"
-    readonly property color cFg:        "#d6d6d8"
-    readonly property color cFgDim:     "#6b6b70"
-    readonly property color cAccent:    "#b9b9be"
-    readonly property color cAccentDim: "#5a5a5f"
-    readonly property color cBorder:    "#1c1c1f"
+    readonly property color cBg:     "#0a0a0b"
+    readonly property color cFg:     "#d6d6d8"
+    readonly property color cDim:    "#6b6b70"
+    readonly property color cAccent: "#b9b9be"
+    readonly property color cDimmer: "#5a5a5f"
+    readonly property color cBorder: "#1c1c1f"
 
-    // Les proprietes audio d'un noeud PipeWire ne sont liees que si l'objet est
-    // suivi ; sans tracker, volume et muted restent a zero.
     PwObjectTracker { objects: [Pipewire.defaultAudioSink] }
 
-    // Disposition clavier : Hyprland l'annonce via l'evenement activelayout,
-    // dont la donnee est "clavier,Disposition". Pas de sondage.
+    // --- disposition clavier : evenement Hyprland, pas de sondage -----------
     property string kbLayout: "fr"
     Connections {
         target: Hyprland
         function onRawEvent(event) {
             if (event.name !== "activelayout") return;
-            const parts = event.data.split(",");
-            root.kbLayout = parts[parts.length - 1].slice(0, 2).toLowerCase();
+            const p = event.data.split(",");
+            root.kbLayout = p[p.length - 1].slice(0, 2).toLowerCase();
         }
     }
 
+    // --- CPU : deux echantillons de /proc/stat -----------------------------
+    property real cpuUsage: 0
+    property var _prevCpu: null
+    FileView { id: statFile; path: "/proc/stat" }
+    FileView { id: memFile;  path: "/proc/meminfo" }
+
+    property real memUsage: 0
+
+    Timer {
+        interval: 3000
+        running: true
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: {
+            statFile.reload();
+            memFile.reload();
+
+            const line = statFile.text().split("\n")[0].trim().split(/\s+/).slice(1).map(Number);
+            if (line.length >= 4) {
+                const idle = line[3] + (line[4] ?? 0);
+                const total = line.reduce((a, b) => a + b, 0);
+                if (root._prevCpu) {
+                    const dTotal = total - root._prevCpu.total;
+                    const dIdle = idle - root._prevCpu.idle;
+                    if (dTotal > 0) root.cpuUsage = Math.max(0, Math.min(1, 1 - dIdle / dTotal));
+                }
+                root._prevCpu = { total: total, idle: idle };
+            }
+
+            const mem = memFile.text();
+            const grab = k => Number((mem.match(new RegExp(k + ":\\s+(\\d+)")) ?? [0, 0])[1]);
+            const totalKb = grab("MemTotal"), availKb = grab("MemAvailable");
+            if (totalKb > 0) root.memUsage = (totalKb - availKb) / totalKb;
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    component MIcon: Text {
+        property real fill: 0
+        font.family: "Material Symbols Rounded"
+        font.pixelSize: 17
+        font.variableAxes: ({ "FILL": fill, "opsz": 20, "wght": 400 })
+        renderType: Text.NativeRendering
+        color: root.cDim
+        anchors.verticalCenter: parent ? parent.verticalCenter : undefined
+    }
+
+    component MLabel: Text {
+        font.family: "Adwaita Sans"
+        font.pixelSize: 13
+        color: root.cDim
+        anchors.verticalCenter: parent ? parent.verticalCenter : undefined
+    }
+
+    // Ilot : fond arrondi qui s'eclaire au survol.
     component Island: Rectangle {
+        id: isl
         default property alias content: inner.data
-        implicitWidth: inner.implicitWidth + 22
-        implicitHeight: 26
-        radius: 13
-        color: Qt.alpha(root.cBg, 0.82)
+        property alias hovered: ma.containsMouse
+        signal clicked()
+
+        implicitWidth: inner.implicitWidth + 20
+        implicitHeight: 28
+        radius: 14
+        color: ma.containsMouse ? Qt.alpha(root.cAccent, 0.14) : Qt.alpha(root.cBg, 0.82)
         border.width: 1
-        border.color: root.cBorder
+        border.color: ma.containsMouse ? root.cDimmer : root.cBorder
         visible: inner.implicitWidth > 0
+
+        Behavior on color        { ColorAnimation { duration: 160 } }
+        Behavior on border.color { ColorAnimation { duration: 160 } }
+
+        MouseArea {
+            id: ma
+            anchors.fill: parent
+            hoverEnabled: true
+            acceptedButtons: Qt.LeftButton
+            onClicked: isl.clicked()
+        }
 
         Row {
             id: inner
             anchors.centerIn: parent
-            spacing: 10
+            spacing: 9
         }
-    }
-
-    component Label: Text {
-        color: root.cFgDim
-        font.family: "Adwaita Sans"
-        font.pixelSize: 13
-        anchors.verticalCenter: parent ? parent.verticalCenter : undefined
     }
 
     Variants {
@@ -79,12 +144,13 @@ ShellRoot {
             screen: modelData
 
             anchors { top: true; left: true; right: true }
-            implicitHeight: 38
+            implicitHeight: 40
             color: "transparent"
 
-            readonly property var activeToplevel: Hyprland.activeToplevel
             readonly property var player: Mpris.players.values.find(p => p.isPlaying)
                                        ?? Mpris.players.values[0] ?? null
+            readonly property var sink: Pipewire.defaultAudioSink
+            readonly property var bat: UPower.displayDevice
 
             // ---------------- gauche ----------------
             Row {
@@ -92,34 +158,28 @@ ShellRoot {
                 spacing: 6
 
                 Island {
-                    Label {
-                        text: bar.activeToplevel?.title ?? "Bureau"
-                        color: root.cFg
-                        elide: Text.ElideRight
-                        width: Math.min(implicitWidth, 320)
-                    }
+                    MIcon { text: "memory" }
+                    MLabel { text: Math.round(root.cpuUsage * 100) + "%" }
+                    MIcon { text: "developer_board"; }
+                    MLabel { text: Math.round(root.memUsage * 100) + "%" }
                 }
 
                 Island {
-                    Label {
-                        visible: bar.player !== null
-                        text: bar.player
-                            ? (bar.player.isPlaying ? "▶  " : "⏸  ")
-                              + (bar.player.trackTitle ?? "")
-                            : ""
+                    onClicked: bar.player?.togglePlaying()
+                    MIcon {
+                        text: bar.player?.isPlaying ? "pause" : "music_note"
+                        fill: bar.player?.isPlaying ? 1 : 0
+                        color: bar.player?.isPlaying ? root.cAccent : root.cDim
+                    }
+                    MLabel {
+                        text: bar.player?.trackTitle ?? "Aucun média"
                         elide: Text.ElideRight
-                        width: Math.min(implicitWidth, 260)
-
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: bar.player?.togglePlaying()
-                        }
+                        width: Math.min(implicitWidth, 240)
                     }
                 }
             }
 
-            // ---------------- centre : workspaces ----------------
+            // ---------------- centre ----------------
             Island {
                 anchors { horizontalCenter: parent.horizontalCenter; verticalCenter: parent.verticalCenter }
 
@@ -129,12 +189,15 @@ ShellRoot {
                     delegate: Rectangle {
                         required property var modelData
                         anchors.verticalCenter: parent.verticalCenter
-                        width: 8; height: 8; radius: 4
+                        width: modelData.focused ? 22 : 8
+                        height: 8
+                        radius: 4
                         color: modelData.focused ? root.cAccent
-                             : modelData.active  ? root.cFgDim
-                             : root.cAccentDim
+                             : modelData.active  ? root.cDim
+                             : root.cDimmer
 
-                        Behavior on color { ColorAnimation { duration: 150 } }
+                        Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+                        Behavior on color { ColorAnimation { duration: 160 } }
 
                         MouseArea {
                             anchors.fill: parent
@@ -152,39 +215,56 @@ ShellRoot {
 
                 Island {
                     SystemClock { id: clk; precision: SystemClock.Minutes }
-                    Label {
+                    MLabel {
                         color: root.cFg
-                        text: clk.date.toLocaleString(Qt.locale("fr_FR"), "HH:mm  ddd d MMM")
+                        text: clk.date.toLocaleString(Qt.locale("fr_FR"), "HH:mm")
+                    }
+                    MLabel {
+                        color: root.cDimmer
+                        text: "·"
+                    }
+                    MLabel {
+                        text: clk.date.toLocaleString(Qt.locale("fr_FR"), "ddd d MMM")
                     }
                 }
 
                 Island {
-                    Label {
-                        text: root.kbLayout.toUpperCase()
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: Hyprland.dispatch("exec hyprctl switchxkblayout all next")
-                        }
+                    onClicked: Hyprland.dispatch("exec hyprctl switchxkblayout all next")
+
+                    MIcon { text: "keyboard" }
+                    MLabel { text: root.kbLayout.toUpperCase() }
+
+                    MIcon {
+                        text: !bar.sink?.audio ? "volume_off"
+                            : bar.sink.audio.muted ? "volume_off"
+                            : bar.sink.audio.volume > 0.5 ? "volume_up" : "volume_down"
+                        fill: 1
+                    }
+                    MLabel {
+                        text: !bar.sink?.audio ? "—"
+                            : bar.sink.audio.muted ? "muet"
+                            : Math.round(bar.sink.audio.volume * 100) + "%"
                     }
 
-                    Label {
-                        readonly property var sink: Pipewire.defaultAudioSink
-                        text: !sink?.audio ? ""
-                            : sink.audio.muted ? "muet"
-                            : Math.round(sink.audio.volume * 100) + "%"
+                    MIcon {
+                        text: Networking.connectivity === NetworkConnectivity.Full ? "wifi" : "wifi_off"
+                        fill: 1
+                        color: Networking.connectivity === NetworkConnectivity.Full ? root.cDim : root.cAccent
                     }
 
-                    Label {
-                        text: Networking.connectivity === NetworkConnectivity.Full ? "net" : "hors ligne"
-                        color: Networking.connectivity === NetworkConnectivity.Full
-                             ? root.cFgDim : root.cAccent
+                    MIcon {
+                        text: Bluetooth.defaultAdapter?.enabled ? "bluetooth" : "bluetooth_disabled"
+                        fill: 1
                     }
 
-                    Label {
-                        readonly property var bat: UPower.displayDevice
-                        visible: bat?.isLaptopBattery ?? false
-                        text: bat ? Math.round(bat.percentage * 100) + "%" : ""
+                    MIcon {
+                        visible: bar.bat?.isLaptopBattery ?? false
+                        text: "battery_full"
+                        fill: 1
+                    }
+                    MLabel {
+                        visible: bar.bat?.isLaptopBattery ?? false
+                        text: bar.bat ? Math.round(bar.bat.percentage * 100) + "%" : ""
                     }
                 }
 
@@ -195,7 +275,7 @@ ShellRoot {
                         delegate: IconImage {
                             required property var modelData
                             anchors.verticalCenter: parent.verticalCenter
-                            implicitSize: 15
+                            implicitSize: 16
                             source: modelData.icon
 
                             MouseArea {

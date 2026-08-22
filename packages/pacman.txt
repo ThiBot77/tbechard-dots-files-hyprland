@@ -3,6 +3,7 @@ stow
 zsh
 fastfetch
 ttf-firacode-nerd
+ttf-material-symbols-variable
 gnome-themes-extra
 noto-fonts-emoji
 
