@@ -135,7 +135,6 @@ Configs are copied, not symlinked: edit the file in `config/`, not in
 |---|---|
 | `SUPER` (tap) | Search / launcher |
 | `SUPER + /` | Cheatsheet |
-| `SUPER + A` | Left sidebar |
 | `SUPER + N` | Right sidebar (notifications) |
 | `SUPER + V` | Clipboard history |
 | `SUPER + .` | Emoji picker |
