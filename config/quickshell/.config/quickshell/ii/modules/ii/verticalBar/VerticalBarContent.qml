@@ -273,6 +273,13 @@ Item { // Bar content region
                         }
                     }
                     MaterialSymbol {
+                        visible: Network.vpnActive
+                        Layout.bottomMargin: visible ? 4 : 0
+                        text: "vpn_key"
+                        iconSize: Appearance.font.pixelSize.larger
+                        color: rightSidebarButton.colText
+                    }
+                    MaterialSymbol {
                         text: Network.materialSymbol
                         iconSize: Appearance.font.pixelSize.larger
                         color: rightSidebarButton.colText
