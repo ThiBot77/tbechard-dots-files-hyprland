@@ -33,13 +33,17 @@ apply_kitty() {
     echo "Template file not found for Kitty theme. Skipping that."
     return
   fi
-  # Copy template
+  # Copy template, substitute in a temp file, then move it into place: kitty.conf
+  # includes the final path, so a kitty starting mid-write would otherwise read
+  # the raw "#$term0 #" placeholders and refuse the config.
   mkdir -p "$STATE_DIR"/user/generated/terminal
-  cp "$SCRIPT_DIR/terminal/kitty-theme.conf" "$STATE_DIR"/user/generated/terminal/kitty-theme.conf
+  local tmp="$STATE_DIR/user/generated/terminal/.kitty-theme.conf.tmp"
+  cp "$SCRIPT_DIR/terminal/kitty-theme.conf" "$tmp"
   # Apply colors
   for i in "${!colorlist[@]}"; do
-    sed -i "s/${colorlist[$i]} #/${colorvalues[$i]#\#}/g" "$STATE_DIR"/user/generated/terminal/kitty-theme.conf
+    sed -i "s/${colorlist[$i]} #/${colorvalues[$i]#\#}/g" "$tmp"
   done
+  mv "$tmp" "$STATE_DIR"/user/generated/terminal/kitty-theme.conf
 
   # Reload
   if ! pgrep -f kitty >/dev/null; then
@@ -73,9 +77,22 @@ apply_anyterm() {
   done
 }
 
+apply_fastfetch() {
+  # .zshrc starts fastfetch with --color "$(cat <this file>)", falling back to
+  # the static accent shipped in ~/.config/fastfetch/accent. It lives in the
+  # state dir because 20-copy-configs.sh would overwrite anything under
+  # ~/.config/fastfetch.
+  local accent_file="$STATE_DIR/user/generated/terminal/accent"
+  mkdir -p "$(dirname "$accent_file")"
+  local primary
+  primary=$(grep -m1 '^\$primary:' "$STATE_DIR/user/generated/material_colors.scss" | cut -d' ' -f2 | tr -d ';')
+  [ -n "$primary" ] && printf '%s\n' "$primary" > "$accent_file"
+}
+
 apply_term() {
   apply_anyterm &
   apply_kitty &
+  apply_fastfetch &
 }
 
 # Check if terminal theming is enabled in config

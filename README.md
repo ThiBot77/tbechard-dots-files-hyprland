@@ -180,6 +180,15 @@ reloads kitty in place. `kitty.conf` includes that file after `theme.conf`, so
 the graphite palette in `theme.conf` is the base and the generated colors
 override it; comment the include out to pin kitty to graphite.
 
+The prompt and fastfetch ride along. `starship.toml` styles its segments with
+palette indexes (255 primary, 254 primaryContainer, 252 secondaryContainer,
+251 tertiary, 249 error) rather than hex, and quickshell rewrites exactly those
+slots, so the prompt takes the accent with no value duplicated. fastfetch is
+started by `.zshrc` with `--color` read from
+`~/.local/state/quickshell/user/generated/terminal/accent`, which
+`applycolor.sh` fills with the primary color, falling back to the static accent
+in `~/.config/fastfetch/accent`.
+
 The generated ANSI colors start from the graphite palette (it seeds
 `scripts/colors/terminal/scheme-base.json`) and are blended toward the
 wallpaper accent. How far is controlled by `harmony` and `termFgBoost` under
