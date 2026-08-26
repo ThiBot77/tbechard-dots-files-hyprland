@@ -139,7 +139,7 @@ if args.termscheme is not None:
 
     primary_color_argb = hex_to_argb(material_colors['primary_paletteKeyColor'])
     for color, val in term_source_colors.items():
-        if(args.scheme == 'monochrome') :
+        if args.scheme in ('monochrome', 'scheme-monochrome'):
             term_colors[color] = val
             continue
         if args.blend_bg_fg and color == "term0":

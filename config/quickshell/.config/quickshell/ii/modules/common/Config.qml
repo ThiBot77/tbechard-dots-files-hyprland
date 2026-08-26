@@ -103,9 +103,12 @@ Singleton {
                     property bool enableQtApps: true
                     property bool enableTerminal: true
                     property JsonObject terminalGenerationProps: JsonObject {
-                        property real harmony: 0.6
+                        // Muted values on purpose: the terminal base palette is
+                        // graphite, and the upstream defaults (0.6 / 0.35) wash
+                        // every ANSI color out to near-white.
+                        property real harmony: 0.3
                         property real harmonizeThreshold: 100
-                        property real termFgBoost: 0.35
+                        property real termFgBoost: 0.1
                         property bool forceDarkMode: true
                     }
                 }
