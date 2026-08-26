@@ -19,8 +19,7 @@
   "modules": [
     "break",
     {
-      "type": "title",
-      "format": "{user-name}@{host-name}"
+      "type": "title"
     },
     {
       "type": "custom",
@@ -77,6 +76,12 @@
       "type": "disk",
       "key": "",
       "folders": "/"
+    },
+    "break",
+    {
+      "type": "colors",
+      "symbol": "circle",
+      "paddingLeft": 3
     },
     "break"
   ]

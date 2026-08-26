@@ -32,6 +32,15 @@ Singleton {
     })
     property string wifiStatus: "disconnected"
 
+    // VPN / tunnel connection profiles (openvpn, wireguard, tun, ...)
+    // Each entry: { name, uuid, type, active }
+    property list<var> vpnProfiles: []
+    readonly property list<var> activeVpnProfiles: vpnProfiles.filter(p => p.active)
+    readonly property bool vpnActive: activeVpnProfiles.length > 0
+    readonly property string vpnName: activeVpnProfiles.map(p => p.name).join(", ")
+    // uuid of the profile currently being brought up/down, "" when idle
+    property string vpnBusyUuid: ""
+
     property string networkName: ""
     property int networkStrength
     property string materialSymbol: root.ethernet
@@ -96,6 +105,54 @@ Singleton {
         })
     }
 
+    function connectVpn(profile): void {
+        if (!profile) return;
+        root.vpnBusyUuid = profile.uuid;
+        vpnUpProc.exec(["nmcli", "connection", "up", "uuid", profile.uuid]);
+    }
+
+    function disconnectVpn(profile): void {
+        if (!profile) return;
+        root.vpnBusyUuid = profile.uuid;
+        vpnDownProc.exec(["nmcli", "connection", "down", "uuid", profile.uuid]);
+    }
+
+    function toggleVpn(profile): void {
+        if (!profile) return;
+        if (profile.active) root.disconnectVpn(profile);
+        else root.connectVpn(profile);
+    }
+
+    // Turns the last used VPN on, or every active one off
+    function toggleLastVpn(): void {
+        if (root.vpnActive) root.activeVpnProfiles.forEach(p => root.disconnectVpn(p));
+        else root.connectVpn(root.vpnProfiles[0] ?? null);
+    }
+
+    Process {
+        id: vpnUpProc
+        environment: ({
+            LANG: "C",
+            LC_ALL: "C"
+        })
+        onExited: {
+            root.vpnBusyUuid = "";
+            root.update();
+        }
+    }
+
+    Process {
+        id: vpnDownProc
+        environment: ({
+            LANG: "C",
+            LC_ALL: "C"
+        })
+        onExited: {
+            root.vpnBusyUuid = "";
+            root.update();
+        }
+    }
+
     Process {
         id: enableWifiProc
     }
@@ -158,6 +215,7 @@ Singleton {
         wifiStatusProcess.running = true
         updateNetworkName.running = true;
         updateNetworkStrength.running = true;
+        updateVpn.running = true;
     }
 
     Process {
@@ -216,6 +274,32 @@ Singleton {
             root.wifiStatus = wifiStatus;
             root.ethernet = hasEthernet;
             root.wifi = hasWifi;
+        }
+    }
+
+    Process {
+        id: updateVpn
+        running: true
+        // Every VPN-ish profile, connected or not, active ones first
+        command: ["nmcli", "-t", "-f", "NAME,UUID,TYPE,ACTIVE", "connection", "show", "--order", "active:name"]
+        environment: ({
+            LANG: "C",
+            LC_ALL: "C"
+        })
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const vpnTypes = ["vpn", "wireguard", "tun", "tap"];
+                root.vpnProfiles = text.trim().split("\n").filter(line => line.length > 0).map(line => {
+                    // nmcli -t escapes literal colons as "\:"
+                    const fields = line.replace(/\\:/g, "\u0000").split(":").map(f => f.replace(/\u0000/g, ":"));
+                    return {
+                        name: fields[0],
+                        uuid: fields[1],
+                        type: fields[2],
+                        active: fields[3] === "yes"
+                    };
+                }).filter(p => vpnTypes.includes(p.type));
+            }
         }
     }
 

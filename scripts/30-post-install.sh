@@ -52,6 +52,13 @@ if command -v spicetify >/dev/null 2>&1 && [[ -d /opt/spotify ]]; then
     log_warn "Re-run 'spicetify apply' after each Spotify update: the patch is undone by it."
 fi
 
+KITTY_GENERATED_THEME="${XDG_STATE_HOME:-$HOME/.local/state}/quickshell/user/generated/terminal/kitty-theme.conf"
+if [[ ! -f "$KITTY_GENERATED_THEME" ]]; then
+    log_info "Seeding the generated kitty palette from the graphite theme"
+    run mkdir -p "$(dirname "$KITTY_GENERATED_THEME")"
+    run cp "$REPO_DIR/config/kitty/.config/kitty/theme.conf" "$KITTY_GENERATED_THEME"
+fi
+
 ILLOGICAL_VENV="${XDG_STATE_HOME:-$HOME/.local/state}/quickshell/.venv"
 if [[ ! -x "$ILLOGICAL_VENV/bin/kde-material-you-colors" ]]; then
     if command -v uv >/dev/null 2>&1; then

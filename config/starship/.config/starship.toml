@@ -1,20 +1,30 @@
 # Prompt powerline arrondi, inspiré de github.com/elifouts/Dotfiles.
 #
-# Les couleurs sont *nommées* (white / bright-black / black…) et non en hex :
-# elles se résolvent depuis la palette du terminal (kitty/theme.conf), donc
-# le prompt reste cohérent si la palette bouge, sans duplication de valeurs.
+# Les couleurs sont des *index de palette* (240, 252, 255…) et non des hex :
+# quickshell réécrit ces cases-là avec les couleurs Material You générées
+# depuis le fond d'écran (scripts/colors/terminal/ dans la config quickshell),
+# donc le prompt suit le thème sans duplication de valeurs.
+#
+#   255 primary            240 onPrimary
+#   254 primaryContainer   233 onPrimaryContainer
+#   253 secondary          235 onSecondaryContainer
+#   252 secondaryContainer 251 tertiary
+#   249 error
+#
+# Hors terminal thémé, ces index retombent sur les gris par défaut de la
+# palette 256 couleurs : le prompt reste lisible, simplement sans accent.
 #
 # Convention des séparateurs : bg = segment précédent, fg = segment suivant.
 # L'inverse produit une encoche au lieu d'un fondu.
 
 format = """\
-[](fg:white)\
+[](fg:255)\
 $os\
-[](bg:white fg:bright-black)\
+[](bg:255 fg:254)\
 $username\
-[](bg:bright-black fg:black)\
+[](bg:254 fg:252)\
 $directory\
-[](fg:black)\
+[](fg:252)\
 $git_branch\
 $git_status\
 $cmd_duration\
@@ -24,18 +34,18 @@ add_newline = true
 
 [os]
 disabled = false
-style = "bg:white fg:black"
+style = "bg:255 fg:240"
 [os.symbols]
 Arch = " "
 Linux = " "
 
 [username]
 show_always = true
-format = "[$user ](bg:bright-black fg:white)"
+format = "[$user ](bg:254 fg:233)"
 disabled = false
 
 [directory]
-format = "[$path ](bg:black fg:white)"
+format = "[$path ](bg:252 fg:235)"
 truncation_length = 3
 truncation_symbol = "…/"
 
@@ -48,18 +58,18 @@ truncation_symbol = "…/"
 [git_branch]
 symbol = "  "
 format = "[$symbol$branch]($style)"
-style = "fg:bright-black"
+style = "fg:251"
 
 [git_status]
 format = "[ $all_status$ahead_behind]($style)"
-style = "fg:bright-black"
+style = "fg:251"
 
 [cmd_duration]
 min_time = 2000
 format = "[ $duration]($style)"
-style = "fg:bright-black"
+style = "fg:253"
 
 [character]
-success_symbol = "[❯](bold white)"
-error_symbol = "[❯](bold red)"
+success_symbol = "[❯](bold 255)"
+error_symbol = "[❯](bold 249)"
 disabled = false

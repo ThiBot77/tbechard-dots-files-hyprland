@@ -252,12 +252,6 @@ Item { // Bar content region
                             color: rightSidebarButton.colText
                         }
                     }
-                    Bar.HyprlandXkbIndicator {
-                        vertical: true
-                        Layout.alignment: Qt.AlignHCenter
-                        Layout.bottomMargin: indicatorsColumnLayout.realSpacing
-                        color: rightSidebarButton.colText
-                    }
                     Revealer {
                         vertical: true
                         reveal: Notifications.silent || Notifications.unread > 0
@@ -271,6 +265,13 @@ Item { // Bar content region
                         Bar.NotificationUnreadCount {
                             id: notificationUnreadCount
                         }
+                    }
+                    MaterialSymbol {
+                        visible: Network.vpnActive
+                        Layout.bottomMargin: visible ? 4 : 0
+                        text: "vpn_key"
+                        iconSize: Appearance.font.pixelSize.larger
+                        color: rightSidebarButton.colText
                     }
                     MaterialSymbol {
                         text: Network.materialSymbol

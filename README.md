@@ -135,7 +135,6 @@ Configs are copied, not symlinked: edit the file in `config/`, not in
 |---|---|
 | `SUPER` (tap) | Search / launcher |
 | `SUPER + /` | Cheatsheet |
-| `SUPER + A` | Left sidebar |
 | `SUPER + N` | Right sidebar (notifications) |
 | `SUPER + V` | Clipboard history |
 | `SUPER + .` | Emoji picker |
@@ -170,6 +169,31 @@ Configs are copied, not symlinked: edit the file in `config/`, not in
 
 Add your own in `config/hypr/.config/hypr/custom/keybinds.lua`; that file is
 loaded last, so it wins over the defaults.
+
+## Colors
+
+The palette follows the wallpaper. Picking a wallpaper or a scheme in the
+quickshell settings runs `scripts/colors/switchwall.sh`, which regenerates the
+Material You colors and writes a kitty palette to
+`~/.local/state/quickshell/user/generated/terminal/kitty-theme.conf`, then
+reloads kitty in place. `kitty.conf` includes that file after `theme.conf`, so
+the graphite palette in `theme.conf` is the base and the generated colors
+override it; comment the include out to pin kitty to graphite.
+
+The prompt and fastfetch ride along. `starship.toml` styles its segments with
+palette indexes (255 primary, 254 primaryContainer, 252 secondaryContainer,
+251 tertiary, 249 error) rather than hex, and quickshell rewrites exactly those
+slots, so the prompt takes the accent with no value duplicated. fastfetch is
+started by `.zshrc` with `--color` read from
+`~/.local/state/quickshell/user/generated/terminal/accent`, which
+`applycolor.sh` fills with the primary color, falling back to the static accent
+in `~/.config/fastfetch/accent`.
+
+The generated ANSI colors start from the graphite palette (it seeds
+`scripts/colors/terminal/scheme-base.json`) and are blended toward the
+wallpaper accent. How far is controlled by `harmony` and `termFgBoost` under
+`appearance.wallpaperTheming.terminalGenerationProps`; picking the monochrome
+scheme skips the blend entirely and gives back graphite as-is.
 
 ## Repository layout
 
