@@ -17,6 +17,22 @@ MaterialShape { // App icon
     property real appIconScale: 0.8
     property real smallAppIconScale: 0.49
     property real materialIconSize: implicitSize * materialIconScale
+
+    // Le hint `image-path` d'une notification peut etre une URI *ou* un simple
+    // nom d'icone de theme (spec freedesktop) ; nm-applet envoie le second,
+    // "gnome-lockscreen", qui n'existe dans aucun theme installe ici.
+    // Quickshell traduit ce nom en "image://icon/<nom>" sans verifier qu'il
+    // existe, et le provider echoue alors au chargement en affichant son damier
+    // magenta/noir. On valide donc nous-memes le nom derriere l'URL, et on rend
+    // "" quand le theme ne l'a pas : les Loaders ci-dessous retombent alors
+    // proprement sur le Material Symbol.
+    readonly property string resolvedImage: {
+        const img = String(root.image ?? "");
+        if (img.length === 0) return "";
+        const themed = img.match(/^image:\/\/icon\/([^?#]+)/);
+        if (!themed) return img;
+        return Quickshell.hasThemeIcon(decodeURIComponent(themed[1])) ? img : "";
+    }
     property real appIconSize: implicitSize * appIconScale
     property real smallAppIconSize: implicitSize * smallAppIconScale
 
@@ -30,7 +46,7 @@ MaterialShape { // App icon
     color: isUrgent ? Appearance.colors.colPrimaryContainer : Appearance.colors.colSecondaryContainer
     Loader {
         id: materialSymbolLoader
-        active: root.appIcon == "" && root.image == ""
+        active: root.appIcon == "" && root.resolvedImage == ""
         anchors.fill: parent
         sourceComponent: MaterialSymbol {
             text: {
@@ -48,7 +64,7 @@ MaterialShape { // App icon
     }
     Loader {
         id: appIconLoader
-        active: root.image == "" && root.appIcon != ""
+        active: root.resolvedImage == "" && root.appIcon != ""
         anchors.centerIn: parent
         sourceComponent: IconImage {
             id: appIconImage
@@ -59,7 +75,7 @@ MaterialShape { // App icon
     }
     Loader {
         id: notifImageLoader
-        active: root.image != ""
+        active: root.resolvedImage != ""
         anchors.fill: parent
         sourceComponent: Item {
             anchors.fill: parent
@@ -68,7 +84,7 @@ MaterialShape { // App icon
                 anchors.fill: parent
                 readonly property int size: parent.width
 
-                source: root.image
+                source: root.resolvedImage
                 fillMode: Image.PreserveAspectCrop
                 cache: false
                 antialiasing: true
