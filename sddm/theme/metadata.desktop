@@ -1,10 +1,14 @@
 [SddmGreeterTheme]
 Name=tbe
-Description=Minimal dark greeter matching the tbe-dots-files rice
-Author=tbe-dots-files
-Theme-Id=tbe
-Theme-API=2.0
+Description=Sugar Candy, recoloured graphite and pointed at the rice wallpaper
+Author=Marian Arlt
+Copyright=(c) 2018-2020, Marian Arlt
+License=GPLv3
+Website=https://github.com/MarianArlt/sddm-sugar-candy
 Type=sddm-theme
 Version=1.0
 MainScript=Main.qml
 ConfigFile=theme.conf
+Email=
+Screenshot=
+TranslationsDirectory=

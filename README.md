@@ -208,6 +208,45 @@ Configs are copied, not symlinked: edit the file in `config/`, not in
 Add your own in `config/hypr/.config/hypr/custom/keybinds.lua`; that file is
 loaded last, so it wins over the defaults.
 
+## Login screen
+
+The greeter is [Sugar Candy](https://github.com/MarianArlt/sddm-sugar-candy)
+by Marian Arlt (GPL-3.0), vendored in `sddm/theme/` and recoloured graphite.
+Two changes were needed beyond `theme.conf`:
+
+- The imports were ported to Qt6. Upstream is a Qt5 theme and pulls in
+  `QtGraphicalEffects`, which no longer exists; on a Qt6 SDDM it fails to load
+  and the greeter silently falls back to the default one. It is now
+  `Qt5Compat.GraphicalEffects`, from `qt6-5compat` in `packages/pacman.txt`.
+- The sample backgrounds were dropped for a single `backgrounds/graphite.jpg`.
+
+Everything else lives in `sddm/theme/theme.conf`, which carries the palette
+duplicated from `config/kitty/.config/kitty/theme.conf` — the greeter runs
+before any user session, so it cannot read anything under `$HOME`.
+
+The background is the rice wallpaper, desaturated. Regenerate it after
+changing wallpaper, at exactly the resolution in `ScreenWidth`/`ScreenHeight`
+(the theme scales its layout off the image, so a different size shrinks the
+form):
+
+```sh
+magick ~/.config/quickshell/ii/assets/images/default_wallpaper.png \
+    -resize 1920x1080^ -gravity center -extent 1920x1080 \
+    -colorspace Gray -colorspace sRGB -quality 92 \
+    sddm/theme/backgrounds/graphite.jpg
+```
+
+Preview it without installing, and without logging out:
+
+```sh
+sddm-greeter-qt6 --test-mode --theme "$PWD/sddm/theme"
+```
+
+`scripts/40-sddm.sh` installs the theme to `/usr/share/sddm/themes/tbe`. It
+also disables any other file in `/etc/sddm.conf.d/` that sets a theme: that
+directory is read in alphabetical order and the last `Current=` wins, so one
+left behind by another rice overrides ours without a word.
+
 ## Colors
 
 The palette follows the wallpaper. Picking a wallpaper or a scheme in the
