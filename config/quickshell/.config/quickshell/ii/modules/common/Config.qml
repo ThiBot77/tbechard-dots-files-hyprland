@@ -145,7 +145,10 @@ Singleton {
                     property JsonObject clock: JsonObject {
                         property bool enable: true
                         property bool showOnlyWhenLocked: false
-                        property string placementStrategy: "leastBusy" // "free", "leastBusy", "mostBusy"
+                        // "free" like the other widgets, so it can be dragged.
+                        // "leastBusy"/"mostBusy" place it automatically and
+                        // ignore any drag.
+                        property string placementStrategy: "free" // "free", "leastBusy", "mostBusy"
                         property real x: 100
                         property real y: 100
                         property string style: "cookie"        // Options: "cookie", "digital"
@@ -187,6 +190,22 @@ Singleton {
                         property string placementStrategy: "free" // "free", "leastBusy", "mostBusy"
                         property real x: 400
                         property real y: 100
+                    }
+                    property JsonObject resources: JsonObject {
+                        property bool enable: true
+                        property string placementStrategy: "free" // "free", "leastBusy", "mostBusy"
+                        property real x: 100
+                        property real y: 620
+                        property bool showCpu: true
+                        property bool showMemory: true
+                        property bool showBattery: true
+                    }
+                    property JsonObject media: JsonObject {
+                        property bool enable: true
+                        property string placementStrategy: "free" // "free", "leastBusy", "mostBusy"
+                        property real x: 100
+                        property real y: 800
+                        property bool hideWhenStopped: true
                     }
                 }
                 property string wallpaperPath: ""
