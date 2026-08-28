@@ -1,0 +1,8 @@
+# Paquets AUR laisses de cote par yay, un par ligne. Passes en --ignore.
+
+# Les qt5-* du AUR se recompilent depuis les sources a chaque mise a jour, et
+# qt5-webengine a lui seul prend des heures. Rien dans la config n'en depend :
+# quickshell, hyprland et le reste sont en qt6.
+qt5-webengine
+qt5-location
+qt5-webchannel
