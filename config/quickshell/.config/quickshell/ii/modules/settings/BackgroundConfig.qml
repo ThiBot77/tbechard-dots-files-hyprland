@@ -1,11 +1,31 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
+import Quickshell.Io
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
 
 ContentPage {
     forceWidth: true
+
+    // Same picker the wallpaper switcher uses.
+    Process {
+        id: avatarPicker
+        // No mime filter: kdialog exits 1 immediately when given one here,
+        // which is why switchwall.sh does not pass one either.
+        command: ["kdialog", "--getopenfilename", Directories.home, "--title", Translation.tr("Choose an avatar")]
+        stdout: StdioCollector {
+            id: avatarPickerOutput
+            onStreamFinished: {
+                const path = avatarPickerOutput.text.trim();
+                // kdialog prints nothing and exits non-zero when cancelled.
+                if (path.length > 0) {
+                    Config.options.background.widgets.session.avatarPath = path;
+                }
+            }
+        }
+    }
 
     ContentSection {
         icon: "sync_alt"
@@ -739,6 +759,188 @@ ContentPage {
             checked: Config.options.background.widgets.media.hideWhenStopped
             onCheckedChanged: {
                 Config.options.background.widgets.media.hideWhenStopped = checked;
+            }
+        }
+    }
+
+    ContentSection {
+        icon: "account_circle"
+        title: Translation.tr("Widget: Session")
+
+        ConfigRow {
+            Layout.fillWidth: true
+
+            ConfigSwitch {
+                Layout.fillWidth: false
+                buttonIcon: "check"
+                text: Translation.tr("Enable")
+                checked: Config.options.background.widgets.session.enable
+                onCheckedChanged: {
+                    Config.options.background.widgets.session.enable = checked;
+                }
+            }
+            Item {
+                Layout.fillWidth: true
+            }
+            ConfigSelectionArray {
+                Layout.fillWidth: false
+                currentValue: Config.options.background.widgets.session.placementStrategy
+                onSelected: newValue => {
+                    Config.options.background.widgets.session.placementStrategy = newValue;
+                }
+                options: [
+                    {
+                        displayName: Translation.tr("Draggable"),
+                        icon: "drag_pan",
+                        value: "free"
+                    },
+                    {
+                        displayName: Translation.tr("Least busy"),
+                        icon: "category",
+                        value: "leastBusy"
+                    },
+                    {
+                        displayName: Translation.tr("Most busy"),
+                        icon: "shapes",
+                        value: "mostBusy"
+                    },
+                ]
+            }
+        }
+
+        ConfigSwitch {
+            buttonIcon: "person"
+            text: Translation.tr("Show avatar")
+            checked: Config.options.background.widgets.session.showAvatar
+            onCheckedChanged: {
+                Config.options.background.widgets.session.showAvatar = checked;
+            }
+            StyledToolTip {
+                text: Translation.tr("Read from AccountsService, falling back to ~/.face")
+            }
+        }
+
+        ContentSubsection {
+            title: Translation.tr("Avatar picture")
+            tooltip: Translation.tr("Leave empty to use the picture the system already has:\n/var/lib/AccountsService/icons/<user>, then ~/.face")
+
+            ConfigRow {
+                Layout.fillWidth: true
+
+                MaterialTextArea {
+                    id: avatarPathInput
+                    Layout.fillWidth: true
+                    placeholderText: Translation.tr("Detected automatically")
+                    text: Config.options.background.widgets.session.avatarPath
+                    wrapMode: TextEdit.Wrap
+                    onTextChanged: {
+                        Config.options.background.widgets.session.avatarPath = text;
+                    }
+                }
+
+                RippleButtonWithIcon {
+                    Layout.alignment: Qt.AlignVCenter
+                    materialIcon: "image"
+                    mainText: Translation.tr("Choose...")
+                    onClicked: {
+                        avatarPicker.running = false;
+                        avatarPicker.running = true;
+                    }
+                }
+
+                RippleButtonWithIcon {
+                    Layout.alignment: Qt.AlignVCenter
+                    materialIcon: "backspace"
+                    mainText: Translation.tr("Reset")
+                    enabled: Config.options.background.widgets.session.avatarPath.length > 0
+                    onClicked: {
+                        Config.options.background.widgets.session.avatarPath = "";
+                    }
+                }
+            }
+        }
+    }
+
+    ContentSection {
+        icon: "globe"
+        title: Translation.tr("Widget: World clock")
+
+        ConfigRow {
+            Layout.fillWidth: true
+
+            ConfigSwitch {
+                Layout.fillWidth: false
+                buttonIcon: "check"
+                text: Translation.tr("Enable")
+                checked: Config.options.background.widgets.worldClock.enable
+                onCheckedChanged: {
+                    Config.options.background.widgets.worldClock.enable = checked;
+                }
+            }
+            Item {
+                Layout.fillWidth: true
+            }
+            ConfigSelectionArray {
+                Layout.fillWidth: false
+                currentValue: Config.options.background.widgets.worldClock.placementStrategy
+                onSelected: newValue => {
+                    Config.options.background.widgets.worldClock.placementStrategy = newValue;
+                }
+                options: [
+                    {
+                        displayName: Translation.tr("Draggable"),
+                        icon: "drag_pan",
+                        value: "free"
+                    },
+                    {
+                        displayName: Translation.tr("Least busy"),
+                        icon: "category",
+                        value: "leastBusy"
+                    },
+                    {
+                        displayName: Translation.tr("Most busy"),
+                        icon: "shapes",
+                        value: "mostBusy"
+                    },
+                ]
+            }
+        }
+
+        ConfigSwitch {
+            buttonIcon: "schedule"
+            text: Translation.tr("24-hour format")
+            checked: Config.options.background.widgets.worldClock.use24h
+            onCheckedChanged: {
+                Config.options.background.widgets.worldClock.use24h = checked;
+            }
+        }
+
+        ContentSubsection {
+            title: Translation.tr("Location name")
+
+            MaterialTextArea {
+                Layout.fillWidth: true
+                placeholderText: Translation.tr("Leave empty to use the system timezone")
+                text: Config.options.background.widgets.worldClock.localLabel
+                wrapMode: TextEdit.Wrap
+                onTextChanged: {
+                    Config.options.background.widgets.worldClock.localLabel = text;
+                }
+            }
+        }
+
+        ContentSubsection {
+            title: Translation.tr("Timezones")
+            tooltip: Translation.tr("Comma-separated IANA zone ids, e.g. Europe/Paris, Asia/Tokyo.\nThe tile is labelled with the last part of the id, and the\nUTC offset follows the system's DST rules.")
+
+            MaterialTextArea {
+                Layout.fillWidth: true
+                placeholderText: Translation.tr("Europe/Paris, Asia/Tokyo")
+                text: Config.options.background.widgets.worldClock.zones.join(", ")
+                wrapMode: TextEdit.Wrap
+                onTextChanged: {
+                    Config.options.background.widgets.worldClock.zones = text.split(",").map(zone => zone.trim()).filter(zone => zone.length > 0);
+                }
             }
         }
     }
