@@ -280,7 +280,7 @@ Singleton {
     Process {
         id: updateVpn
         running: true
-        // Every VPN-ish profile, connected or not, active ones first
+        // Every VPN profile, connected or not, active ones first
         command: ["nmcli", "-t", "-f", "NAME,UUID,TYPE,ACTIVE", "connection", "show", "--order", "active:name"]
         environment: ({
             LANG: "C",
@@ -288,7 +288,14 @@ Singleton {
         })
         stdout: StdioCollector {
             onStreamFinished: {
-                const vpnTypes = ["vpn", "wireguard", "tun", "tap"];
+                // Uniquement les VPN qu'on a configures soi-meme. "tun"/"tap"
+                // sont volontairement exclus : ce ne sont pas des profils VPN
+                // mais des interfaces creees par d'autres programmes, que
+                // NetworkManager se contente d'adopter (managed-type:
+                // 'external') et pour lesquelles il fabrique un profil jetable
+                // dans /run. L'agent Netskope du boulot en cree une (sta0,
+                // puis sta1... a chaque reconnexion) qui polluait le menu.
+                const vpnTypes = ["vpn", "wireguard"];
                 root.vpnProfiles = text.trim().split("\n").filter(line => line.length > 0).map(line => {
                     // nmcli -t escapes literal colons as "\:"
                     const fields = line.replace(/\\:/g, "\u0000").split(":").map(f => f.replace(/\u0000/g, ":"));
