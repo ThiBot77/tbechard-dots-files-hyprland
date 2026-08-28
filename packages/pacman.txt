@@ -111,3 +111,6 @@ discord
 firefox
 filezilla
 dbeaver
+
+# Extras
+cool-retro-term
