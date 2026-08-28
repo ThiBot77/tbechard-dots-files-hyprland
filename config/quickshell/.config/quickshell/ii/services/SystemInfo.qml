@@ -13,7 +13,12 @@ Singleton {
     property string distroName: "Unknown"
     property string distroId: "unknown"
     property string distroIcon: "linux-symbolic"
-    property string username: "user"
+    // Seeded from the environment so it is right on the very first binding;
+    // the whoami below only confirms it. The avatar path is built from this,
+    // and an Image that already failed on "user" never retries once whoami
+    // lands, so the placeholder would stick even with an avatar on disk.
+    property string username: Quickshell.env("USER") || "user"
+    property string hostname: "localhost"
     property string homeUrl: ""
     property string documentationUrl: ""
     property string supportUrl: ""
@@ -30,6 +35,8 @@ Singleton {
         repeat: false
         onTriggered: {
             getUsername.running = true
+            fileHostname.reload()
+            hostname = fileHostname.text().trim() || "localhost"
             fileOsRelease.reload()
             const textOsRelease = fileOsRelease.text()
 
@@ -114,5 +121,10 @@ Singleton {
     FileView {
         id: fileOsRelease
         path: "/etc/os-release"
+    }
+
+    FileView {
+        id: fileHostname
+        path: "/etc/hostname"
     }
 }

@@ -16,15 +16,53 @@ cd ~/Documents/tbe-dots-files
 Then **log out and back in**. Hyprland reads its config at startup, and the
 new user groups only apply at session start.
 
-The installer runs four steps, in order:
+The installer runs five steps, in order:
 
 | Step | What it does |
 |---|---|
 | `scripts/00-check-system.sh` | Checks it is Arch, installs `yay` if missing |
-| `scripts/10-install-packages.sh` | Installs everything in `packages/pacman.txt` and `packages/aur.txt` |
+| `scripts/10-install-packages.sh` | Upgrades the system and installs everything in `packages/pacman.txt` and `packages/aur.txt`, minus `packages/ignore.txt` |
 | `scripts/20-copy-configs.sh` | Copies each package in `config/` into `$HOME` |
 | `scripts/30-post-install.sh` | Oh My Zsh, Python venv, spicetify, user groups |
 | `scripts/40-sddm.sh` | Installs and enables the SDDM login theme |
+
+### On a machine that already runs GNOME
+
+`install.sh` assumes a bare Arch install. If the machine already has a GNOME
+desktop and configs of its own, use the migration script instead:
+
+```sh
+./migrate-from-gnome.sh          # --dry-run to see what it would do first
+```
+
+Run it **from a TTY** (`Ctrl+Alt+F3`): it removes gnome-shell, which the
+graphical session you are looking at is made of. **Reboot** when it is done —
+here a logout is not enough, the login screen itself changes from GDM to SDDM.
+
+| Step | What it does |
+|---|---|
+| `scripts/00-check-system.sh` | Same as above |
+| `scripts/migrate-backup-configs.sh` | Moves every config this repo is about to write, plus the GNOME session state, into `~/.dotfiles-backup-<date>` |
+| `scripts/10-install-packages.sh` | Same as above — before the removal, so a failure here leaves GNOME intact |
+| `scripts/migrate-remove-gnome.sh` | Disables GDM, then `pacman -Rns` on the `gnome` and `gnome-extra` groups |
+| `scripts/20…40` | Same as above |
+
+Nothing is deleted from `$HOME`: the old kitty, fastfetch and `.zshrc` are
+moved, not overwritten, and `~/.config/dconf` goes with them. Move a file back
+out of the backup directory to get it back.
+
+The package removal prints its list and asks before running. Options:
+
+| Option | Effect |
+|---|---|
+| `--dry-run` | Print every command instead of running it |
+| `-y`, `--yes` | Do not ask before removing |
+| `--keep=pkg1,pkg2` | Keep those packages — e.g. `--keep=gnome-calculator,gnome-disk-utility` |
+| `--keep-gnome` | Back up and install, but leave GNOME alone |
+
+Everything in `packages/` is kept automatically, and so is the plumbing the
+shell needs: `dconf` and `gsettings-desktop-schemas` (the palette script sets
+the GTK theme through `gsettings`), `gnome-keyring`, and `gvfs`.
 
 To reinstall a single config after editing it:
 
@@ -170,6 +208,45 @@ Configs are copied, not symlinked: edit the file in `config/`, not in
 Add your own in `config/hypr/.config/hypr/custom/keybinds.lua`; that file is
 loaded last, so it wins over the defaults.
 
+## Login screen
+
+The greeter is [Sugar Candy](https://github.com/MarianArlt/sddm-sugar-candy)
+by Marian Arlt (GPL-3.0), vendored in `sddm/theme/` and recoloured graphite.
+Two changes were needed beyond `theme.conf`:
+
+- The imports were ported to Qt6. Upstream is a Qt5 theme and pulls in
+  `QtGraphicalEffects`, which no longer exists; on a Qt6 SDDM it fails to load
+  and the greeter silently falls back to the default one. It is now
+  `Qt5Compat.GraphicalEffects`, from `qt6-5compat` in `packages/pacman.txt`.
+- The sample backgrounds were dropped for a single `backgrounds/graphite.jpg`.
+
+Everything else lives in `sddm/theme/theme.conf`, which carries the palette
+duplicated from `config/kitty/.config/kitty/theme.conf` — the greeter runs
+before any user session, so it cannot read anything under `$HOME`.
+
+The background is the rice wallpaper, desaturated. Regenerate it after
+changing wallpaper, at exactly the resolution in `ScreenWidth`/`ScreenHeight`
+(the theme scales its layout off the image, so a different size shrinks the
+form):
+
+```sh
+magick ~/.config/quickshell/ii/assets/images/default_wallpaper.png \
+    -resize 1920x1080^ -gravity center -extent 1920x1080 \
+    -colorspace Gray -colorspace sRGB -quality 92 \
+    sddm/theme/backgrounds/graphite.jpg
+```
+
+Preview it without installing, and without logging out:
+
+```sh
+sddm-greeter-qt6 --test-mode --theme "$PWD/sddm/theme"
+```
+
+`scripts/40-sddm.sh` installs the theme to `/usr/share/sddm/themes/tbe`. It
+also disables any other file in `/etc/sddm.conf.d/` that sets a theme: that
+directory is read in alphabetical order and the last `Current=` wins, so one
+left behind by another rice overrides ours without a word.
+
 ## Colors
 
 The palette follows the wallpaper. Picking a wallpaper or a scheme in the
@@ -200,7 +277,7 @@ scheme skips the blend entirely and gives back graphite as-is.
 | Directory | Contents |
 |---|---|
 | `config/` | One directory per config; each mirrors `$HOME` and is copied there |
-| `packages/` | The pacman and AUR package lists |
+| `packages/` | The pacman and AUR package lists, plus the AUR packages yay must leave alone |
 | `scripts/` | The install steps |
 | `sddm/` | The login screen theme |
 | `vendor/` | Files taken from end-4 that the scripts use: the `kdeglobals` base and the Python requirements |

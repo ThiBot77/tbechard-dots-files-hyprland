@@ -1,8 +1,11 @@
+[CompactMode]
+PreviewSize=16
+
 [DetailsMode]
 PreviewSize=32
 
 [General]
-GlobalViewProps=false
+GlobalViewProps=true
 ShowFullPath=true
 ShowStatusBar=FullWidth
 Version=202
@@ -13,6 +16,10 @@ Places Icons Static Size=22
 
 [MainWindow]
 MenuBar=Disabled
+
+[MainWindow][Toolbar mainToolBar]
+IconSize=16
+ToolButtonStyle=IconOnly
 
 [PreviewSettings]
 Plugins=ffmpegthumbnailer,appimagethumbnail,audiothumbnail,avif,blenderthumbnail,comicbookthumbnail,cursorthumbnail,djvuthumbnail,ebookthumbnail,exrthumbnail,directorythumbnail,fontthumbnail,heif,imagethumbnail,jpegthumbnail,jxl,kraorathumbnail,windowsexethumbnail,windowsimagethumbnail,mobithumbnail,opendocumentthumbnail,gsthumbnail,rawthumbnail,librsvg,svgthumbnail,ffmpegthumbs,gdk-pixbuf-thumbnailer,gsf-office

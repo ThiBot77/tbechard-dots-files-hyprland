@@ -145,7 +145,10 @@ Singleton {
                     property JsonObject clock: JsonObject {
                         property bool enable: true
                         property bool showOnlyWhenLocked: false
-                        property string placementStrategy: "leastBusy" // "free", "leastBusy", "mostBusy"
+                        // "free" like the other widgets, so it can be dragged.
+                        // "leastBusy"/"mostBusy" place it automatically and
+                        // ignore any drag.
+                        property string placementStrategy: "free" // "free", "leastBusy", "mostBusy"
                         property real x: 100
                         property real y: 100
                         property string style: "cookie"        // Options: "cookie", "digital"
@@ -187,6 +190,45 @@ Singleton {
                         property string placementStrategy: "free" // "free", "leastBusy", "mostBusy"
                         property real x: 400
                         property real y: 100
+                    }
+                    property JsonObject resources: JsonObject {
+                        property bool enable: true
+                        property string placementStrategy: "free" // "free", "leastBusy", "mostBusy"
+                        property real x: 100
+                        property real y: 620
+                        property bool showCpu: true
+                        property bool showMemory: true
+                        property bool showBattery: true
+                    }
+                    property JsonObject media: JsonObject {
+                        property bool enable: true
+                        property string placementStrategy: "free" // "free", "leastBusy", "mostBusy"
+                        property real x: 100
+                        property real y: 800
+                        property bool hideWhenStopped: true
+                    }
+                    property JsonObject session: JsonObject {
+                        property bool enable: true
+                        property string placementStrategy: "free" // "free", "leastBusy", "mostBusy"
+                        property real x: 100
+                        property real y: 380
+                        property bool showAvatar: true
+                        // Empty means: look for the picture the system already
+                        // has, /var/lib/AccountsService/icons/<user> then ~/.face.
+                        property string avatarPath: ""
+                    }
+                    property JsonObject worldClock: JsonObject {
+                        property bool enable: true
+                        property string placementStrategy: "free" // "free", "leastBusy", "mostBusy"
+                        property real x: 600
+                        property real y: 100
+                        property bool use24h: false
+                        // Empty means "read it off /etc/localtime".
+                        property string localLabel: ""
+                        // IANA zone ids. The tile label is the last path
+                        // component, so keep them in that form; the offset and
+                        // the DST shift come from the system tzdata at runtime.
+                        property list<string> zones: ["Australia/Sydney", "Asia/Tokyo", "Europe/London", "America/New_York"]
                     }
                 }
                 property string wallpaperPath: ""
@@ -591,7 +633,10 @@ Singleton {
                     property bool leftAlignApps: false
                 }
                 property JsonObject actionCenter: JsonObject {
-                    property list<string> toggles: [ "network", "bluetooth", "easyEffects", "powerProfile", "idleInhibitor", "nightLight", "darkMode", "antiFlashbang", "cloudflareWarp", "mic", "musicRecognition", "notifications", "onScreenKeyboard", "gameMode", "screenSnip", "colorPicker" ]
+                    // easyEffects, cloudflareWarp and onScreenKeyboard are gone:
+                    // easyeffects, warp-cli and wvkbd are not installed, so those
+                    // toggles sat in the sidebar doing nothing.
+                    property list<string> toggles: [ "network", "bluetooth", "powerProfile", "idleInhibitor", "nightLight", "darkMode", "antiFlashbang", "mic", "musicRecognition", "notifications", "gameMode", "screenSnip", "colorPicker" ]
                 }
                 property JsonObject calendar: JsonObject {
                     property bool force2CharDayOfWeek: true
