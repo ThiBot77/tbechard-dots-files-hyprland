@@ -16,11 +16,12 @@ cd ~/Documents/tbe-dots-files
 Then **log out and back in**. Hyprland reads its config at startup, and the
 new user groups only apply at session start.
 
-The installer runs five steps, in order:
+The installer runs six steps, in order:
 
 | Step | What it does |
 |---|---|
 | `scripts/00-check-system.sh` | Checks it is Arch, installs `yay` if missing |
+| `scripts/05-ca-certs.sh` | Adds every certificate in `certs/` to the system trust store |
 | `scripts/10-install-packages.sh` | Upgrades the system and installs everything in `packages/pacman.txt` and `packages/aur.txt`, minus `packages/ignore.txt` |
 | `scripts/20-copy-configs.sh` | Copies each package in `config/` into `$HOME` |
 | `scripts/30-post-install.sh` | Oh My Zsh, Python venv, spicetify, user groups |
@@ -277,6 +278,7 @@ scheme skips the blend entirely and gives back graphite as-is.
 | Directory | Contents |
 |---|---|
 | `config/` | One directory per config; each mirrors `$HOME` and is copied there |
+| `certs/` | Internal CA certificates the system must trust |
 | `packages/` | The pacman and AUR package lists, plus the AUR packages yay must leave alone |
 | `scripts/` | The install steps |
 | `sddm/` | The login screen theme |
