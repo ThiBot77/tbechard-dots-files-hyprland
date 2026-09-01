@@ -288,13 +288,9 @@ Singleton {
         })
         stdout: StdioCollector {
             onStreamFinished: {
-                // Uniquement les VPN qu'on a configures soi-meme. "tun"/"tap"
-                // sont volontairement exclus : ce ne sont pas des profils VPN
-                // mais des interfaces creees par d'autres programmes, que
-                // NetworkManager se contente d'adopter (managed-type:
-                // 'external') et pour lesquelles il fabrique un profil jetable
-                // dans /run. L'agent Netskope du boulot en cree une (sta0,
-                // puis sta1... a chaque reconnexion) qui polluait le menu.
+                // "tun"/"tap" exclus : interfaces adoptees d'autres
+                // programmes (l'agent Netskope en cree une par reconnexion),
+                // pas des profils VPN.
                 const vpnTypes = ["vpn", "wireguard"];
                 root.vpnProfiles = text.trim().split("\n").filter(line => line.length > 0).map(line => {
                     // nmcli -t escapes literal colons as "\:"

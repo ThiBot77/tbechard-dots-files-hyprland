@@ -18,19 +18,9 @@ MaterialShape { // App icon
     property real smallAppIconScale: 0.49
     property real materialIconSize: implicitSize * materialIconScale
 
-    // Le champ `app_icon` et le hint `image-path` d'une notification peuvent
-    // etre une URI, un chemin absolu, *ou* un simple nom d'icone de theme (spec
-    // freedesktop). Quickshell emballe tout ce qui n'est pas une URI dans
-    // "image://icon/<valeur>" sans verifier que le theme connait ce nom, donc :
-    //   - un nom que le theme n'a pas ("gnome-lockscreen", envoye par nm-applet)
-    //     fait echouer le provider, qui affiche son damier magenta/noir ;
-    //   - un chemin absolu n'est pas un nom de theme non plus et se perd de la
-    //     meme facon, alors que le fichier existe. Chrome fait exactement ca
-    //     pour les notifications web : app_icon pointe son propre logo et
-    //     image-path l'avatar de l'expediteur, tous deux dans
-    //     /tmp/com.google.Chrome.scoped_dir.XXXX/.
-    // On defait donc l'emballage nous-memes et on rend une source utilisable,
-    // ou "" pour laisser les Loaders retomber proprement sur le Material Symbol.
+    // app_icon et image-path valent une URI, un chemin absolu ou un nom de
+    // theme ; Quickshell emballe les deux derniers en "image://icon/<valeur>"
+    // sans verifier. Rend "" quand rien n'est utilisable.
     function resolveIconSource(raw) {
         const value = String(raw ?? "");
         if (value.length === 0)
@@ -48,10 +38,7 @@ MaterialShape { // App icon
 
     readonly property string resolvedImage: root.resolveIconSource(root.image)
 
-    // Beaucoup d'apps laissent app_icon vide ; le nom de l'app donne alors
-    // souvent un nom d'icone de theme valide ("Google Chrome" ->
-    // "google-chrome"). Sert aussi de secours quand app_icon designe un fichier
-    // temporaire que l'app a deja efface.
+    // Repli quand app_icon est vide ou mort : "Google Chrome" -> google-chrome.
     readonly property string appNameIcon: {
         const guess = String(root.appName ?? "").trim().toLowerCase().replace(/\s+/g, "-");
         if (guess.length === 0)
@@ -63,11 +50,8 @@ MaterialShape { // App icon
         return direct !== "" ? direct : root.appNameIcon;
     }
 
-    // Une source resolue peut quand meme echouer au chargement : les fichiers
-    // sous /tmp disparaissent quand l'app qui les a ecrits se ferme, et une
-    // notification lui survit dans le centre de notifications. On ne peut le
-    // constater qu'au chargement, d'ou ces deux drapeaux, remis a zero des que
-    // la source change.
+    // Les icones sous /tmp disparaissent avant la notification qui les cite,
+    // et ca ne se voit qu'au chargement.
     property bool imageBroken: false
     property bool appIconBroken: false
     onResolvedImageChanged: imageBroken = false

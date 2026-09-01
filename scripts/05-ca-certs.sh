@@ -6,8 +6,8 @@ source "$SCRIPT_DIR/lib/common.sh"
 
 log_step "Trusted CA certificates"
 
-# Avant l'installation des paquets : derriere un proxy TLS d'entreprise, les
-# telechargements suivants echouent tant que son CA n'est pas approuve.
+# Avant l'installation des paquets : derriere un proxy TLS, les
+# telechargements echouent tant que son CA n'est pas approuve.
 CERT_DIR="$REPO_DIR/certs"
 ANCHOR_DIR="/etc/ca-certificates/trust-source/anchors"
 
@@ -30,8 +30,7 @@ for cert in "${certs[@]}"; do
     name="$(basename "$cert")"
     target="$ANCHOR_DIR/$name"
 
-    # Compare le contenu, pas seulement la presence : un CA reemis garde son nom
-    # de fichier, et c'est justement le cas ou il faut remplacer l'ancien.
+    # Compare le contenu : un CA reemis garde son nom de fichier.
     if [[ -f "$target" ]] && cmp -s "$cert" "$target"; then
         continue
     fi

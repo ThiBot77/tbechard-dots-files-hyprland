@@ -107,11 +107,8 @@ xdg-desktop-portal-kde
 xdg-user-dirs
 ydotool
 
-# Reseau : agent de secrets NetworkManager. Sans lui NetworkManager n'a
-# personne a qui demander un secret et refuse la connexion ("No agents were
-# available for this request") : l'OpenVPN du boulot ne peut pas reclamer son
-# code MFA. plasma-nm est deja plus haut, mais son agent vit dans kded6, qui ne
-# tourne pas dans une session Hyprland.
+# Agent de secrets NetworkManager : celui de plasma-nm vit dans kded6, qui ne
+# tourne pas sous Hyprland.
 network-manager-applet
 networkmanager-openvpn
 

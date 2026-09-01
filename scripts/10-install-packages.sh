@@ -13,9 +13,7 @@ read_list() {
 mapfile -t PACMAN_PKGS < <(read_list "$REPO_DIR/packages/pacman.txt")
 mapfile -t AUR_PKGS < <(read_list "$REPO_DIR/packages/aur.txt")
 
-# -Syu, not -S: installing today's packages onto a system that is a few
-# updates behind is a partial upgrade, and pacman refuses it as soon as one
-# of the new dependencies has a newer soname than an installed package.
+# -Syu, not -S: installing onto an out-of-date system is a partial upgrade.
 log_info "Official repo packages: ${PACMAN_PKGS[*]}"
 log_info "Upgrading the whole system in the same transaction."
 run sudo pacman -Syu --needed --noconfirm "${PACMAN_PKGS[@]}"

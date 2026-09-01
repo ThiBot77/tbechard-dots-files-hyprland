@@ -1,21 +1,14 @@
 # Prompt powerline arrondi, inspiré de github.com/elifouts/Dotfiles.
 #
-# Les couleurs sont des *index de palette* (240, 252, 255…) et non des hex :
-# quickshell réécrit ces cases-là avec les couleurs Material You générées
-# depuis le fond d'écran (scripts/colors/terminal/ dans la config quickshell),
-# donc le prompt suit le thème sans duplication de valeurs.
-#
+# Index de palette 256, réécrits par quickshell avec les couleurs Material You
+# (scripts/colors/terminal/) :
 #   255 primary            240 onPrimary
 #   254 primaryContainer   233 onPrimaryContainer
 #   253 secondary          235 onSecondaryContainer
 #   252 secondaryContainer 251 tertiary
 #   249 error
 #
-# Hors terminal thémé, ces index retombent sur les gris par défaut de la
-# palette 256 couleurs : le prompt reste lisible, simplement sans accent.
-#
-# Convention des séparateurs : bg = segment précédent, fg = segment suivant.
-# L'inverse produit une encoche au lieu d'un fondu.
+# Séparateurs : bg = segment précédent, fg = segment suivant.
 
 format = """\
 [](fg:255)\

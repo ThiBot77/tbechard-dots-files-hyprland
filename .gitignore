@@ -1,6 +1,5 @@
-# Etat genere par spicetify dans ~/.config/spicetify. Ces fichiers contiennent
-# des chemins absolus propres a la machine (spotify_path, prefs_path) : seul le
-# theme graphite est versionne.
+# Etat spicetify : chemins absolus propres a la machine. Seul le theme est
+# versionne.
 config/spicetify/.config/spicetify/config-xpui.ini
 config/spicetify/.config/spicetify/Backup/
 config/spicetify/.config/spicetify/CustomApps/
