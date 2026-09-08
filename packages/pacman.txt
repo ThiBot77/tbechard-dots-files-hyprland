@@ -120,3 +120,4 @@ dbeaver
 
 # Extras
 cool-retro-term
+yazi
