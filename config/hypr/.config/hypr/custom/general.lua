@@ -7,3 +7,13 @@ hl.config({
         kb_options = "grp:win_space_toggle",
     }
 })
+
+-- end-4 active clickfinger_behavior : l'appui physique compte les doigts au
+-- lieu de regarder ou on appuie, donc le coin bas-droit rendait un clic gauche.
+hl.config({
+    input = {
+        touchpad = {
+            clickfinger_behavior = false,
+        }
+    }
+})
