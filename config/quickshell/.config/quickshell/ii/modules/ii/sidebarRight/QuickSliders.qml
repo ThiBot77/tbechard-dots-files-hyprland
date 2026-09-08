@@ -22,7 +22,7 @@ Rectangle {
     property real verticalPadding: 4
     property real horizontalPadding: 12
 
-    Column {
+    RowLayout { // Les curseurs se partagent la largeur au lieu de s'empiler
         id: contentItem
         anchors {
             fill: parent
@@ -31,12 +31,10 @@ Rectangle {
             topMargin: root.verticalPadding
             bottomMargin: root.verticalPadding
         }
+        spacing: 8
 
         Loader {
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
+            Layout.fillWidth: true
             visible: active
             active: Config.options.sidebar.quickSliders.showBrightness
             sourceComponent: QuickSlider {
@@ -64,33 +62,28 @@ Rectangle {
         }
 
         Loader {
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
+            Layout.fillWidth: true
             visible: active
             active: Config.options.sidebar.quickSliders.showVolume
             sourceComponent: QuickSlider {
                 materialSymbol: "volume_up"
-                value: Audio.sink.audio.volume
+                // Audio.sink/source sont null quand aucune carte n'est active.
+                value: Audio.sink?.audio?.volume ?? 0
                 onMoved: {
-                    Audio.sink.audio.volume = value
+                    if (Audio.sink?.audio) Audio.sink.audio.volume = value
                 }
             }
         }
 
         Loader {
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
+            Layout.fillWidth: true
             visible: active
             active: Config.options.sidebar.quickSliders.showMic
             sourceComponent: QuickSlider {
                 materialSymbol: "mic"
-                value: Audio.source.audio.volume
+                value: Audio.source?.audio?.volume ?? 0
                 onMoved: {
-                    Audio.source.audio.volume = value
+                    if (Audio.source?.audio) Audio.source.audio.volume = value
                 }
             }
         }

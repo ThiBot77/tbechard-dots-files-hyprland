@@ -553,8 +553,8 @@ Singleton {
                 }
 
                 property JsonObject quickSliders: JsonObject {
-                    property bool enable: false
-                    property bool showMic: false
+                    property bool enable: true
+                    property bool showMic: true
                     property bool showVolume: true
                     property bool showBrightness: true
                 }

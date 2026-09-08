@@ -5,6 +5,7 @@ import qs.modules.common.widgets
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Qt5Compat.GraphicalEffects
 import Quickshell
 import Quickshell.Bluetooth
 import Quickshell.Hyprland
@@ -218,51 +219,113 @@ Item {
         }
     }
 
-    component SystemButtonRow: Item {
-        implicitHeight: Math.max(uptimeContainer.implicitHeight, systemButtonsRow.implicitHeight)
+    // En-tete : banniere du fond d'ecran, avatar et identite, boutons systeme.
+    component SystemButtonRow: ColumnLayout {
+        spacing: 10
 
-        Rectangle {
-            id: uptimeContainer
-            anchors {
-                top: parent.top
-                bottom: parent.bottom
-                left: parent.left
-            }
+        Rectangle { // Banniere
+            Layout.fillWidth: true
+            implicitHeight: 84
+            radius: Appearance.rounding.normal
             color: Appearance.colors.colLayer1
-            radius: height / 2
-            implicitWidth: uptimeRow.implicitWidth + 24
-            implicitHeight: uptimeRow.implicitHeight + 8
-            
-            Row {
-                id: uptimeRow
-                anchors.centerIn: parent
-                spacing: 8
-                CustomIcon {
-                    id: distroIcon
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 25
-                    height: 25
-                    source: SystemInfo.distroIcon
-                    colorize: true
-                    color: Appearance.colors.colOnLayer0
-                }
-                StyledText {
-                    anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: Appearance.font.pixelSize.normal
-                    color: Appearance.colors.colOnLayer0
-                    text: Translation.tr("Up %1").arg(DateTime.uptime)
-                    textFormat: Text.MarkdownText
+            clip: true
+
+            StyledImage {
+                anchors.fill: parent
+                source: Config.options.background.wallpaperPath ? Qt.resolvedUrl(Config.options.background.wallpaperPath) : ""
+                fillMode: Image.PreserveAspectCrop
+                asynchronous: true
+                cache: true
+
+                layer.enabled: true
+                layer.effect: OpacityMask {
+                    maskSource: Rectangle {
+                        width: bannerMask.width
+                        height: bannerMask.height
+                        radius: Appearance.rounding.normal
+                    }
                 }
             }
+
+            Item { id: bannerMask; anchors.fill: parent; visible: false }
         }
+
+        RowLayout { // Identite + boutons
+            Layout.fillWidth: true
+            spacing: 10
+
+            Rectangle { // Avatar
+                implicitWidth: 44
+                implicitHeight: 44
+                radius: width / 2
+                color: Appearance.colors.colLayer1
+                clip: true
+
+                StyledImage {
+                    id: avatarImage
+                    anchors.fill: parent
+                    source: `file:///var/lib/AccountsService/icons/${SystemInfo.username}`
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                    visible: status === Image.Ready
+
+                    layer.enabled: true
+                    layer.effect: OpacityMask {
+                        maskSource: Rectangle {
+                            width: avatarImage.width
+                            height: avatarImage.height
+                            radius: width / 2
+                        }
+                    }
+                }
+
+                MaterialSymbol { // Repli sans image de compte
+                    anchors.centerIn: parent
+                    visible: avatarImage.status !== Image.Ready
+                    text: "person"
+                    iconSize: 26
+                    color: Appearance.colors.colOnLayer1
+                }
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 0
+
+                StyledText {
+                    Layout.fillWidth: true
+                    font.pixelSize: Appearance.font.pixelSize.large
+                    color: Appearance.colors.colOnLayer0
+                    elide: Text.ElideRight
+                    text: SystemInfo.username
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 6
+
+                    CustomIcon {
+                        Layout.alignment: Qt.AlignVCenter
+                        implicitWidth: 14
+                        implicitHeight: 14
+                        source: SystemInfo.distroIcon
+                        colorize: true
+                        color: Appearance.colors.colSubtext
+                    }
+                    StyledText {
+                        Layout.fillWidth: true
+                        font.pixelSize: Appearance.font.pixelSize.smaller
+                        color: Appearance.colors.colSubtext
+                        elide: Text.ElideRight
+                        text: `${SystemInfo.username}@${SystemInfo.hostname} \u00b7 ${Translation.tr("Up %1").arg(DateTime.uptime)}`
+                    }
+                }
+            }
 
         ButtonGroup {
             id: systemButtonsRow
-            anchors {
-                top: parent.top
-                bottom: parent.bottom
-                right: parent.right
-            }
+            Layout.alignment: Qt.AlignVCenter
+            Layout.fillWidth: false
             color: Appearance.colors.colLayer1
             padding: 4
 
@@ -307,6 +370,7 @@ Item {
                     text: Translation.tr("Session")
                 }
             }
+        }
         }
     }
 }
