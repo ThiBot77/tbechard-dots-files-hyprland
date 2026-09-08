@@ -537,7 +537,9 @@ Singleton {
                 property JsonObject quickToggles: JsonObject {
                     property string style: "android" // Options: classic, android
                     property JsonObject android: JsonObject {
-                        property int columns: 5
+                        // 4, not 5: with the toggle sizes below every row adds up
+                        // to 4, so a 5th column just leaves a gap on the right.
+                        property int columns: 4
                         property list<var> toggles: [
                             { "size": 2, "type": "network" },
                             { "size": 2, "type": "vpn" },
