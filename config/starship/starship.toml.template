@@ -15,8 +15,7 @@ $directory\
 [](fg:{{colors.secondary_container.default.hex}})\
 $git_branch\
 $git_status\
-$cmd_duration\
-$character"""
+$cmd_duration"""
 
 add_newline = true
 
@@ -58,6 +57,4 @@ format = "[ $duration]($style)"
 style = "fg:{{colors.secondary.default.hex}}"
 
 [character]
-success_symbol = "[❯](bold {{colors.primary.default.hex}})"
-error_symbol = "[❯](bold {{colors.error.default.hex}})"
-disabled = false
+disabled = true
