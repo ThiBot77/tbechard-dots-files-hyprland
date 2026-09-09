@@ -9,6 +9,7 @@ SETTINGS="$HOME/.config/hypr/config/settings.lua"
 AUTOSTART="$HOME/.config/hypr/config/autostart.lua"
 KITTY="$HOME/.config/kitty/kitty.conf"
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+MATUGEN="$HOME/.local/share/serpantinum/src/assets/matugen"
 
 ok()   { printf '\033[32m[ ok ]\033[0m %s\n' "$1"; }
 skip() { printf '\033[90m[ -- ]\033[0m %s\n' "$1"; }
@@ -34,6 +35,28 @@ if s.count(old) != 1:
 open(path, "w").write(s.replace(old, new))
 PYEOF
 }
+
+# --- Prompt aux couleurs du theme ---------------------------------------------
+# Serpantinum ne definit que les 16 couleurs ANSI : les index 233-255 dont se
+# servait le prompt ne sont plus alimentes. On passe donc par un template
+# matugen, qui ecrit starship.toml en hexadecimal a chaque changement de theme.
+if [ ! -d "$MATUGEN" ]; then
+    skip "assets matugen de serpantinum introuvables"
+elif [ ! -f "$REPO/config/starship/starship.toml.template" ]; then
+    skip "template starship absent du depot"
+elif grep -q "templates.starship" "$MATUGEN/config.toml" \
+     && cmp -s "$REPO/config/starship/starship.toml.template" "$MATUGEN/templates/starship.toml.template"; then
+    skip "template starship deja en place"
+else
+    cp -a "$REPO/config/starship/starship.toml.template" "$MATUGEN/templates/starship.toml.template"
+    grep -q "templates.starship" "$MATUGEN/config.toml" || cat >> "$MATUGEN/config.toml" <<'TOML'
+
+[templates.starship]
+input_path = "templates/starship.toml.template"
+output_path = "~/.config/starship.toml"
+TOML
+    ok "Template starship installe, applique au prochain changement de fond"
+fi
 
 # --- zsh ----------------------------------------------------------------------
 # Serpantinum ne fournit rien pour le shell. Le depot fait donc autorite :

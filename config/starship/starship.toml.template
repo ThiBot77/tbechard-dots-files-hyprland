@@ -1,0 +1,63 @@
+# Prompt powerline arrondi, inspire de github.com/elifouts/Dotfiles.
+#
+# Genere par matugen : ce fichier est ecrase a chaque changement de theme.
+# Edite le template, pas le resultat.
+#
+# Separateurs : bg = segment precedent, fg = segment suivant.
+
+format = """\
+[](fg:{{colors.primary.default.hex}})\
+$os\
+[](bg:{{colors.primary.default.hex}} fg:{{colors.primary_container.default.hex}})\
+$username\
+[](bg:{{colors.primary_container.default.hex}} fg:{{colors.secondary_container.default.hex}})\
+$directory\
+[](fg:{{colors.secondary_container.default.hex}})\
+$git_branch\
+$git_status\
+$cmd_duration\
+$character"""
+
+add_newline = true
+
+[os]
+disabled = false
+style = "bg:{{colors.primary.default.hex}} fg:{{colors.on_primary.default.hex}}"
+[os.symbols]
+Arch = " "
+Linux = " "
+
+[username]
+show_always = true
+format = "[$user ](bg:{{colors.primary_container.default.hex}} fg:{{colors.on_primary_container.default.hex}})"
+disabled = false
+
+[directory]
+format = "[$path ](bg:{{colors.secondary_container.default.hex}} fg:{{colors.on_secondary_container.default.hex}})"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "\U000f0219 "
+"Downloads" = "\uf019 "
+"Music" = "\U000f075a "
+"Pictures" = "\uf03e "
+
+[git_branch]
+symbol = "  "
+format = "[$symbol$branch]($style)"
+style = "fg:{{colors.tertiary.default.hex}}"
+
+[git_status]
+format = "[ $all_status$ahead_behind]($style)"
+style = "fg:{{colors.tertiary.default.hex}}"
+
+[cmd_duration]
+min_time = 2000
+format = "[ $duration]($style)"
+style = "fg:{{colors.secondary.default.hex}}"
+
+[character]
+success_symbol = "[❯](bold {{colors.primary.default.hex}})"
+error_symbol = "[❯](bold {{colors.error.default.hex}})"
+disabled = false

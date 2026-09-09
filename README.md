@@ -10,6 +10,7 @@ passage, plus les fichiers qui n'appartiennent qu'a cette machine.
 |---|---|
 | `post-install.sh` | Rejoue les corrections de raccourcis apres chaque install ou mise a jour de serpantinum |
 | `config/zsh/.zshrc` | Ta config zsh : serpantinum n'en fournit aucune |
+| `config/starship/` | Template matugen du prompt, pour qu'il suive le theme |
 | `certs/` | Certificats de CA interne que le systeme doit approuver |
 
 ## post-install.sh
@@ -23,6 +24,11 @@ Il sauvegarde `keybinds.lua` avant sa premiere modification, et s'arrete net si
 un motif a disparu plutot que de patcher a moitie.
 
 Ce qu'il corrige :
+
+- **Il installe le template starship** dans les assets matugen de serpantinum.
+  Celui-ci ne definit que les 16 couleurs ANSI, alors que le prompt utilisait
+  les index 233-255 qu'end-4 alimentait. Le template ecrit `starship.toml` en
+  hexadecimal, regenere a chaque changement de fond d'ecran.
 
 - **Il deploie `config/zsh/.zshrc`** vers `~/.zshrc`. Serpantinum ne livre rien
   pour le shell, ni zsh ni bash. Le depot fait autorite : edite le fichier ici,
