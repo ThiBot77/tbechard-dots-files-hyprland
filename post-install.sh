@@ -10,6 +10,7 @@ set -euo pipefail
 KEYBINDS="$HOME/.config/hypr/config/keybinds.lua"
 SETTINGS="$HOME/.config/hypr/config/settings.lua"
 AUTOSTART="$HOME/.config/hypr/config/autostart.lua"
+KITTY="$HOME/.config/kitty/kitty.conf"
 
 ok()   { printf '\033[32m[ ok ]\033[0m %s\n' "$1"; }
 skip() { printf '\033[90m[ -- ]\033[0m %s\n' "$1"; }
@@ -36,6 +37,31 @@ if s.count(old) != 1:
 open(path, "w").write(s.replace(old, new))
 PYEOF
 }
+
+# --- Police du terminal -------------------------------------------------------
+# Serpantinum livre un kitty.conf qui demande "JetBrains Mono". Ce nom exact
+# n existe pas sur Arch : le paquet fournit "JetBrainsMono Nerd Font", sans
+# espace. Kitty retombe donc sur Noto Sans Mono, sans glyphes Nerd Font, et le
+# prompt starship comme fastfetch s affichent en carres.
+if [ -f "$KITTY" ]; then
+    if grep -qF 'font_family      JetBrainsMono Nerd Font' "$KITTY"; then
+        skip "Police kitty deja corrigee"
+    else
+        [ -f "$KITTY.avant-post-install" ] || cp -a "$KITTY" "$KITTY.avant-post-install"
+        python3 - "$KITTY" <<'PYEOF'
+import sys
+path = sys.argv[1]
+s = open(path).read()
+old = "font_family      JetBrains Mono\n"
+if s.count(old) != 1:
+    sys.exit("motif font_family introuvable : l amont a change, a revoir a la main")
+open(path, "w").write(s.replace(old, "font_family      JetBrainsMono Nerd Font\n"))
+PYEOF
+        ok "Police kitty en JetBrainsMono Nerd Font"
+    fi
+else
+    skip "kitty.conf absent"
+fi
 
 # --- Agent de secrets NetworkManager ------------------------------------------
 # Serpantinum ne gere pas le VPN : aucun de ses fichiers ne le mentionne, son

@@ -23,6 +23,12 @@ un motif a disparu plutot que de patcher a moitie.
 
 Ce qu'il corrige :
 
+- **La police de kitty**, dans `~/.config/kitty/kitty.conf`. Serpantinum
+  demande `JetBrains Mono` ; ce nom exact n'existe pas sur Arch, ou le paquet
+  fournit `JetBrainsMono Nerd Font`. Kitty retombe donc sur Noto Sans Mono,
+  sans glyphes Nerd Font, et le prompt starship comme fastfetch s'affichent en
+  carres. Serpantinum ne livre en revanche aucune configuration zsh.
+
 - **`nm-applet` est lance au demarrage**, dans `config/autostart.lua`.
   Serpantinum ne gere pas le VPN du tout : son panneau reseau se limite au wifi
   et au bluetooth. Sans agent de secrets, NetworkManager ne peut demander ni
