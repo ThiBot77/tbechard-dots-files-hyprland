@@ -146,14 +146,6 @@ ContentPage {
             }))
         }
 
-        ConfigSwitch {
-            buttonIcon: "ev_shadow"
-            text: Translation.tr("Transparency")
-            checked: Config.options.appearance.transparency.enable
-            onCheckedChanged: {
-                Config.options.appearance.transparency.enable = checked;
-            }
-        }
     }
 
     ContentSection {

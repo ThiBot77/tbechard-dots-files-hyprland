@@ -18,9 +18,7 @@
         },
         "transparency": {
             "automatic": true,
-            "backgroundTransparency": 0.11,
-            "contentTransparency": 0.57,
-            "enable": true
+            "contentTransparency": 0.57
         },
         "wallpaperTheming": {
             "enableAppsAndShell": true,
@@ -54,14 +52,6 @@
     },
     "background": {
         "hideWhenFullscreen": true,
-        "parallax": {
-            "autoVertical": false,
-            "enableSidebar": false,
-            "enableWorkspace": false,
-            "vertical": false,
-            "widgetsFactor": 1.2,
-            "workspaceZoom": 1.07
-        },
         "thumbnailPath": "",
         "wallpaperPath": "/home/tbechard/Images/Wallpapers/wallhaven-391k7d.jpg",
         "widgets": {
@@ -71,13 +61,13 @@
                     "constantlyRotate": false,
                     "dateInClock": true,
                     "dateStyle": "bubble",
-                    "dialNumberStyle": "numbers",
-                    "hourHandStyle": "fill",
-                    "hourMarks": false,
+                    "dialNumberStyle": "dots",
+                    "hourHandStyle": "hollow",
+                    "hourMarks": true,
                     "minuteHandStyle": "thin",
                     "secondHandStyle": "line",
-                    "sides": 12,
-                    "timeIndicators": false,
+                    "sides": 2,
+                    "timeIndicators": true,
                     "useSineCookie": false
                 },
                 "digital": {
@@ -196,7 +186,7 @@
         "verbose": true,
         "vertical": false,
         "weather": {
-            "city": "",
+            "city": "Linse",
             "enable": true,
             "enableGPS": true,
             "fetchInterval": 10,
@@ -277,7 +267,7 @@
             "sourceLanguage": "auto",
             "targetLanguage": "auto"
         },
-        "ui": "auto"
+        "ui": "fr_FR"
     },
     "launcher": {
         "pinnedApps": [

@@ -52,16 +52,16 @@ Variants {
             const sensitiveNetwork = (CF.StringUtils.stringListContainsSubstring(Network.networkName.toLowerCase(), Config.options.workSafety.triggerCondition.networkNameKeywords));
             return enabled && sensitiveWallpaper && sensitiveNetwork;
         }
-        readonly property real parallaxRation: Config.options.background.parallax.workspaceZoom
         property real minSuitableScale: 1 // Some reasonable init, to be updated
-        property real effectiveWallpaperScale: minSuitableScale * parallaxRation
+        // Le parallax a ete retire : plus de sur-zoom, le fond est agrandi juste
+        // assez pour couvrir l'ecran, donc moins rogne et moins interpole.
+        property real effectiveWallpaperScale: minSuitableScale
         property int wallpaperWidth: modelData.width // Some reasonable init value, to be updated
         property int wallpaperHeight: modelData.height // Some reasonable init value, to be updated
         property real scaledWallpaperWidth: wallpaperWidth * effectiveWallpaperScale
         property real scaledWallpaperHeight: wallpaperHeight * effectiveWallpaperScale
-        property real parallaxTotalPixelsX: Math.max(0, scaledWallpaperWidth - screen.width)
-        property real parallaxTotalPixelsY: Math.max(0, scaledWallpaperHeight - screen.height)
-        readonly property bool verticalParallax: (Config.options.background.parallax.autoVertical && wallpaperHeight > wallpaperWidth) || Config.options.background.parallax.vertical
+        property real overflowPixelsX: Math.max(0, scaledWallpaperWidth - screen.width)
+        property real overflowPixelsY: Math.max(0, scaledWallpaperHeight - screen.height)
         // Colors
         property bool shouldBlur: (GlobalStates.screenLocked && Config.options.lock.blur.enable)
         property color dominantColor: Appearance.colors.colPrimary // Default, to be changed
@@ -139,49 +139,23 @@ Variants {
                 cache: false
                 smooth: false
 
-                property int workspaceIndex: (bgRoot.monitor.activeWorkspace?.id ?? 1) - 1
-                property real middleFraction: 0.5
-                property real fraction: {
-                    // 0 - start of the picture
-                    // 1 - end of the picture
-                    if (bgRoot.totalWorkspaces <= 1) {
-                        return middleFraction;
-                    }
-                    return Math.max(0, Math.min(1, workspaceIndex / (bgRoot.totalWorkspaces - 1)));
-                }
+                // Le fond est centre : la moitie du debordement de chaque cote.
+                readonly property real middleFraction: 0.5
 
-                property real usedFractionX: {
-                    let usedFraction = middleFraction;
-                    if (Config.options.background.parallax.enableWorkspace && !bgRoot.verticalParallax) {
-                        usedFraction = fraction;
-                    }
-                    if (Config.options.background.parallax.enableSidebar) {
-                        let sidebarFraction = bgRoot.parallaxRation / bgRoot.workspaceChunkSize / 2;
-                        usedFraction += (sidebarFraction * GlobalStates.sidebarRightOpen - sidebarFraction * GlobalStates.sidebarLeftOpen);
-                    }
-                    return Math.max(0, Math.min(1, usedFraction));
-                }
-                property real usedFractionY: {
-                    let usedFraction = middleFraction;
-                    if (Config.options.background.parallax.enableWorkspace && bgRoot.verticalParallax) {
-                        usedFraction = fraction;
-                    }
-                    return Math.max(0, Math.min(1, usedFraction));
-                }
 
                 x: {
                     if (bgRoot.screen.width > width) {
                         // Center the picture
                         return (bgRoot.screen.width - width) / 2;
                     }
-                    return - bgRoot.parallaxTotalPixelsX * usedFractionX;
+                    return - bgRoot.overflowPixelsX * middleFraction;
                 }
                 y: {
                     if (bgRoot.screen.height > height) {
                         // Center the picture
                         return (bgRoot.screen.height - height) / 2;
                     }
-                    return - bgRoot.parallaxTotalPixelsY * usedFractionY;
+                    return - bgRoot.overflowPixelsY * middleFraction;
                 }
 
                 source: bgRoot.wallpaperSafetyTriggered ? "" : bgRoot.wallpaperPath
@@ -232,17 +206,9 @@ Variants {
                 id: widgetCanvas
                 width: parent.width
                 height: parent.height
-                readonly property real parallaxFactor: {
-                    var f = Config.options.background.parallax.widgetsFactor;
-                    return f / bgRoot.parallaxRation;
-                }
-                readonly property real baseWallpaperOffsetX: (bgRoot.screen.width - wallpaper.width) / 2
-                readonly property real baseWallpaperOffsetY: (bgRoot.screen.height - wallpaper.height) / 2
-                readonly property real wallpaperTotalOffsetX: wallpaper.x - baseWallpaperOffsetX
-                readonly property real wallpaperTotalOffsetY: wallpaper.y - baseWallpaperOffsetY
-                readonly property bool locked: GlobalStates.screenLocked
-                x: wallpaperTotalOffsetX * parallaxFactor * !locked
-                y: wallpaperTotalOffsetY * parallaxFactor * !locked
+                // Le fond est centre et fixe, les widgets n'ont plus a le suivre.
+                x: 0
+                y: 0
 
                 transitions: Transition {
                     PropertyAnimation {
