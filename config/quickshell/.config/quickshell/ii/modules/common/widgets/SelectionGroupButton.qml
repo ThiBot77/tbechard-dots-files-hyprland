@@ -7,6 +7,7 @@ import Quickshell.Hyprland
 import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
+import qs.modules.common.functions
 
 GroupButton {
     id: root
@@ -14,6 +15,9 @@ GroupButton {
     verticalPadding: 8
     bounce: false
     property string buttonIcon
+    // Pastille de couleur optionnelle, pour les selecteurs de palette.
+    // Vide par defaut : les autres appelants ne voient aucun changement.
+    property string swatchColor: ""
     property bool leftmost: false
     property bool rightmost: false
     leftRadius: (toggled || leftmost) ? (height / 2) : Appearance.rounding.unsharpenmore
@@ -24,6 +28,20 @@ GroupButton {
 
     contentItem: RowLayout {
         spacing: 4 * (root.buttonText?.length > 0)
+
+        Loader {
+            Layout.alignment: Qt.AlignVCenter
+            active: root.swatchColor.length > 0
+            visible: active
+            sourceComponent: Rectangle {
+                implicitWidth: 14
+                implicitHeight: 14
+                radius: width / 2
+                color: root.swatchColor
+                border.width: 1
+                border.color: ColorUtils.transparentize(Appearance.colors.colOnLayer1, 0.7)
+            }
+        }
 
         Loader {
             Layout.alignment: Qt.AlignVCenter

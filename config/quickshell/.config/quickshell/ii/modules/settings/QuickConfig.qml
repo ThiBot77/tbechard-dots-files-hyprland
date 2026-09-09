@@ -129,49 +129,21 @@ ContentPage {
         }
 
         ConfigSelectionArray {
-            currentValue: Config.options.appearance.palette.type
+            currentValue: Config.options.appearance.palette.preset
             onSelected: newValue => {
-                Config.options.appearance.palette.type = newValue;
+                const palette = ColorPalettes.byName(newValue);
+                Config.options.appearance.palette.preset = palette.name;
+                Config.options.appearance.palette.accentColor = palette.accent;
+                Config.options.appearance.palette.type = palette.type;
+                // switchwall relit accentColor et type dans config.json, puis
+                // regenere toute la palette sans toucher au fond d'ecran.
                 Quickshell.execDetached(["bash", "-c", `${Directories.wallpaperSwitchScriptPath} --noswitch`]);
             }
-            options: [
-                {
-                    "value": "auto",
-                    "displayName": Translation.tr("Auto")
-                },
-                {
-                    "value": "scheme-content",
-                    "displayName": Translation.tr("Content")
-                },
-                {
-                    "value": "scheme-expressive",
-                    "displayName": Translation.tr("Expressive")
-                },
-                {
-                    "value": "scheme-fidelity",
-                    "displayName": Translation.tr("Fidelity")
-                },
-                {
-                    "value": "scheme-fruit-salad",
-                    "displayName": Translation.tr("Fruit Salad")
-                },
-                {
-                    "value": "scheme-monochrome",
-                    "displayName": Translation.tr("Monochrome")
-                },
-                {
-                    "value": "scheme-neutral",
-                    "displayName": Translation.tr("Neutral")
-                },
-                {
-                    "value": "scheme-rainbow",
-                    "displayName": Translation.tr("Rainbow")
-                },
-                {
-                    "value": "scheme-tonal-spot",
-                    "displayName": Translation.tr("Tonal Spot")
-                }
-            ]
+            options: ColorPalettes.list.map(palette => ({
+                "value": palette.name,
+                "displayName": palette.displayName,
+                "swatch": palette.swatch
+            }))
         }
 
         ConfigSwitch {

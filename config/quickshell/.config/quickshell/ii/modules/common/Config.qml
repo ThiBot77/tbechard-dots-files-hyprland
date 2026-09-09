@@ -113,8 +113,18 @@ Singleton {
                     }
                 }
                 property JsonObject palette: JsonObject {
-                    property string type: "scheme-monochrome" // graphite : greyscale genere depuis le fond. Allowed: auto, scheme-content, scheme-expressive, scheme-fidelity, scheme-fruit-salad, scheme-monochrome, scheme-neutral, scheme-rainbow, scheme-tonal-spot
-                    property string accentColor: ""
+                    // Pilotes ensemble par le selecteur de palettes : voir
+                    // modules/common/ColorPalettes.qml pour le catalogue.
+                    // type    : algorithme Material You (auto, scheme-content,
+                    //           scheme-expressive, scheme-fidelity,
+                    //           scheme-fruit-salad, scheme-monochrome,
+                    //           scheme-neutral, scheme-rainbow,
+                    //           scheme-tonal-spot)
+                    // accent  : couleur source ; vide = prise dans le fond d'ecran
+                    // preset  : nom de la palette active, pour l'interface
+                    property string type: "scheme-monochrome"
+                    property string accentColor: "#8A8A8A"
+                    property string preset: "graphite"
                 }
             }
 

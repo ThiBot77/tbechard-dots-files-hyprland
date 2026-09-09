@@ -44,6 +44,7 @@ Flow {
             leftmost: index === 0
             rightmost: index === root.options.length - 1
             buttonIcon: modelData.icon || ""
+            swatchColor: modelData.swatch || ""
             buttonText: modelData.displayName
             toggled: root.currentValue == modelData.value
             onClicked: {
