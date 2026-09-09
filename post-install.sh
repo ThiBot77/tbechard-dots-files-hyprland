@@ -9,6 +9,7 @@ set -euo pipefail
 
 KEYBINDS="$HOME/.config/hypr/config/keybinds.lua"
 SETTINGS="$HOME/.config/hypr/config/settings.lua"
+AUTOSTART="$HOME/.config/hypr/config/autostart.lua"
 
 ok()   { printf '\033[32m[ ok ]\033[0m %s\n' "$1"; }
 skip() { printf '\033[90m[ -- ]\033[0m %s\n' "$1"; }
@@ -16,6 +17,7 @@ die()  { printf '\033[31m[ !! ]\033[0m %s\n' "$1" >&2; exit 1; }
 
 [ -f "$KEYBINDS" ] || die "Introuvable : $KEYBINDS. Serpantinum est-il installe ?"
 [ -f "$SETTINGS" ] || die "Introuvable : $SETTINGS. Serpantinum est-il installe ?"
+[ -f "$AUTOSTART" ] || die "Introuvable : $AUTOSTART. Serpantinum est-il installe ?"
 
 backup_once() {
     local dest="$KEYBINDS.avant-post-install"
@@ -34,6 +36,29 @@ if s.count(old) != 1:
 open(path, "w").write(s.replace(old, new))
 PYEOF
 }
+
+# --- Agent de secrets NetworkManager ------------------------------------------
+# Serpantinum ne gere pas le VPN : aucun de ses fichiers ne le mentionne, son
+# panneau reseau se limite au wifi et au bluetooth. Sans agent de secrets,
+# NetworkManager ne peut demander ni mot de passe ni code MFA et abandonne la
+# connexion en silence. nm-applet fournit cet agent, et son menu de barre
+# systeme permet en prime de monter les VPN.
+if grep -qF 'nm-applet' "$AUTOSTART"; then
+    skip "nm-applet deja au demarrage"
+else
+    [ -f "$AUTOSTART.avant-post-install" ] || cp -a "$AUTOSTART" "$AUTOSTART.avant-post-install"
+    python3 - "$AUTOSTART" <<'PYEOF'
+import sys
+path = sys.argv[1]
+s = open(path).read()
+old = '  hl.exec_cmd("serpantinumd start")'
+if s.count(old) != 1:
+    sys.exit("motif autostart introuvable : l amont a change, a revoir a la main")
+open(path, "w").write(s.replace(old, '  hl.exec_cmd("nm-applet")\n' + old))
+PYEOF
+    pgrep -x nm-applet >/dev/null || (nohup nm-applet >/dev/null 2>&1 &)
+    ok "nm-applet au demarrage, agent de secrets pour les VPN"
+fi
 
 # --- Disposition clavier ------------------------------------------------------
 # L installateur remet kb_layout a "us" a chaque passage. On repasse en

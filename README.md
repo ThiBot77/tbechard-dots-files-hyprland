@@ -23,6 +23,12 @@ un motif a disparu plutot que de patcher a moitie.
 
 Ce qu'il corrige :
 
+- **`nm-applet` est lance au demarrage**, dans `config/autostart.lua`.
+  Serpantinum ne gere pas le VPN du tout : son panneau reseau se limite au wifi
+  et au bluetooth. Sans agent de secrets, NetworkManager ne peut demander ni
+  mot de passe ni code MFA, et abandonne la connexion en silence. nm-applet
+  fournit cet agent, et son menu de barre systeme sert a monter les VPN.
+
 - **La disposition clavier repasse en francais**, dans `config/settings.lua`.
   L'installateur la remet a `us` a chaque passage. Le `us` est garde en second
   groupe, `Alt+Shift` bascule entre les deux.
