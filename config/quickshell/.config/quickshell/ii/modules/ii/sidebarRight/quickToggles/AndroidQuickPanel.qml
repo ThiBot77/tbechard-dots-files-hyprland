@@ -10,11 +10,12 @@ import qs.modules.ii.sidebarRight.quickToggles.androidStyle
 
 AbstractQuickPanel {
     id: root
-    property bool editMode: false
+    // Le mode edition n'a plus de point d'entree : la grille est figee.
+    readonly property bool editMode: false
     Layout.fillWidth: true
 
     // Sizes
-    implicitHeight: (editMode ? contentItem.implicitHeight : usedRows.implicitHeight) + root.padding * 2
+    implicitHeight: usedRows.implicitHeight + root.padding * 2
     Behavior on implicitHeight {
         animation: Appearance.animation.elementMove.numberAnimation.createObject(this)
     }
@@ -28,19 +29,11 @@ AbstractQuickPanel {
     }
     readonly property real baseCellHeight: 56
 
-    // Toggles
-    // Pas de "powerProfile" : cette machine tourne sous TLP, avec lequel
-    // power-profiles-daemon ne doit pas cohabiter. La bascule ne pouvait
-    // qu'echouer, en jetant "power-profiles-daemon not accessible".
-    readonly property list<string> availableToggleTypes: ["network", "vpn", "bluetooth", "idleInhibitor", "easyEffects", "nightLight", "darkMode", "cloudflareWarp", "gameMode", "screenSnip", "colorPicker", "onScreenKeyboard", "mic", "audio", "notifications", "musicRecognition", "antiFlashbang"]
+    // Toggles. La liste des types disponibles a disparu avec le mode edition :
+    // la grille se lit desormais uniquement dans Config, sidebar.quickToggles.
     readonly property int columns: Config.options.sidebar.quickToggles.android.columns
     readonly property list<var> toggles: Config.ready ? Config.options.sidebar.quickToggles.android.toggles : []
     readonly property list<var> toggleRows: toggleRowsForList(toggles)
-    readonly property list<var> unusedToggles: {
-        const types = availableToggleTypes.filter(type => !toggles.some(toggle => (toggle && toggle.type === type)))
-        return types.map(type => { return { type: type, size: 1 } })
-    }
-    readonly property list<var> unusedToggleRows: toggleRowsForList(unusedToggles)
 
     function toggleRowsForList(togglesList) {
         var rows = [];
@@ -116,52 +109,5 @@ AbstractQuickPanel {
             }
         }
 
-        FadeLoader {
-            shown: root.editMode
-            anchors {
-                left: parent.left
-                right: parent.right
-                leftMargin: root.baseCellHeight / 2
-                rightMargin: root.baseCellHeight / 2
-            }
-            sourceComponent: Rectangle {
-                implicitHeight: 1
-                color: Appearance.colors.colOutlineVariant
-            }
-        }
-
-        FadeLoader {
-            shown: root.editMode
-            sourceComponent: Column {
-                id: unusedRows
-                spacing: root.spacing
-
-                Repeater {
-                    model: ScriptModel {
-                        values: Array(root.unusedToggleRows.length)
-                    }
-                    delegate: ButtonGroup {
-                        id: unusedToggleRow
-                        required property int index
-                        property var modelData: root.unusedToggleRows[index]
-                        spacing: root.spacing
-
-                        Repeater {
-                            model: ScriptModel {
-                                values: unusedToggleRow?.modelData ?? []
-                                objectProp: "type"
-                            }
-                            delegate: AndroidToggleDelegateChooser {
-                                startingIndex: -1
-                                editMode: root.editMode
-                                baseCellWidth: root.baseCellWidth
-                                baseCellHeight: root.baseCellHeight
-                                spacing: root.spacing
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }

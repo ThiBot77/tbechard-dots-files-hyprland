@@ -30,7 +30,6 @@ Item {
     property bool showNightLightDialog: false
     property bool showWifiDialog: false
     property bool showVpnDialog: false
-    property bool editMode: false
 
     Connections {
         target: GlobalStates
@@ -95,9 +94,7 @@ Item {
 
             LoaderedQuickPanelImplementation {
                 styleName: "android"
-                sourceComponent: AndroidQuickPanel {
-                    editMode: root.editMode
-                }
+                sourceComponent: AndroidQuickPanel {}
             }
 
             CenterWidgetGroup {
@@ -329,15 +326,6 @@ Item {
             color: Appearance.colors.colLayer1
             padding: 4
 
-            QuickToggleButton {
-                toggled: root.editMode
-                visible: Config.options.sidebar.quickToggles.style === "android"
-                buttonIcon: "edit"
-                onClicked: root.editMode = !root.editMode
-                StyledToolTip {
-                    text: Translation.tr("Edit quick toggles") + (root.editMode ? Translation.tr("\nLMB to enable/disable\nRMB to toggle size\nScroll to swap position") : "")
-                }
-            }
             QuickToggleButton {
                 toggled: false
                 buttonIcon: "restart_alt"
