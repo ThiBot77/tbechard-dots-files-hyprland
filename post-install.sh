@@ -8,12 +8,14 @@
 set -euo pipefail
 
 KEYBINDS="$HOME/.config/hypr/config/keybinds.lua"
+SETTINGS="$HOME/.config/hypr/config/settings.lua"
 
 ok()   { printf '\033[32m[ ok ]\033[0m %s\n' "$1"; }
 skip() { printf '\033[90m[ -- ]\033[0m %s\n' "$1"; }
 die()  { printf '\033[31m[ !! ]\033[0m %s\n' "$1" >&2; exit 1; }
 
 [ -f "$KEYBINDS" ] || die "Introuvable : $KEYBINDS. Serpantinum est-il installe ?"
+[ -f "$SETTINGS" ] || die "Introuvable : $SETTINGS. Serpantinum est-il installe ?"
 
 backup_once() {
     local dest="$KEYBINDS.avant-post-install"
@@ -32,6 +34,26 @@ if s.count(old) != 1:
 open(path, "w").write(s.replace(old, new))
 PYEOF
 }
+
+# --- Disposition clavier ------------------------------------------------------
+# L installateur remet kb_layout a "us" a chaque passage. On repasse en
+# francais, en gardant le us en second groupe : grp:alt_shift_toggle bascule
+# entre les deux, ce qui depanne pour les jeux et certains logiciels.
+if grep -qF 'kb_layout = "fr' "$SETTINGS"; then
+    skip "Clavier deja en francais"
+else
+    [ -f "$SETTINGS.avant-post-install" ] || cp -a "$SETTINGS" "$SETTINGS.avant-post-install"
+    python3 - "$SETTINGS" <<'PYEOF'
+import sys
+path = sys.argv[1]
+s = open(path).read()
+old = '    kb_layout = "us",'
+if s.count(old) != 1:
+    sys.exit("motif kb_layout introuvable : l amont a change, a revoir a la main")
+open(path, "w").write(s.replace(old, '    kb_layout = "fr,us",'))
+PYEOF
+    ok "Clavier en francais, us en second groupe"
+fi
 
 # --- Terminal sur SUPER+T -----------------------------------------------------
 # L original ne bind que SUPER+Return. On ajoute T sans retirer Return.

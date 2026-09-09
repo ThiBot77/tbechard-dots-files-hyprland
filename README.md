@@ -21,7 +21,13 @@ Idempotent : il detecte ce qui est deja en place et ne touche a rien d'autre.
 Il sauvegarde `keybinds.lua` avant sa premiere modification, et s'arrete net si
 un motif a disparu plutot que de patcher a moitie.
 
-Ce qu'il corrige, dans `~/.config/hypr/config/keybinds.lua` :
+Ce qu'il corrige :
+
+- **La disposition clavier repasse en francais**, dans `config/settings.lua`.
+  L'installateur la remet a `us` a chaque passage. Le `us` est garde en second
+  groupe, `Alt+Shift` bascule entre les deux.
+
+Et dans `config/keybinds.lua` :
 
 - **`SUPER+T`** ouvre le terminal, en plus de `SUPER+Return`
 - **`SUPER+A`** ouvre le lanceur ; l'autohide qui occupait cette touche passe
