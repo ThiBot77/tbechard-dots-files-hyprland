@@ -162,7 +162,7 @@ Configs are copied, not symlinked: edit the file in `config/`, not in
 | Shortcut | Action |
 |---|---|
 | `SUPER + 1..0` | Go to workspace |
-| `SUPER + ALT + 1..0` | Send window to workspace |
+| `SUPER + SHIFT + 1..0` | Send window to workspace (`SUPER + ALT` works too) |
 | `CTRL + SUPER + ←/→` | Previous / next workspace |
 | `SUPER + scroll` | Previous / next workspace |
 | `SUPER + S` | Toggle scratchpad (`SUPER + ALT + S` sends the window there) |
@@ -283,3 +283,8 @@ scheme skips the blend entirely and gives back graphite as-is.
 | `scripts/` | The install steps |
 | `sddm/` | The login screen theme |
 | `vendor/` | Files taken from end-4 that the scripts use: the `kdeglobals` base and the Python requirements |
+
+The shell's own settings live in `config/illogical-impulse/.config/illogical-impulse/config.json`
+rather than in the QML. Quickshell rewrites that file at runtime -- it appends
+any option a new version introduces -- so expect it to show up as modified
+after an upgrade, and commit it when the change is one you meant.
