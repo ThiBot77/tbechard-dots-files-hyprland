@@ -26,6 +26,10 @@ un motif a disparu plutot que de patcher a moitie.
 
 Ce qu'il corrige :
 
+- **Il approuve les certificats de `certs/`** dans le magasin systeme. Avant
+  l'installation des paquets : derriere un proxy TLS, les telechargements
+  echouent tant que le CA n'est pas approuve.
+
 - **Il installe les paquets manquants** de `packages/pacman.txt` et
   `packages/aur.txt`. Serpantinum n'installe que ses propres dependances.
   `SKIP_PACKAGES=1` saute cette etape.

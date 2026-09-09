@@ -32,6 +32,36 @@ open(path, "w").write(s.replace(old, new))
 PYEOF
 }
 
+# --- Certificats de CA --------------------------------------------------------
+CERT_DIR="$REPO/certs"
+ANCHORS="/etc/ca-certificates/trust-source/anchors"
+shopt -s nullglob
+CERTS=("$CERT_DIR"/*.crt)
+shopt -u nullglob
+
+if [ ${#CERTS[@]} -eq 0 ]; then
+    skip "Aucun certificat dans certs/"
+elif ! command -v update-ca-trust >/dev/null; then
+    skip "update-ca-trust absent"
+else
+    CHANGED=0
+    for cert in "${CERTS[@]}"; do
+        target="$ANCHORS/$(basename "$cert")"
+        [ -f "$target" ] && cmp -s "$cert" "$target" && continue
+        openssl x509 -in "$cert" -noout >/dev/null 2>&1 || {
+            echo "  $(basename "$cert") : PEM illisible, ignore"; continue
+        }
+        sudo install -m 644 -D "$cert" "$target"
+        CHANGED=1
+    done
+    if [ "$CHANGED" = "1" ]; then
+        sudo update-ca-trust
+        ok "Magasin de certificats reconstruit"
+    else
+        skip "Certificats deja approuves"
+    fi
+fi
+
 # --- Paquets ------------------------------------------------------------------
 if [ "${SKIP_PACKAGES:-0}" = "1" ]; then
     skip "Paquets ignores (SKIP_PACKAGES=1)"
