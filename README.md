@@ -9,6 +9,7 @@ passage, plus les fichiers qui n'appartiennent qu'a cette machine.
 | Fichier | Role |
 |---|---|
 | `post-install.sh` | Rejoue les corrections de raccourcis apres chaque install ou mise a jour de serpantinum |
+| `config/zsh/.zshrc` | Ta config zsh : serpantinum n'en fournit aucune |
 | `certs/` | Certificats de CA interne que le systeme doit approuver |
 
 ## post-install.sh
@@ -22,6 +23,10 @@ Il sauvegarde `keybinds.lua` avant sa premiere modification, et s'arrete net si
 un motif a disparu plutot que de patcher a moitie.
 
 Ce qu'il corrige :
+
+- **Il deploie `config/zsh/.zshrc`** vers `~/.zshrc`. Serpantinum ne livre rien
+  pour le shell, ni zsh ni bash. Le depot fait autorite : edite le fichier ici,
+  pas dans `$HOME`, puis relance le script.
 
 - **Les reglages de kitty**, dans `~/.config/kitty/kitty.conf`. Serpantinum
   livre le sien : corps 16, aucune transparence, 4 px de marge. On revient a

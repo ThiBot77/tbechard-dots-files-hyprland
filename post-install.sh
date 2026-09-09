@@ -1,16 +1,14 @@
 #!/usr/bin/env bash
 #
-# Rejoue ce que l'installateur de serpantinum ne conserve pas.
-#
-# Il reecrit ~/.config/hypr/config/keybinds.lua a chaque installation ou mise a
-# jour, ce qui efface les corrections ci-dessous. Ce script est idempotent :
-# relance-le apres chaque passage de l'installateur.
+# Rejoue ce que l'installateur de serpantinum ecrase a chaque passage.
+# Idempotent : relance-le apres chaque mise a jour.
 set -euo pipefail
 
 KEYBINDS="$HOME/.config/hypr/config/keybinds.lua"
 SETTINGS="$HOME/.config/hypr/config/settings.lua"
 AUTOSTART="$HOME/.config/hypr/config/autostart.lua"
 KITTY="$HOME/.config/kitty/kitty.conf"
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 ok()   { printf '\033[32m[ ok ]\033[0m %s\n' "$1"; }
 skip() { printf '\033[90m[ -- ]\033[0m %s\n' "$1"; }
@@ -25,8 +23,7 @@ backup_once() {
     [ -f "$dest" ] || cp -a "$KEYBINDS" "$dest"
 }
 
-# Remplace une chaine exacte, ou echoue bruyamment si le motif a disparu :
-# mieux vaut s arreter que patcher a moitie.
+# Echoue plutot que de patcher a moitie si l amont a bouge.
 patch_lua() {
     python3 - "$KEYBINDS" "$1" "$2" "$3" <<'PYEOF'
 import sys
@@ -38,14 +35,24 @@ open(path, "w").write(s.replace(old, new))
 PYEOF
 }
 
+# --- zsh ----------------------------------------------------------------------
+# Serpantinum ne fournit rien pour le shell. Le depot fait donc autorite :
+# edite config/zsh/.zshrc, pas ~/.zshrc, puis relance ce script.
+if [ ! -f "$REPO/config/zsh/.zshrc" ]; then
+    skip "config/zsh/.zshrc absent du depot"
+elif cmp -s "$REPO/config/zsh/.zshrc" "$HOME/.zshrc"; then
+    skip "zshrc deja a jour"
+else
+    [ -f "$HOME/.zshrc" ] && [ ! -f "$HOME/.zshrc.avant-post-install" ] \
+        && cp -a "$HOME/.zshrc" "$HOME/.zshrc.avant-post-install"
+    cp -a "$REPO/config/zsh/.zshrc" "$HOME/.zshrc"
+    ok "zshrc deploye depuis le depot"
+fi
+
 # --- Reglages du terminal -----------------------------------------------------
-# Serpantinum livre son propre kitty.conf, avec une police en corps 16, aucune
-# transparence et 4 px de marge. On revient aux reglages d avant, en gardant
-# son include de colors.conf pour que la palette continue de le suivre.
-#
-# Sa police par defaut, "JetBrains Mono", n existe pas sur Arch : le paquet
-# fournit "FiraCode Nerd Font" ou "JetBrainsMono Nerd Font". Sans correction,
-# kitty retombe sur Noto Sans Mono, sans glyphes Nerd Font.
+# On garde son include de colors.conf : la palette continue de le suivre.
+# Sa police "JetBrains Mono" n existe pas sur Arch, kitty retombait sur
+# Noto Sans Mono, sans glyphes Nerd Font.
 if [ ! -f "$KITTY" ]; then
     skip "kitty.conf absent"
 elif grep -qF 'font_size        10.5' "$KITTY"; then
@@ -59,7 +66,7 @@ s = open(path).read()
 subs = [
     ("font_family      JetBrains Mono",   "font_family      FiraCode Nerd Font"),
     ("font_size        16.0",             "font_size        10.5"),
-    ("background_opacity 1.0",            "background_opacity 0.85\ndynamic_background_opacity yes"),
+    ("background_opacity 1.0",            "background_opacity 0.70\ndynamic_background_opacity yes"),
     ("window_padding_width 4",            "window_padding_width 24"),
     ("scrollback_lines 2000",             "scrollback_lines 10000"),
     ("cursor_trail 1",                    "cursor_shape beam\ncursor_blink_interval 0"),
@@ -71,15 +78,13 @@ for old, new in subs:
     s = s.replace(old, new)
 open(path, "w").write(s)
 PYEOF
-    ok "Kitty : police, corps 10.5, transparence 0.85, marge 24 px"
+    ok "Kitty : police, corps 10.5, transparence 0.70, marge 24 px"
 fi
 
 # --- Agent de secrets NetworkManager ------------------------------------------
-# Serpantinum ne gere pas le VPN : aucun de ses fichiers ne le mentionne, son
-# panneau reseau se limite au wifi et au bluetooth. Sans agent de secrets,
-# NetworkManager ne peut demander ni mot de passe ni code MFA et abandonne la
-# connexion en silence. nm-applet fournit cet agent, et son menu de barre
-# systeme permet en prime de monter les VPN.
+# Serpantinum ne gere pas le VPN. Sans agent, NetworkManager ne peut pas
+# demander le code MFA et abandonne en silence. nm-applet le fournit, et son
+# menu sert a monter les VPN.
 if grep -qF 'nm-applet' "$AUTOSTART"; then
     skip "nm-applet deja au demarrage"
 else
@@ -98,9 +103,8 @@ PYEOF
 fi
 
 # --- Disposition clavier ------------------------------------------------------
-# L installateur remet kb_layout a "us" a chaque passage. On repasse en
-# francais, en gardant le us en second groupe : grp:alt_shift_toggle bascule
-# entre les deux, ce qui depanne pour les jeux et certains logiciels.
+# L installateur remet kb_layout a "us". Le us reste en second groupe,
+# Alt+Shift bascule.
 if grep -qF 'kb_layout = "fr' "$SETTINGS"; then
     skip "Clavier deja en francais"
 else
@@ -118,7 +122,6 @@ PYEOF
 fi
 
 # --- Terminal sur SUPER+T -----------------------------------------------------
-# L original ne bind que SUPER+Return. On ajoute T sans retirer Return.
 if grep -qF 'mainMod .. " + T", hl.dsp.exec_cmd(terminal)' "$KEYBINDS"; then
     skip "SUPER+T deja en place"
 else
@@ -131,7 +134,7 @@ hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal))' \
 fi
 
 # --- Lanceur sur SUPER+A ------------------------------------------------------
-# SUPER+A sert a l autohide dans l original : on le decale sur SHIFT+A.
+# SUPER+A servait a l autohide, qui passe sur SHIFT+A.
 if grep -qF '" + A", hl.dsp.exec_cmd("serpantinum msg toggle launcher")' "$KEYBINDS"; then
     skip "SUPER+A deja en place"
 else
@@ -147,9 +150,8 @@ hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("serpantinum msg toggle launcher"))' 
 fi
 
 # --- Workspaces en AZERTY -----------------------------------------------------
-# L original bind les keysyms "1".."0". En AZERTY les chiffres sont sur le
-# niveau Shift, ces raccourcis sont donc injouables tels quels. Les codes bruts
-# 10..19 designent la rangee physique quelle que soit la disposition.
+# En AZERTY les chiffres sont sur le niveau Shift : les keysyms "1".."0" sont
+# injouables. Les codes bruts 10..19 designent la rangee physique.
 if grep -qF 'numberkey' "$KEYBINDS"; then
     skip "Workspaces AZERTY deja en place"
 else
@@ -160,8 +162,7 @@ else
   hl.bind(mainMod .. " + " .. key, hl.dsp.exec_cmd("serpantinum msg workspace " .. ws))
   hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.exec_cmd("serpantinum msg workspace " .. ws .. " move"))
 end' \
-              '-- Codes bruts : la rangee des chiffres quelle que soit la disposition.
-local numberkey = { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }
+              'local numberkey = { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }
 for i = 1, 10 do
   local ws = tostring(i)
   hl.bind(mainMod .. " + code:" .. numberkey[i], hl.dsp.exec_cmd("serpantinum msg workspace " .. ws))
