@@ -252,6 +252,10 @@ Item {
             spacing: 10
 
             Rectangle { // Avatar, remonte pour chevaucher le bas de la banniere
+                id: avatarCircle
+                readonly property string configuredPath: Config.options.background.widgets.session.avatarPath
+                readonly property string avatarSource: configuredPath.length > 0
+                    ? configuredPath : Directories.userAvatarPathAccountsService
                 Layout.topMargin: -26
                 Layout.alignment: Qt.AlignTop
                 implicitWidth: 52
@@ -267,10 +271,25 @@ Item {
                 StyledImage {
                     id: avatarImage
                     anchors.fill: parent
-                    source: `file:///var/lib/AccountsService/icons/${SystemInfo.username}`
+                    source: avatarCircle.avatarSource
+                    // ~/.face ne vaut la peine que si aucun chemin n'est impose.
+                    fallbacks: avatarCircle.configuredPath.length > 0 ? []
+                        : [Directories.userAvatarPathRicersAndWeirdSystems,
+                           Directories.userAvatarPathRicersAndWeirdSystems2]
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
                     visible: status === Image.Ready
+
+                    // StyledImage *assigne* source en parcourant ses fallbacks, ce
+                    // qui casse la liaison ci-dessus : on la rearme, sinon choisir
+                    // un avatar dans les parametres ne changerait rien.
+                    Connections {
+                        target: avatarCircle
+                        function onAvatarSourceChanged() {
+                            avatarImage.currentFallbackIndex = 0;
+                            avatarImage.source = avatarCircle.avatarSource;
+                        }
+                    }
 
                     layer.enabled: true
                     layer.effect: OpacityMask {
