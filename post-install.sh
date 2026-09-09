@@ -12,9 +12,24 @@ ok()   { printf '\033[32m[ ok ]\033[0m %s\n' "$1"; }
 skip() { printf '\033[90m[ -- ]\033[0m %s\n' "$1"; }
 die()  { printf '\033[31m[ !! ]\033[0m %s\n' "$1" >&2; exit 1; }
 
-[ -f "$KEYBINDS" ] || die "Introuvable : $KEYBINDS. Serpantinum est-il installe ?"
-[ -f "$SETTINGS" ] || die "Introuvable : $SETTINGS. Serpantinum est-il installe ?"
-[ -f "$AUTOSTART" ] || die "Introuvable : $AUTOSTART. Serpantinum est-il installe ?"
+banner() {
+    printf '\033[36m'
+    cat <<'ART'
+╭───────────────────────────────────────────────────────────────╮
+│   _____ _     _ ____  __  __            _     _               │
+│  |_   _| |__ (_) __ )|  \/  | __ _  ___| |__ (_)_ __   ___    │
+│    | | | '_ \| |  _ \| |\/| |/ _` |/ __| '_ \| | '_ \ / _ \   │
+│    | | | | | | | |_) | |  | | (_| | (__| | | | | | | |  __/   │
+│    |_| |_| |_|_|____/|_|  |_|\__,_|\___|_| |_|_|_| |_|\___|   │
+├───────────────────────────────────────────────────────────────┤
+│                             S E T U P                         │
+├───────────────────────────────────────────────────────────────┤
+
+ART
+    printf '\033[0m\n'
+}
+
+banner
 
 backup_once() {
     local dest="$KEYBINDS.avant-post-install"
@@ -27,12 +42,12 @@ import sys
 path, old, new, label = sys.argv[1:5]
 s = open(path).read()
 if s.count(old) != 1:
-    sys.exit("motif introuvable ou ambigu pour %s : l amont a change, a revoir a la main" % label)
+    sys.exit("pattern missing or ambiguous for %s: upstream changed, fix by hand" % label)
 open(path, "w").write(s.replace(old, new))
 PYEOF
 }
 
-# --- Certificats de CA --------------------------------------------------------
+# --- CA certificates --------------------------------------------------------
 CERT_DIR="$REPO/certs"
 ANCHORS="/etc/ca-certificates/trust-source/anchors"
 shopt -s nullglob
@@ -40,33 +55,33 @@ CERTS=("$CERT_DIR"/*.crt)
 shopt -u nullglob
 
 if [ ${#CERTS[@]} -eq 0 ]; then
-    skip "Aucun certificat dans certs/"
+    skip "No certificate in certs/"
 elif ! command -v update-ca-trust >/dev/null; then
-    skip "update-ca-trust absent"
+    skip "update-ca-trust missing"
 else
     CHANGED=0
     for cert in "${CERTS[@]}"; do
         target="$ANCHORS/$(basename "$cert")"
         [ -f "$target" ] && cmp -s "$cert" "$target" && continue
         openssl x509 -in "$cert" -noout >/dev/null 2>&1 || {
-            echo "  $(basename "$cert") : PEM illisible, ignore"; continue
+            echo "  $(basename "$cert"): unreadable PEM, skipped"; continue
         }
         sudo install -m 644 -D "$cert" "$target"
         CHANGED=1
     done
     if [ "$CHANGED" = "1" ]; then
         sudo update-ca-trust
-        ok "Magasin de certificats reconstruit"
+        ok "Certificate store rebuilt"
     else
-        skip "Certificats deja approuves"
+        skip "Certificates already trusted"
     fi
 fi
 
-# --- Paquets ------------------------------------------------------------------
+# --- Packages ------------------------------------------------------------------
 if [ "${SKIP_PACKAGES:-0}" = "1" ]; then
-    skip "Paquets ignores (SKIP_PACKAGES=1)"
+    skip "Packages skipped (SKIP_PACKAGES=1)"
 elif [ ! -f "$REPO/packages/pacman.txt" ]; then
-    skip "packages/pacman.txt absent"
+    skip "packages/pacman.txt missing"
 else
     mapfile -t PKGS < <(grep -vE '^\s*(#|$)' "$REPO/packages/pacman.txt")
     MISSING=()
@@ -77,42 +92,47 @@ else
     for p in "${AURPKGS[@]}"; do pacman -Q "$p" >/dev/null 2>&1 || AURMISSING+=("$p"); done
 
     if [ ${#MISSING[@]} -eq 0 ] && [ ${#AURMISSING[@]} -eq 0 ]; then
-        skip "Paquets deja tous installes"
+        skip "All packages already installed"
     else
         [ ${#MISSING[@]} -gt 0 ] && {
-            echo "  depots : ${MISSING[*]}"
+            echo "  repos: ${MISSING[*]}"
             sudo pacman -S --needed --noconfirm "${MISSING[@]}"
         }
         [ ${#AURMISSING[@]} -gt 0 ] && {
-            command -v yay >/dev/null || die "yay absent, requis pour : ${AURMISSING[*]}"
-            echo "  aur : ${AURMISSING[*]}"
+            command -v yay >/dev/null || die "yay missing, required for: ${AURMISSING[*]}"
+            echo "  aur: ${AURMISSING[*]}"
             yay -S --needed --noconfirm "${AURMISSING[@]}"
         }
-        ok "Paquets installes"
+        ok "Packages installed"
     fi
 fi
 
-# --- Theme d icones -----------------------------------------------------------
-if ! command -v gsettings >/dev/null; then
-    skip "gsettings absent"
-elif [ "$(gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null)" = "'breeze-plus-dark'" ]; then
-    skip "Theme d icones deja coherent"
-elif [ ! -d /usr/share/icons/breeze-plus-dark ]; then
-    skip "breeze-plus-dark non installe"
+# --- Serpantinum --------------------------------------------------------------
+SERP_INSTALLER="https://raw.githubusercontent.com/ilyamiro/serpantinum/master/install/install.sh"
+
+if command -v serpantinumd >/dev/null; then
+    skip "Serpantinum already installed"
+elif [ "${SKIP_SERPANTINUM:-0}" = "1" ]; then
+    skip "Serpantinum install skipped (SKIP_SERPANTINUM=1)"
 else
-    gsettings set org.gnome.desktop.interface icon-theme "breeze-plus-dark"
-    ok "Icones GTK sur breeze-plus-dark, comme les applis Qt"
+    echo "  upstream installer: $SERP_INSTALLER"
+    bash -c "$(curl -fsSL "$SERP_INSTALLER")"
+    ok "Serpantinum installed"
 fi
 
-# --- Prompt aux couleurs du theme ---------------------------------------------
+[ -f "$KEYBINDS" ] || die "Missing: $KEYBINDS. Did the serpantinum install fail?"
+[ -f "$SETTINGS" ] || die "Missing: $SETTINGS. Did the serpantinum install fail?"
+[ -f "$AUTOSTART" ] || die "Missing: $AUTOSTART. Did the serpantinum install fail?"
+
+# --- Themed prompt ---------------------------------------------
 if [ ! -d "$MATUGEN" ]; then
-    skip "assets matugen de serpantinum introuvables"
+    skip "Serpantinum matugen assets not found"
 elif [ ! -f "$REPO/config/starship/starship.toml.template" ]; then
-    skip "template starship absent du depot"
+    skip "Starship template missing from the repo"
 elif grep -q "templates.starship" "$MATUGEN/config.toml" \
      && grep -q "templates.starship" "$MATUGEN/config-static.toml" \
      && cmp -s "$REPO/config/starship/starship.toml.template" "$MATUGEN/templates/starship.toml.template"; then
-    skip "template starship deja en place"
+    skip "Starship template already in place"
 else
     cp -a "$REPO/config/starship/starship.toml.template" "$MATUGEN/templates/starship.toml.template"
     for cfg in config.toml config-static.toml; do
@@ -124,36 +144,51 @@ input_path = "templates/starship.toml.template"
 output_path = "~/.config/starship.toml"
 TOML
     done
-    ok "Template starship installe pour le fond et pour les themes"
+    ok "Starship template installed for wallpaper and preset themes"
+fi
+
+# --- Fastfetch ----------------------------------------------------------------
+FF_SRC="$REPO/config/fastfetch/config.jsonc.template"
+FF_DEST="$MATUGEN/templates/fastfetch.jsonc.template"
+
+if [ ! -d "$MATUGEN" ]; then
+    skip "Serpantinum matugen assets not found"
+elif [ ! -f "$FF_SRC" ]; then
+    skip "Fastfetch template missing from the repo"
+elif cmp -s "$FF_SRC" "$FF_DEST"; then
+    skip "Fastfetch template already in place"
+else
+    cp -a "$FF_SRC" "$FF_DEST"
+    ok "Fastfetch template installed, applied on the next theme render"
 fi
 
 # --- oh-my-zsh ----------------------------------------------------------------
 if [ -d "$HOME/.oh-my-zsh" ]; then
-    skip "oh-my-zsh deja dans le HOME"
+    skip "oh-my-zsh already in HOME"
 elif [ -d /usr/share/oh-my-zsh ]; then
     cp -a /usr/share/oh-my-zsh "$HOME/.oh-my-zsh"
-    ok "oh-my-zsh copie depuis /usr/share vers le HOME"
+    ok "oh-my-zsh copied from /usr/share into HOME"
 else
-    skip "oh-my-zsh introuvable, installe le paquet oh-my-zsh-git"
+    skip "oh-my-zsh not found, install the oh-my-zsh-git package"
 fi
 
 # --- zsh ----------------------------------------------------------------------
 if [ ! -f "$REPO/config/zsh/.zshrc" ]; then
-    skip "config/zsh/.zshrc absent du depot"
+    skip "config/zsh/.zshrc missing from the repo"
 elif cmp -s "$REPO/config/zsh/.zshrc" "$HOME/.zshrc"; then
-    skip "zshrc deja a jour"
+    skip "zshrc already up to date"
 else
     [ -f "$HOME/.zshrc" ] && [ ! -f "$HOME/.zshrc.avant-post-install" ] \
         && cp -a "$HOME/.zshrc" "$HOME/.zshrc.avant-post-install"
     cp -a "$REPO/config/zsh/.zshrc" "$HOME/.zshrc"
-    ok "zshrc deploye depuis le depot"
+    ok "zshrc deployed from the repo"
 fi
 
-# --- Reglages du terminal -----------------------------------------------------
+# --- Terminal settings -----------------------------------------------------
 if [ ! -f "$KITTY" ]; then
-    skip "kitty.conf absent"
+    skip "kitty.conf missing"
 elif grep -qF 'font_size        10.5' "$KITTY"; then
-    skip "Reglages kitty deja en place"
+    skip "Kitty settings already in place"
 else
     [ -f "$KITTY.avant-post-install" ] || cp -a "$KITTY" "$KITTY.avant-post-install"
     python3 - "$KITTY" <<'PYEOF'
@@ -170,17 +205,17 @@ subs = [
 ]
 missing = [old for old, _ in subs if s.count(old) != 1]
 if missing:
-    sys.exit("motifs kitty introuvables (%s) : l amont a change, a revoir a la main" % ", ".join(missing))
+    sys.exit("kitty patterns not found (%s): upstream changed, fix by hand" % ", ".join(missing))
 for old, new in subs:
     s = s.replace(old, new)
 open(path, "w").write(s)
 PYEOF
-    ok "Kitty : police, corps 10.5, transparence 0.70, marge 24 px"
+    ok "Kitty: font, size 10.5, opacity 0.70, 24px padding"
 fi
 
-# --- Agent de secrets NetworkManager ------------------------------------------
+# --- NetworkManager secret agent ------------------------------------------
 if grep -qF 'nm-applet' "$AUTOSTART"; then
-    skip "nm-applet deja au demarrage"
+    skip "nm-applet already autostarted"
 else
     [ -f "$AUTOSTART.avant-post-install" ] || cp -a "$AUTOSTART" "$AUTOSTART.avant-post-install"
     python3 - "$AUTOSTART" <<'PYEOF'
@@ -189,16 +224,16 @@ path = sys.argv[1]
 s = open(path).read()
 old = '  hl.exec_cmd("serpantinumd start")'
 if s.count(old) != 1:
-    sys.exit("motif autostart introuvable : l amont a change, a revoir a la main")
+    sys.exit("autostart pattern not found: upstream changed, fix by hand")
 open(path, "w").write(s.replace(old, '  hl.exec_cmd("nm-applet")\n' + old))
 PYEOF
     pgrep -x nm-applet >/dev/null || (nohup nm-applet >/dev/null 2>&1 &)
-    ok "nm-applet au demarrage, agent de secrets pour les VPN"
+    ok "nm-applet autostarted, secret agent for VPNs"
 fi
 
-# --- Disposition clavier ------------------------------------------------------
+# --- Keyboard layout ------------------------------------------------------
 if grep -qF 'kb_layout = "fr' "$SETTINGS"; then
-    skip "Clavier deja en francais"
+    skip "Keyboard already French"
 else
     [ -f "$SETTINGS.avant-post-install" ] || cp -a "$SETTINGS" "$SETTINGS.avant-post-install"
     python3 - "$SETTINGS" <<'PYEOF'
@@ -207,27 +242,27 @@ path = sys.argv[1]
 s = open(path).read()
 old = '    kb_layout = "us",'
 if s.count(old) != 1:
-    sys.exit("motif kb_layout introuvable : l amont a change, a revoir a la main")
+    sys.exit("kb_layout pattern not found: upstream changed, fix by hand")
 open(path, "w").write(s.replace(old, '    kb_layout = "fr,us",'))
 PYEOF
-    ok "Clavier en francais, us en second groupe"
+    ok "Keyboard set to French, us as second group"
 fi
 
-# --- Terminal sur SUPER+T -----------------------------------------------------
+# --- Terminal on SUPER+T -----------------------------------------------------
 if grep -qF 'mainMod .. " + T", hl.dsp.exec_cmd(terminal)' "$KEYBINDS"; then
-    skip "SUPER+T deja en place"
+    skip "SUPER+T already bound"
 else
     backup_once
     patch_lua 'hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))' \
               'hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal))' \
               "SUPER+T"
-    ok "SUPER+T ouvre le terminal"
+    ok "SUPER+T opens the terminal"
 fi
 
-# --- Lanceur sur SUPER+A ------------------------------------------------------
+# --- Launcher on SUPER+A ------------------------------------------------------
 if grep -qF '" + A", hl.dsp.exec_cmd("serpantinum msg toggle launcher")' "$KEYBINDS"; then
-    skip "SUPER+A deja en place"
+    skip "SUPER+A already bound"
 else
     backup_once
     patch_lua 'hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("serpantinum msg toggle autohide"))' \
@@ -237,12 +272,12 @@ else
               'hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("serpantinum msg toggle launcher"))
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("serpantinum msg toggle launcher"))' \
               "SUPER+A"
-    ok "SUPER+A ouvre le lanceur, autohide sur SUPER+SHIFT+A"
+    ok "SUPER+A opens the launcher, autohide moved to SUPER+SHIFT+A"
 fi
 
-# --- Workspaces en AZERTY -----------------------------------------------------
+# --- AZERTY workspaces -----------------------------------------------------
 if grep -qF 'numberkey' "$KEYBINDS"; then
-    skip "Workspaces AZERTY deja en place"
+    skip "AZERTY workspaces already bound"
 else
     backup_once
     patch_lua 'for i = 1, 10 do
@@ -258,12 +293,12 @@ for i = 1, 10 do
   hl.bind(mainMod .. " + SHIFT + code:" .. numberkey[i], hl.dsp.exec_cmd("serpantinum msg workspace " .. ws .. " move"))
 end' \
               "workspaces AZERTY"
-    ok "Workspaces sur la rangee & e \" ( sans Shift"
+    ok "Workspaces on the & e \" ( row without Shift"
 fi
 
-# --- Rechargement -------------------------------------------------------------
+# --- Reload -------------------------------------------------------------
 if command -v hyprctl >/dev/null && [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
-    hyprctl reload >/dev/null && ok "Hyprland recharge"
+    hyprctl reload >/dev/null && ok "Hyprland reloaded"
 else
-    skip "Hyprland non detecte, relance ta session pour appliquer"
+    skip "Hyprland not detected, restart your session to apply"
 fi
