@@ -416,7 +416,7 @@
       "cornerRegionHeight": 5,
       "cornerRegionWidth": 250,
       "enable": true,
-      "valueScroll": true,
+      "valueScroll": false,
       "visualize": false
     },
     "keepRightSidebarLoaded": true,

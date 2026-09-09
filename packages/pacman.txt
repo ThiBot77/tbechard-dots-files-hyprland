@@ -81,7 +81,6 @@ quickshell
 ripgrep
 rsync
 slurp
-songrec
 starship
 swappy
 syntax-highlighting
