@@ -171,7 +171,6 @@ Singleton {
                             property string dateStyle: "bubble"       // Options: "border", "rect", "bubble" , "hide"
                             property bool timeIndicators: true
                             property bool hourMarks: false
-                            property bool dateInClock: true
                             property bool constantlyRotate: false
                             property bool useSineCookie: false
                         }

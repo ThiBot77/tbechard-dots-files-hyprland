@@ -746,13 +746,6 @@ ContentPage {
     }
 
     ContentSection {
-        icon: "wallpaper_slideshow"
-        title: Translation.tr("Wallpaper selector")
-
-        }
-    }
-
-    ContentSection {
         icon: "text_format"
         title: Translation.tr("Fonts")
 
