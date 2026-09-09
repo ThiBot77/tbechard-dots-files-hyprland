@@ -23,11 +23,13 @@ un motif a disparu plutot que de patcher a moitie.
 
 Ce qu'il corrige :
 
-- **La police de kitty**, dans `~/.config/kitty/kitty.conf`. Serpantinum
-  demande `JetBrains Mono` ; ce nom exact n'existe pas sur Arch, ou le paquet
-  fournit `JetBrainsMono Nerd Font`. Kitty retombe donc sur Noto Sans Mono,
-  sans glyphes Nerd Font, et le prompt starship comme fastfetch s'affichent en
-  carres. Serpantinum ne livre en revanche aucune configuration zsh.
+- **Les reglages de kitty**, dans `~/.config/kitty/kitty.conf`. Serpantinum
+  livre le sien : corps 16, aucune transparence, 4 px de marge. On revient a
+  FiraCode Nerd Font en corps 10.5, opacite 0.85 et marge 24 px, en gardant son
+  `include colors.conf` pour que la palette continue de le suivre. Sa police par
+  defaut, `JetBrains Mono`, n'existe d'ailleurs pas sur Arch : kitty retombait
+  sur Noto Sans Mono, sans glyphes Nerd Font, d'ou le prompt en carres.
+  Serpantinum ne livre en revanche aucune configuration zsh.
 
 - **`nm-applet` est lance au demarrage**, dans `config/autostart.lua`.
   Serpantinum ne gere pas le VPN du tout : son panneau reseau se limite au wifi

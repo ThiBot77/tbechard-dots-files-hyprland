@@ -38,29 +38,40 @@ open(path, "w").write(s.replace(old, new))
 PYEOF
 }
 
-# --- Police du terminal -------------------------------------------------------
-# Serpantinum livre un kitty.conf qui demande "JetBrains Mono". Ce nom exact
-# n existe pas sur Arch : le paquet fournit "JetBrainsMono Nerd Font", sans
-# espace. Kitty retombe donc sur Noto Sans Mono, sans glyphes Nerd Font, et le
-# prompt starship comme fastfetch s affichent en carres.
-if [ -f "$KITTY" ]; then
-    if grep -qF 'font_family      JetBrainsMono Nerd Font' "$KITTY"; then
-        skip "Police kitty deja corrigee"
-    else
-        [ -f "$KITTY.avant-post-install" ] || cp -a "$KITTY" "$KITTY.avant-post-install"
-        python3 - "$KITTY" <<'PYEOF'
+# --- Reglages du terminal -----------------------------------------------------
+# Serpantinum livre son propre kitty.conf, avec une police en corps 16, aucune
+# transparence et 4 px de marge. On revient aux reglages d avant, en gardant
+# son include de colors.conf pour que la palette continue de le suivre.
+#
+# Sa police par defaut, "JetBrains Mono", n existe pas sur Arch : le paquet
+# fournit "FiraCode Nerd Font" ou "JetBrainsMono Nerd Font". Sans correction,
+# kitty retombe sur Noto Sans Mono, sans glyphes Nerd Font.
+if [ ! -f "$KITTY" ]; then
+    skip "kitty.conf absent"
+elif grep -qF 'font_size        10.5' "$KITTY"; then
+    skip "Reglages kitty deja en place"
+else
+    [ -f "$KITTY.avant-post-install" ] || cp -a "$KITTY" "$KITTY.avant-post-install"
+    python3 - "$KITTY" <<'PYEOF'
 import sys
 path = sys.argv[1]
 s = open(path).read()
-old = "font_family      JetBrains Mono\n"
-if s.count(old) != 1:
-    sys.exit("motif font_family introuvable : l amont a change, a revoir a la main")
-open(path, "w").write(s.replace(old, "font_family      JetBrainsMono Nerd Font\n"))
+subs = [
+    ("font_family      JetBrains Mono",   "font_family      FiraCode Nerd Font"),
+    ("font_size        16.0",             "font_size        10.5"),
+    ("background_opacity 1.0",            "background_opacity 0.85\ndynamic_background_opacity yes"),
+    ("window_padding_width 4",            "window_padding_width 24"),
+    ("scrollback_lines 2000",             "scrollback_lines 10000"),
+    ("cursor_trail 1",                    "cursor_shape beam\ncursor_blink_interval 0"),
+]
+missing = [old for old, _ in subs if s.count(old) != 1]
+if missing:
+    sys.exit("motifs kitty introuvables (%s) : l amont a change, a revoir a la main" % ", ".join(missing))
+for old, new in subs:
+    s = s.replace(old, new)
+open(path, "w").write(s)
 PYEOF
-        ok "Police kitty en JetBrainsMono Nerd Font"
-    fi
-else
-    skip "kitty.conf absent"
+    ok "Kitty : police, corps 10.5, transparence 0.85, marge 24 px"
 fi
 
 # --- Agent de secrets NetworkManager ------------------------------------------
