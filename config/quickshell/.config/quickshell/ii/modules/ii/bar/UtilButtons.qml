@@ -6,7 +6,6 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Services.Pipewire
-import Quickshell.Services.UPower
 
 Item {
     id: root
