@@ -11,6 +11,7 @@ passage, plus les fichiers qui n'appartiennent qu'a cette machine.
 | `post-install.sh` | Rejoue les corrections de raccourcis apres chaque install ou mise a jour de serpantinum |
 | `config/zsh/.zshrc` | Ta config zsh : serpantinum n'en fournit aucune |
 | `config/starship/` | Template matugen du prompt, pour qu'il suive le theme |
+| `packages/` | Les paquets a installer sur une machine neuve |
 | `certs/` | Certificats de CA interne que le systeme doit approuver |
 
 ## post-install.sh
@@ -24,6 +25,14 @@ Il sauvegarde `keybinds.lua` avant sa premiere modification, et s'arrete net si
 un motif a disparu plutot que de patcher a moitie.
 
 Ce qu'il corrige :
+
+- **Il installe les paquets manquants** de `packages/pacman.txt` et
+  `packages/aur.txt`. Serpantinum n'installe que ses propres dependances.
+  `SKIP_PACKAGES=1` saute cette etape.
+
+- **Il amorce oh-my-zsh**. Le paquet AUR l'installe dans `/usr/share`, alors que
+  `.zshrc` attend `~/.oh-my-zsh` : sans cette copie, le shell casse sur une
+  machine neuve.
 
 - **Il installe le template starship** dans les assets matugen de serpantinum.
   Celui-ci ne definit que les 16 couleurs ANSI, alors que le prompt utilisait

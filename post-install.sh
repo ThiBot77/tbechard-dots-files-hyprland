@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-#
-# Rejoue ce que l'installateur de serpantinum ecrase a chaque passage.
-# Idempotent : relance-le apres chaque mise a jour.
 set -euo pipefail
 
 KEYBINDS="$HOME/.config/hypr/config/keybinds.lua"
@@ -24,7 +21,6 @@ backup_once() {
     [ -f "$dest" ] || cp -a "$KEYBINDS" "$dest"
 }
 
-# Echoue plutot que de patcher a moitie si l amont a bouge.
 patch_lua() {
     python3 - "$KEYBINDS" "$1" "$2" "$3" <<'PYEOF'
 import sys
@@ -36,11 +32,37 @@ open(path, "w").write(s.replace(old, new))
 PYEOF
 }
 
+# --- Paquets ------------------------------------------------------------------
+if [ "${SKIP_PACKAGES:-0}" = "1" ]; then
+    skip "Paquets ignores (SKIP_PACKAGES=1)"
+elif [ ! -f "$REPO/packages/pacman.txt" ]; then
+    skip "packages/pacman.txt absent"
+else
+    mapfile -t PKGS < <(grep -vE '^\s*(#|$)' "$REPO/packages/pacman.txt")
+    MISSING=()
+    for p in "${PKGS[@]}"; do pacman -Q "$p" >/dev/null 2>&1 || MISSING+=("$p"); done
+
+    AURPKGS=(); AURMISSING=()
+    [ -f "$REPO/packages/aur.txt" ] && mapfile -t AURPKGS < <(grep -vE '^\s*(#|$)' "$REPO/packages/aur.txt")
+    for p in "${AURPKGS[@]}"; do pacman -Q "$p" >/dev/null 2>&1 || AURMISSING+=("$p"); done
+
+    if [ ${#MISSING[@]} -eq 0 ] && [ ${#AURMISSING[@]} -eq 0 ]; then
+        skip "Paquets deja tous installes"
+    else
+        [ ${#MISSING[@]} -gt 0 ] && {
+            echo "  depots : ${MISSING[*]}"
+            sudo pacman -S --needed --noconfirm "${MISSING[@]}"
+        }
+        [ ${#AURMISSING[@]} -gt 0 ] && {
+            command -v yay >/dev/null || die "yay absent, requis pour : ${AURMISSING[*]}"
+            echo "  aur : ${AURMISSING[*]}"
+            yay -S --needed --noconfirm "${AURMISSING[@]}"
+        }
+        ok "Paquets installes"
+    fi
+fi
+
 # --- Theme d icones -----------------------------------------------------------
-# gsettings pointait sur "Tela", absent de la machine : les applis GTK
-# retombaient sur un repli incomplet, d ou les icones manquantes dans le tray
-# et le gestionnaire de fichiers. breeze-plus-dark est installe et deja utilise
-# par les applis Qt, donc GTK et Qt restent coherents.
 if ! command -v gsettings >/dev/null; then
     skip "gsettings absent"
 elif [ "$(gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null)" = "'breeze-plus-dark'" ]; then
@@ -53,9 +75,6 @@ else
 fi
 
 # --- Prompt aux couleurs du theme ---------------------------------------------
-# Serpantinum ne definit que les 16 couleurs ANSI : les index 233-255 dont se
-# servait le prompt ne sont plus alimentes. On passe donc par un template
-# matugen, qui ecrit starship.toml en hexadecimal a chaque changement de theme.
 if [ ! -d "$MATUGEN" ]; then
     skip "assets matugen de serpantinum introuvables"
 elif [ ! -f "$REPO/config/starship/starship.toml.template" ]; then
@@ -66,8 +85,6 @@ elif grep -q "templates.starship" "$MATUGEN/config.toml" \
     skip "template starship deja en place"
 else
     cp -a "$REPO/config/starship/starship.toml.template" "$MATUGEN/templates/starship.toml.template"
-    # config.toml sert aux palettes tirees du fond d ecran, config-static.toml
-    # aux themes choisis dans les reglages. Il faut les deux.
     for cfg in config.toml config-static.toml; do
         [ -f "$MATUGEN/$cfg" ] || continue
         grep -q "templates.starship" "$MATUGEN/$cfg" || cat >> "$MATUGEN/$cfg" <<'TOML'
@@ -80,9 +97,17 @@ TOML
     ok "Template starship installe pour le fond et pour les themes"
 fi
 
+# --- oh-my-zsh ----------------------------------------------------------------
+if [ -d "$HOME/.oh-my-zsh" ]; then
+    skip "oh-my-zsh deja dans le HOME"
+elif [ -d /usr/share/oh-my-zsh ]; then
+    cp -a /usr/share/oh-my-zsh "$HOME/.oh-my-zsh"
+    ok "oh-my-zsh copie depuis /usr/share vers le HOME"
+else
+    skip "oh-my-zsh introuvable, installe le paquet oh-my-zsh-git"
+fi
+
 # --- zsh ----------------------------------------------------------------------
-# Serpantinum ne fournit rien pour le shell. Le depot fait donc autorite :
-# edite config/zsh/.zshrc, pas ~/.zshrc, puis relance ce script.
 if [ ! -f "$REPO/config/zsh/.zshrc" ]; then
     skip "config/zsh/.zshrc absent du depot"
 elif cmp -s "$REPO/config/zsh/.zshrc" "$HOME/.zshrc"; then
@@ -95,9 +120,6 @@ else
 fi
 
 # --- Reglages du terminal -----------------------------------------------------
-# On garde son include de colors.conf : la palette continue de le suivre.
-# Sa police "JetBrains Mono" n existe pas sur Arch, kitty retombait sur
-# Noto Sans Mono, sans glyphes Nerd Font.
 if [ ! -f "$KITTY" ]; then
     skip "kitty.conf absent"
 elif grep -qF 'font_size        10.5' "$KITTY"; then
@@ -127,9 +149,6 @@ PYEOF
 fi
 
 # --- Agent de secrets NetworkManager ------------------------------------------
-# Serpantinum ne gere pas le VPN. Sans agent, NetworkManager ne peut pas
-# demander le code MFA et abandonne en silence. nm-applet le fournit, et son
-# menu sert a monter les VPN.
 if grep -qF 'nm-applet' "$AUTOSTART"; then
     skip "nm-applet deja au demarrage"
 else
@@ -148,8 +167,6 @@ PYEOF
 fi
 
 # --- Disposition clavier ------------------------------------------------------
-# L installateur remet kb_layout a "us". Le us reste en second groupe,
-# Alt+Shift bascule.
 if grep -qF 'kb_layout = "fr' "$SETTINGS"; then
     skip "Clavier deja en francais"
 else
@@ -179,7 +196,6 @@ hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal))' \
 fi
 
 # --- Lanceur sur SUPER+A ------------------------------------------------------
-# SUPER+A servait a l autohide, qui passe sur SHIFT+A.
 if grep -qF '" + A", hl.dsp.exec_cmd("serpantinum msg toggle launcher")' "$KEYBINDS"; then
     skip "SUPER+A deja en place"
 else
@@ -195,8 +211,6 @@ hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("serpantinum msg toggle launcher"))' 
 fi
 
 # --- Workspaces en AZERTY -----------------------------------------------------
-# En AZERTY les chiffres sont sur le niveau Shift : les keysyms "1".."0" sont
-# injouables. Les codes bruts 10..19 designent la rangee physique.
 if grep -qF 'numberkey' "$KEYBINDS"; then
     skip "Workspaces AZERTY deja en place"
 else

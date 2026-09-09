@@ -1,0 +1,10 @@
+cool-retro-term
+discord
+dbeaver
+filezilla
+firefox
+vlc
+zsh
+zsh-autosuggestions
+starship
+fastfetch

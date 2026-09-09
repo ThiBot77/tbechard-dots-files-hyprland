@@ -1,0 +1,6 @@
+google-chrome
+spotify
+visual-studio-code-bin
+zen-browser-bin
+anydesk-bin
+oh-my-zsh-git
