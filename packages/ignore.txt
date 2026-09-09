@@ -1,7 +1,0 @@
-# Paquets AUR laisses de cote par yay, un par ligne. Passes en --ignore.
-
-# Les qt5-* du AUR se recompilent a chaque mise a jour (des heures pour
-# qt5-webengine) et rien ici n'en depend : tout est en qt6.
-qt5-webengine
-qt5-location
-qt5-webchannel
