@@ -130,14 +130,6 @@ DelegateChooser {
         }
     }
     DelegateChoice {
-        roleValue: "powerProfile"
-        ActionCenterToggleButton {
-            toggleModel: PowerProfilesToggle {}
-            icon: WIcons.powerProfileIcon
-            name: toggleModel.statusText
-        }
-    }
-    DelegateChoice {
         roleValue: "screenSnip"
         ActionCenterToggleButton {
             toggleModel: ScreenSnipToggle {}

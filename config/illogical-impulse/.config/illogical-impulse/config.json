@@ -12,9 +12,9 @@
             "title": "Google Sans Flex"
         },
         "palette": {
-            "accentColor": "#8A8A8A",
-            "preset": "graphite",
-            "type": "scheme-monochrome"
+            "accentColor": "",
+            "preset": "wallpaper",
+            "type": "auto"
         },
         "transparency": {
             "automatic": true,
@@ -66,7 +66,7 @@
                     "hourMarks": true,
                     "minuteHandStyle": "thin",
                     "secondHandStyle": "line",
-                    "sides": 2,
+                    "sides": 0,
                     "timeIndicators": true,
                     "useSineCookie": false
                 },
@@ -127,7 +127,7 @@
             },
             "worldClock": {
                 "enable": true,
-                "localLabel": "",
+                "localLabel": "Lille",
                 "placementStrategy": "free",
                 "use24h": true,
                 "x": 1510.171875,
@@ -179,25 +179,22 @@
             "showDarkModeToggle": true,
             "showKeyboardToggle": true,
             "showMicToggle": true,
-            "showPerformanceProfileToggle": false,
             "showScreenRecord": false,
             "showScreenSnip": true
         },
         "verbose": true,
         "vertical": false,
         "weather": {
-            "city": "Linse",
+            "city": "Lille",
             "enable": true,
             "enableGPS": true,
             "fetchInterval": 10,
             "useUSCS": false
         },
         "workspaces": {
-            "alwaysShowNumbers": false,
-            "monochromeIcons": true,
+            "alwaysShowNumbers": true,
+            "monochromeIcons": false,
             "numberMap": [
-                "1",
-                "2"
             ],
             "showAppIcons": true,
             "showNumberDelay": 300,
@@ -295,7 +292,7 @@
         },
         "centerClock": true,
         "launchOnStartup": false,
-        "materialShapeChars": true,
+        "materialShapeChars": false,
         "security": {
             "requirePasswordToPower": false,
             "unlockKeyring": true
@@ -399,13 +396,9 @@
     "sidebar": {
         "cornerOpen": {
             "bottom": false,
-            "clickless": false,
-            "clicklessCornerEnd": true,
-            "clicklessCornerVerticalOffset": 1,
             "cornerRegionHeight": 5,
             "cornerRegionWidth": 250,
             "enable": true,
-            "valueScroll": false,
             "visualize": false
         },
         "keepRightSidebarLoaded": true,
@@ -449,7 +442,7 @@
                     }
                 ]
             },
-            "style": "android"
+            "style": "classic"
         },
         "translator": {
             "delay": 300,

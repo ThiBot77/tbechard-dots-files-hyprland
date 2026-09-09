@@ -78,52 +78,9 @@ Scope {
                     implicitWidth: Config.options.sidebar.cornerOpen.cornerRegionWidth
                     implicitHeight: Config.options.sidebar.cornerOpen.cornerRegionHeight
                     hoverEnabled: true
-                    onPositionChanged: {
-                        if (!Config.options.sidebar.cornerOpen.clicklessCornerEnd) return;
-                        const verticalOffset = Config.options.sidebar.cornerOpen.clicklessCornerVerticalOffset;
-                        const correctX = (cornerWidget.isRight && mouseArea.mouseX >= mouseArea.width - 2) || (cornerWidget.isLeft && mouseArea.mouseX <= 2);
-                        const correctY = (cornerWidget.isTop && mouseArea.mouseY > verticalOffset || cornerWidget.isBottom && mouseArea.mouseY < mouseArea.height - verticalOffset);
-                        if (correctX && correctY)
-                            screenCorners.actionForCorner[cornerPanelWindow.corner]();
-                    }
-                    onEntered: {
-                        if (Config.options.sidebar.cornerOpen.clickless)
-                            screenCorners.actionForCorner[cornerPanelWindow.corner]();
-                    }
                     onPressed: {
                         screenCorners.actionForCorner[cornerPanelWindow.corner]();
                     }
-                    onScrollDown: {
-                        if (!Config.options.sidebar.cornerOpen.valueScroll)
-                            return;
-                        if (cornerWidget.isLeft)
-                            Brightness.decreaseBrightness()
-                        else {
-                            const currentVolume = Audio.value;
-                            const step = currentVolume < 0.1 ? 0.01 : 0.02 || 0.2;
-                            Audio.sink.audio.volume -= step;
-                        }
-                    }
-                    onScrollUp: {
-                        if (!Config.options.sidebar.cornerOpen.valueScroll)
-                            return;
-                        if (cornerWidget.isLeft)
-                            Brightness.increaseBrightness()
-                        else {
-                            const currentVolume = Audio.value;
-                            const step = currentVolume < 0.1 ? 0.01 : 0.02 || 0.2;
-                            Audio.sink.audio.volume = Math.min(1, Audio.sink.audio.volume + step);
-                        }
-                    }
-                    onMovedAway: {
-                        if (!Config.options.sidebar.cornerOpen.valueScroll)
-                            return;
-                        if (cornerWidget.isLeft)
-                            GlobalStates.osdBrightnessOpen = false;
-                        else
-                            GlobalStates.osdVolumeOpen = false;
-                    }
-
                     Loader {
                         active: Config.options.sidebar.cornerOpen.visualize
                         anchors.fill: parent

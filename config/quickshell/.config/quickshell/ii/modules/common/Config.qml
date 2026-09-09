@@ -276,7 +276,6 @@ Singleton {
                     property bool showMicToggle: false
                     property bool showKeyboardToggle: true
                     property bool showDarkModeToggle: true
-                    property bool showPerformanceProfileToggle: false
                     property bool showScreenRecord: false
                 }
                 property JsonObject workspaces: JsonObject {
@@ -520,13 +519,9 @@ Singleton {
                 property JsonObject cornerOpen: JsonObject {
                     property bool enable: true
                     property bool bottom: false
-                    property bool valueScroll: false // Molette dans les coins : inutilisee ici
-                    property bool clickless: false
                     property int cornerRegionWidth: 250
                     property int cornerRegionHeight: 5
                     property bool visualize: false
-                    property bool clicklessCornerEnd: true
-                    property int clicklessCornerVerticalOffset: 1
                 }
 
                 property JsonObject quickToggles: JsonObject {
@@ -633,7 +628,7 @@ Singleton {
                     // easyEffects, cloudflareWarp and onScreenKeyboard are gone:
                     // easyeffects, warp-cli and wvkbd are not installed, so those
                     // toggles sat in the sidebar doing nothing.
-                    property list<string> toggles: [ "network", "bluetooth", "powerProfile", "idleInhibitor", "nightLight", "darkMode", "antiFlashbang", "mic", "notifications", "gameMode", "screenSnip", "colorPicker" ]
+                    property list<string> toggles: [ "network", "bluetooth", "idleInhibitor", "nightLight", "darkMode", "antiFlashbang", "mic", "notifications", "gameMode", "screenSnip", "colorPicker" ]
                 }
                 property JsonObject calendar: JsonObject {
                     property bool force2CharDayOfWeek: true

@@ -1,7 +1,6 @@
 pragma Singleton
 import QtQuick
 import Quickshell
-import Quickshell.Services.UPower
 import qs.services
 
 Singleton {
@@ -74,17 +73,6 @@ Singleton {
     property string nightLightIcon: Hyprsunset.temperatureActive ? "weather-moon" : "weather-moon-off"
 
     property string notificationsIcon: Notifications.silent ? "alert-snooze" : "alert"
-
-    property string powerProfileIcon: {
-        switch (PowerProfiles.profile) {
-        case PowerProfile.PowerSaver:
-            return "leaf-two";
-        case PowerProfile.Balanced:
-            return "flash-on";
-        case PowerProfile.Performance:
-            return "fire";
-        }
-    }
 
     function audioDeviceIcon(node) {
         if (!node.isSink)
