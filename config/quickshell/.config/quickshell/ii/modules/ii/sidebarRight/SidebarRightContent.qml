@@ -251,11 +251,17 @@ Item {
             Layout.fillWidth: true
             spacing: 10
 
-            Rectangle { // Avatar
-                implicitWidth: 44
-                implicitHeight: 44
+            Rectangle { // Avatar, remonte pour chevaucher le bas de la banniere
+                Layout.topMargin: -26
+                Layout.alignment: Qt.AlignTop
+                implicitWidth: 52
+                implicitHeight: 52
                 radius: width / 2
-                color: Appearance.colors.colLayer1
+                // L'anneau reprend le fond de la sidebar : l'avatar se lit comme
+                // decoupe dans la banniere plutot que pose dessus.
+                color: Appearance.colors.colLayer0
+                border.width: 3
+                border.color: Appearance.colors.colLayer0
                 clip: true
 
                 StyledImage {
