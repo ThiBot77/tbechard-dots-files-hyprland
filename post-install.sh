@@ -36,6 +36,22 @@ open(path, "w").write(s.replace(old, new))
 PYEOF
 }
 
+# --- Theme d icones -----------------------------------------------------------
+# gsettings pointait sur "Tela", absent de la machine : les applis GTK
+# retombaient sur un repli incomplet, d ou les icones manquantes dans le tray
+# et le gestionnaire de fichiers. breeze-plus-dark est installe et deja utilise
+# par les applis Qt, donc GTK et Qt restent coherents.
+if ! command -v gsettings >/dev/null; then
+    skip "gsettings absent"
+elif [ "$(gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null)" = "'breeze-plus-dark'" ]; then
+    skip "Theme d icones deja coherent"
+elif [ ! -d /usr/share/icons/breeze-plus-dark ]; then
+    skip "breeze-plus-dark non installe"
+else
+    gsettings set org.gnome.desktop.interface icon-theme "breeze-plus-dark"
+    ok "Icones GTK sur breeze-plus-dark, comme les applis Qt"
+fi
+
 # --- Prompt aux couleurs du theme ---------------------------------------------
 # Serpantinum ne definit que les 16 couleurs ANSI : les index 233-255 dont se
 # servait le prompt ne sont plus alimentes. On passe donc par un template
@@ -45,17 +61,23 @@ if [ ! -d "$MATUGEN" ]; then
 elif [ ! -f "$REPO/config/starship/starship.toml.template" ]; then
     skip "template starship absent du depot"
 elif grep -q "templates.starship" "$MATUGEN/config.toml" \
+     && grep -q "templates.starship" "$MATUGEN/config-static.toml" \
      && cmp -s "$REPO/config/starship/starship.toml.template" "$MATUGEN/templates/starship.toml.template"; then
     skip "template starship deja en place"
 else
     cp -a "$REPO/config/starship/starship.toml.template" "$MATUGEN/templates/starship.toml.template"
-    grep -q "templates.starship" "$MATUGEN/config.toml" || cat >> "$MATUGEN/config.toml" <<'TOML'
+    # config.toml sert aux palettes tirees du fond d ecran, config-static.toml
+    # aux themes choisis dans les reglages. Il faut les deux.
+    for cfg in config.toml config-static.toml; do
+        [ -f "$MATUGEN/$cfg" ] || continue
+        grep -q "templates.starship" "$MATUGEN/$cfg" || cat >> "$MATUGEN/$cfg" <<'TOML'
 
 [templates.starship]
 input_path = "templates/starship.toml.template"
 output_path = "~/.config/starship.toml"
 TOML
-    ok "Template starship installe, applique au prochain changement de fond"
+    done
+    ok "Template starship installe pour le fond et pour les themes"
 fi
 
 # --- zsh ----------------------------------------------------------------------
