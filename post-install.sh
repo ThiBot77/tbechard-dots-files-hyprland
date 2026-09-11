@@ -215,6 +215,17 @@ LUA
     ok "Window borders off"
 fi
 
+if grep -qF 'settings-toggle' "$HYPR_LUA"; then
+    skip "Settings key already bound"
+else
+    cp -a "$HYPR_LUA" "$HYPR_LUA.avant-settings-$STAMP"
+    cat >> "$HYPR_LUA" <<'LUA'
+
+hl.bind("SUPER + comma", hl.dsp.exec_cmd("noctalia msg settings-toggle"))
+LUA
+    ok "SUPER+, opens the noctalia settings"
+fi
+
 if grep -qF 'session lock' "$HYPR_LUA"; then
     skip "Lock keys already bound"
 else
