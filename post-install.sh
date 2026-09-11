@@ -204,6 +204,29 @@ LUA
     ok "Print captures a region, Shift annotates, SUPER takes the screen"
 fi
 
+if grep -qF 'general = { border_size = 0 }' "$HYPR_LUA"; then
+    skip "Window borders already off"
+else
+    cp -a "$HYPR_LUA" "$HYPR_LUA.avant-border-$STAMP"
+    cat >> "$HYPR_LUA" <<'LUA'
+
+hl.config({ general = { border_size = 0 } })
+LUA
+    ok "Window borders off"
+fi
+
+if grep -qF 'session lock' "$HYPR_LUA"; then
+    skip "Lock keys already bound"
+else
+    cp -a "$HYPR_LUA" "$HYPR_LUA.avant-lock-$STAMP"
+    cat >> "$HYPR_LUA" <<'LUA'
+
+hl.bind("SUPER + L", hl.dsp.exec_cmd("noctalia msg session lock"), { locked = true })
+hl.bind("XF86PowerOff", hl.dsp.exec_cmd("noctalia msg session lock"), { locked = true })
+LUA
+    ok "SUPER+L and the power key lock the screen"
+fi
+
 # --- Noctalia config --------------------------------------------------------
 NOCT_DIR="$HOME/.config/noctalia"
 NOCT_SRC="$REPO/config/noctalia"
