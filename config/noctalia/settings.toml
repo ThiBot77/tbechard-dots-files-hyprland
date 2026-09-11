@@ -7,11 +7,15 @@ order = [ "default" ]
     border = "on_surface_variant"
     end = [ "media", "tray", "clipboard", "network", "bluetooth", "volume", "brightness", "battery", "session" ]
     margin_ends = 0
+    margin_opposite_edge = 2
     radius = 50
     radius_top_left = 0
     radius_top_right = 0
+    shadow = false
     start = [ "arch", "workspaces", "active_window" ]
     thickness = 38
+
+        [bar.default.monitor.ff]
 
 [dock]
 enabled = true
@@ -184,6 +188,9 @@ community_palette = "Breeze"
 shell_mode = "dark"
 source = "wallpaper"
 wallpaper_scheme = "m3-tonal-spot"
+
+    [theme.templates]
+    builtin_ids = [ "btop", "cava", "gtk3", "gtk4", "kitty" ]
 
 [wallpaper]
 directory = "__HOME__/Images/Wallpapers"
