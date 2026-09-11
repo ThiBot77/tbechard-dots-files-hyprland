@@ -224,8 +224,8 @@ else
 -- Pinned by description: DP-3 and DP-5 swap between boots, the panel serial does not.
 -- A rule for a screen that is not plugged in is ignored, so this travels.
 hl.monitor({ output = "desc:LG Display 0x0764",              mode = "1920x1080@60.02", position = "0x0",    scale = 1 })
-hl.monitor({ output = "desc:HP Inc. HP E24 G4 CN41512CCR",   mode = "1920x1080@60",    position = "3840x0", scale = 1 })
-hl.monitor({ output = "desc:HP Inc. HP E24 G4 CN42023N27",   mode = "1920x1080@60",    position = "1920x0", scale = 1 })
+hl.monitor({ output = "desc:HP Inc. HP E24 G4 CN41512CCR",   mode = "1920x1080@60",    position = "1920x0", scale = 1 })
+hl.monitor({ output = "desc:HP Inc. HP E24 G4 CN42023N27",   mode = "1920x1080@60",    position = "3840x0", scale = 1 })
 LUA
     ok "Screens pinned: laptop, CN41512CCR, CN42023N27"
 fi
