@@ -278,15 +278,28 @@ NOCT_SRC="$REPO/config/noctalia"
 
 if [ ! -d "$NOCT_SRC" ]; then
     skip "config/noctalia missing from the repo"
-elif cmp -s "$NOCT_SRC/config.toml" "$NOCT_DIR/config.toml" \
-     && cmp -s "$NOCT_SRC/templates/fastfetch.jsonc" "$NOCT_DIR/templates/fastfetch.jsonc"; then
-    skip "Noctalia config already up to date"
 else
-    mkdir -p "$NOCT_DIR/templates"
-    [ -f "$NOCT_DIR/config.toml" ] && cp -a "$NOCT_DIR/config.toml" "$NOCT_DIR/config.toml.overwritten-$STAMP"
-    cp -a "$NOCT_SRC/config.toml" "$NOCT_DIR/config.toml"
-    cp -a "$NOCT_SRC/templates/fastfetch.jsonc" "$NOCT_DIR/templates/fastfetch.jsonc"
-    ok "Noctalia templates: kitty, starship, gtk, btop, fastfetch"
+    NOCT_STALE=0
+    cmp -s "$NOCT_SRC/config.toml" "$NOCT_DIR/config.toml" || NOCT_STALE=1
+    for t in "$NOCT_SRC/templates/"*; do
+        [ -f "$t" ] || continue
+        cmp -s "$t" "$NOCT_DIR/templates/$(basename "$t")" || NOCT_STALE=1
+    done
+
+    if [ "$NOCT_STALE" = "0" ]; then
+        skip "Noctalia config already up to date"
+    else
+        mkdir -p "$NOCT_DIR/templates"
+        if [ -f "$NOCT_DIR/config.toml" ]; then
+            cp -a "$NOCT_DIR/config.toml" "$NOCT_DIR/config.toml.overwritten-$STAMP"
+        fi
+        cp -a "$NOCT_SRC/config.toml" "$NOCT_DIR/config.toml"
+        for t in "$NOCT_SRC/templates/"*; do
+            [ -f "$t" ] || continue
+            cp -a "$t" "$NOCT_DIR/templates/"
+        done
+        ok "Noctalia config and templates deployed: $(cd "$NOCT_SRC/templates" && ls | tr '\n' ' ')"
+    fi
 fi
 
 if command -v noctalia >/dev/null && pgrep -x noctalia >/dev/null; then
