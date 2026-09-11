@@ -276,6 +276,38 @@ if command -v noctalia >/dev/null && pgrep -x noctalia >/dev/null; then
     ok "Templates rendered for the current palette"
 fi
 
+# --- Wallpapers -------------------------------------------------------------
+WALL_SRC="$REPO/config/wallpapers"
+WALL_DEST="$HOME/Images/Wallpapers"
+
+if [ ! -d "$WALL_SRC" ]; then
+    skip "config/wallpapers missing from the repo"
+else
+    mkdir -p "$WALL_DEST"
+    BEFORE=$(find "$WALL_DEST" -maxdepth 1 -type f | wc -l)
+    cp -an "$WALL_SRC"/. "$WALL_DEST"/ 2>/dev/null || true
+    AFTER=$(find "$WALL_DEST" -maxdepth 1 -type f | wc -l)
+    if [ "$BEFORE" = "$AFTER" ]; then
+        skip "Wallpapers already there ($AFTER)"
+    else
+        ok "Wallpapers copied ($((AFTER - BEFORE)) new, $AFTER total)"
+    fi
+fi
+
+# --- Noctalia settings ------------------------------------------------------
+SETTINGS_SRC="$REPO/config/noctalia/settings.toml"
+SETTINGS_DEST="$HOME/.local/state/noctalia/settings.toml"
+
+if [ ! -f "$SETTINGS_SRC" ]; then
+    skip "config/noctalia/settings.toml missing from the repo"
+elif [ -f "$SETTINGS_DEST" ]; then
+    skip "Noctalia settings already exist, left alone"
+else
+    mkdir -p "$(dirname "$SETTINGS_DEST")"
+    sed "s|__HOME__|$HOME|g" "$SETTINGS_SRC" > "$SETTINGS_DEST"
+    ok "Noctalia settings seeded: bar, dock, lockscreen, theme, wallpaper"
+fi
+
 # --- zsh --------------------------------------------------------------------
 if [ -d "$HOME/.oh-my-zsh" ]; then
     skip "oh-my-zsh already in HOME"

@@ -1,0 +1,204 @@
+config_version = 14
+
+[bar]
+order = [ "default" ]
+
+    [bar.default]
+    border = "on_surface_variant"
+    center = [ "clock", "media", "notifications" ]
+    end = [ "tray", "clipboard", "network", "bluetooth", "volume", "brightness", "battery", "session" ]
+    margin_ends = 0
+    radius = 50
+    radius_top_left = 0
+    radius_top_right = 0
+    thickness = 38
+
+[dock]
+enabled = true
+icon_size = 30
+reserve_space = false
+smart_auto_hide = true
+
+[lockscreen]
+blurred_desktop = true
+
+[lockscreen_widgets]
+enabled = true
+schema_version = 2
+widget_order = [
+    "lockscreen-login-box@DP-5",
+    "lockscreen-login-box@DP-3",
+    "lockscreen-login-box@eDP-1",
+    "lockscreen-widget-0000000000000002",
+    "lockscreen-widget-0000000000000003",
+    "lockscreen-widget-0000000000000004",
+    "lockscreen-widget-0000000000000005"
+]
+
+    [lockscreen_widgets.grid]
+    cell_size = 16
+    major_interval = 4
+    visible = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@DP-3"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 960.0
+    cy = 898.0
+    output = "DP-3"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@DP-3".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@DP-5"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 960.0
+    cy = 898.0
+    output = "DP-5"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@DP-5".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@eDP-1"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 1488.0
+    cy = 938.0
+    output = "eDP-1"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@eDP-1".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+    [lockscreen_widgets.widget.lockscreen-widget-0000000000000002]
+    box_height = 112.0
+    box_width = 320.0
+    cx = 224.0
+    cy = 103.0
+    output = "eDP-1"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "sysmon"
+
+        [lockscreen_widgets.widget.lockscreen-widget-0000000000000002.settings]
+        stat = "cpu_usage"
+        stat2 = "cpu_temp"
+
+    [lockscreen_widgets.widget.lockscreen-widget-0000000000000003]
+    box_height = 0.0
+    box_width = 0.0
+    cx = 1712.0
+    cy = 684.0
+    output = "eDP-1"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "media_player"
+
+    [lockscreen_widgets.widget.lockscreen-widget-0000000000000004]
+    box_height = 0.0
+    box_width = 0.0
+    cx = 1572.0
+    cy = 255.0
+    output = "eDP-1"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "calendar"
+
+    [lockscreen_widgets.widget.lockscreen-widget-0000000000000005]
+    box_height = 0.0
+    box_width = 0.0
+    cx = 146.0
+    cy = 231.5
+    output = "eDP-1"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "clock"
+
+[plugins]
+enabled = [ "yuuto/arch-updater" ]
+
+[shell]
+lang = "fr"
+
+    [shell.panel]
+    launcher_placement = "attached"
+
+[theme]
+builtin = "Nord"
+community_palette = "Breeze"
+shell_mode = "dark"
+source = "wallpaper"
+wallpaper_scheme = "m3-tonal-spot"
+
+[wallpaper]
+directory = "__HOME__/Images/Wallpapers"
+
+    [wallpaper.default]
+    path = "__HOME__/Images/Wallpapers/wallhaven-391k7d.jpg"
+
+    [wallpaper.last]
+    path = "__HOME__/Images/Wallpapers/wallhaven-391k7d.jpg"
+
+    [wallpaper.monitors.DP-3]
+    path = "__HOME__/Images/Wallpapers/wallhaven-391k7d.jpg"
+
+    [wallpaper.monitors.DP-5]
+    path = "__HOME__/Images/Wallpapers/wallhaven-391k7d.jpg"
+
+    [wallpaper.monitors.eDP-1]
+    path = "__HOME__/Images/Wallpapers/wallhaven-391k7d.jpg"
