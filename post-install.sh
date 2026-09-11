@@ -126,8 +126,8 @@ elif [ ! -f "$HYPR_DEFAULT" ]; then
     die "Missing $HYPR_DEFAULT. Is the hyprland package installed?"
 else
     mkdir -p "$HYPR_DIR"
-    cp -a "$HYPR_DEFAULT" "$HYPR_LUA"
-    ok "Stock Hyprland config seeded from $HYPR_DEFAULT"
+    sed 's/^\(\s*scale\s*=\s*\)"auto",/\1'"1"',/' "$HYPR_DEFAULT" > "$HYPR_LUA"
+    ok "Stock Hyprland config seeded from $HYPR_DEFAULT, scale pinned to 1"
 fi
 
 if grep -qF 'hl.exec_cmd("noctalia")' "$HYPR_LUA"; then
