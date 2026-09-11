@@ -343,6 +343,34 @@ else
     ok "zshrc deployed from the repo"
 fi
 
+# --- ssh --------------------------------------------------------------------
+SSH_SRC="$REPO/config/ssh/config"
+SSH_DIR="$HOME/.ssh"
+
+if [ ! -f "$SSH_SRC" ]; then
+    skip "config/ssh/config missing from the repo"
+elif grep -qE 'PRIVATE KEY' "$SSH_SRC"; then
+    die "$SSH_SRC contains a private key. Remove it from the repo."
+else
+    mkdir -p "$SSH_DIR"
+    chmod 700 "$SSH_DIR"
+    if cmp -s "$SSH_SRC" "$SSH_DIR/config"; then
+        skip "ssh config already up to date"
+    else
+        [ -f "$SSH_DIR/config" ] && cp -a "$SSH_DIR/config" "$SSH_DIR/config.overwritten-$STAMP"
+        install -m 600 "$SSH_SRC" "$SSH_DIR/config"
+        ok "ssh config deployed ($(grep -cE '^[[:space:]]*Host[[:space:]]' "$SSH_SRC") hosts)"
+    fi
+    for k in "$SSH_DIR"/id_*; do
+        [ -f "$k" ] || continue
+        case "$k" in *.pub) continue ;; esac
+        chmod 600 "$k"
+    done
+    if [ ! -f "$SSH_DIR/id_rsa" ]; then
+        skip "No ~/.ssh/id_rsa here. Copy it across by hand, it is deliberately not in the repo."
+    fi
+fi
+
 # --- Reload -----------------------------------------------------------------
 if command -v hyprctl >/dev/null && [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
     hyprctl reload >/dev/null && ok "Hyprland reloaded"

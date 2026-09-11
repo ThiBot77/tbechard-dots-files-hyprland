@@ -1,0 +1,138 @@
+# ── Defaults ──────────────────────────────────────────────────────────────────
+# FR VMs (tbechard / port 2222)
+Host fr-vm-*
+    User        tbechard
+    Port        2222
+
+# Skorpia VPS (tbechard / port 2222)
+Host sko-vps-*
+    User        tbechard
+    Port        2222
+
+# ── Infrastructure Skorpia (10.10.10.x) ───────────────────────────────────────
+Host HC-Supervision
+    HostName    154.16.254.250
+
+Host SK-PROXY
+    HostName    10.10.10.100
+
+Host SK-Oxidized
+    HostName    10.10.10.112
+
+Host SK-MicroServices
+    HostName    10.10.10.113
+
+Host node35
+    HostName    10.10.10.14
+
+Host pve-par2-cs19
+    HostName    10.10.10.19
+
+Host pve-par2-cs05
+    HostName    10.10.10.5
+
+Host pve-cs53
+    HostName    10.10.10.53
+
+Host STORAGE-01
+    HostName    10.10.10.8
+
+Host skorpia
+    HostName    10.10.10.141
+
+Host dashboard
+    HostName    10.10.10.142
+
+Host api
+    HostName    10.10.10.143
+
+# ── Skorpia VMs ───────────────────────────────────────────────────────────────
+Host sko-vm-bst-prd-01
+    HostName    10.75.3.5
+
+Host sko-vm-gitlab-prd-01
+    HostName    10.14.5.49
+
+Host sko-vm-outline-prd-01
+    HostName    10.14.1.22
+
+# ── Skorpia VPS ───────────────────────────────────────────────────────────────
+Host sko-vps-games-prd-01
+    HostName    154.16.229.31
+
+# ── FR VMs ────────────────────────────────────────────────────────────────────
+Host fr-vm-panel-prd-01
+    HostName    10.10.99.103
+
+Host fr-vm-jelly-prd-01
+    HostName    10.10.99.101
+
+Host fr-vm-nginx-prd-01
+    HostName    10.10.99.106
+
+Host fr-vm-games-prd-01
+    HostName    10.10.99.104
+
+Host fr-vm-vpn-prd-01
+    HostName    10.10.99.107
+
+Host fr-vm-bst-dev-01
+    HostName    10.10.25.101
+
+Host fr-vm-k8s-prd-cp-01
+    HostName    10.10.25.201
+
+Host fr-vm-k8s-prd-wrk-01
+    HostName    10.10.25.202
+
+Host fr-vm-k8s-prd-wrk-02
+    HostName    10.10.25.203
+
+# ── Auchan MyOffer (via bastion PAM) ──────────────────────────────────────────
+Host myoffer-app
+    HostName    access.pam.ari.internal.auchan.com
+    User        XFR5203001@aucusr@10.150.32.33
+
+Host myoffer-db
+    HostName    access.pam.ari.internal.auchan.com
+    User        XFR5203001@aucusr@10.150.32.34
+
+Host myoffer-ref
+    HostName    access.pam.ari.internal.auchan.com
+    User        XFR5203001@aucusr@ua-vm-np-myo-120.tech.internal.auchan.com
+
+Host myoffer-*
+    Port                        22
+    PubkeyAuthentication        no
+    PreferredAuthentications    keyboard-interactive,password
+    StrictHostKeyChecking       no
+    # Le proxy CyberArk PSM n'accepte pas le multiplexage (Invalid session state)
+    ControlMaster               no
+    ControlPath                 none
+
+# ── Auchan ANEE (via bastion PAM) ─────────────────────────────────────────────
+Host ane-app
+    HostName    access.pam.ari.internal.auchan.com
+    User        XFR5203001@aucusr@hu-vm-np-ane-103.tech.internal.auchan.com
+
+Host ane-*
+    Port                        22
+    PubkeyAuthentication        no
+    PreferredAuthentications    keyboard-interactive,password
+    StrictHostKeyChecking       no
+    # Le proxy CyberArk PSM n'accepte pas le multiplexage (Invalid session state)
+    ControlMaster               no
+    ControlPath                 none
+
+# ── Global defaults ───────────────────────────────────────────────────────────
+Host *
+    User                  debian
+    IdentityFile          ~/.ssh/id_rsa
+    ForwardAgent          yes
+    AddKeysToAgent        yes
+    ServerAliveInterval   60
+    ServerAliveCountMax   3
+    IdentitiesOnly        yes
+    ControlMaster         auto
+    ControlPath           ~/.ssh/sockets/%C
+    ControlPersist        10m

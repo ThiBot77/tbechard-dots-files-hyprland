@@ -1,0 +1,6 @@
+id_rsa
+id_*
+*.pem
+*.key
+known_hosts*
+authorized_keys
