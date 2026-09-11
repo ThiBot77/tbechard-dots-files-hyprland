@@ -38,6 +38,10 @@ noctalia and a French keyboard.
 Env:
   SKIP_PACKAGES=1    Leave packages/*.txt alone
   SKIP_NOCTALIA=1    Do not install the noctalia package
+  FORCE_SETTINGS=1   Replace an existing noctalia settings.toml with the repo's.
+                     Without it an existing one is left alone, which means a
+                     machine where noctalia has already started keeps its
+                     defaults and gets none of the bar, dock or widgets.
 EOF
 }
 
@@ -314,14 +318,36 @@ fi
 SETTINGS_SRC="$REPO/config/noctalia/settings.toml"
 SETTINGS_DEST="$HOME/.local/state/noctalia/settings.toml"
 
-if [ ! -f "$SETTINGS_SRC" ]; then
-    skip "config/noctalia/settings.toml missing from the repo"
-elif [ -f "$SETTINGS_DEST" ]; then
-    skip "Noctalia settings already exist, left alone"
-else
+write_settings() {
+    # Noctalia owns this file while it runs and writes its own copy back over
+    # anything put there, so it has to be down for the swap.
+    local was_running=0
+    if pgrep -x noctalia >/dev/null; then
+        was_running=1
+        pkill -x noctalia
+        sleep 2
+    fi
     mkdir -p "$(dirname "$SETTINGS_DEST")"
     sed "s|__HOME__|$HOME|g" "$SETTINGS_SRC" > "$SETTINGS_DEST"
-    ok "Noctalia settings seeded: bar, dock, lockscreen, theme, wallpaper"
+    if [ "$was_running" = "1" ]; then
+        setsid noctalia -d >/dev/null 2>&1 &
+        sleep 3
+    fi
+}
+
+if [ ! -f "$SETTINGS_SRC" ]; then
+    skip "config/noctalia/settings.toml missing from the repo"
+elif [ ! -f "$SETTINGS_DEST" ]; then
+    write_settings
+    ok "Noctalia settings seeded: bar, dock, desktop widgets, lockscreen, theme"
+elif [ "${FORCE_SETTINGS:-0}" = "1" ]; then
+    cp -a "$SETTINGS_DEST" "$SETTINGS_DEST.overwritten-$STAMP"
+    write_settings
+    ok "Noctalia settings replaced, previous one kept as .overwritten-$STAMP"
+    echo "  Per-monitor entries name this machine's connectors. Check the bar and"
+    echo "  the lockscreen if the screens here are not $(grep -oE '"(eDP|DP|HDMI)-[0-9]+"' "$SETTINGS_SRC" | sort -u | tr -d '"' | tr '\n' ' ')"
+else
+    skip "Noctalia settings already exist. FORCE_SETTINGS=1 to replace them with the repo's"
 fi
 
 # --- zsh --------------------------------------------------------------------
