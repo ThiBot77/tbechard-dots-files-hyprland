@@ -11,3 +11,11 @@ output_path = "~/.config/starship.toml"
 
 [hooks]
 colors_changed = "systemctl --user try-restart xdg-desktop-portal-gtk.service"
+
+[widget.arch]
+type = "launcher"
+custom_image = "/usr/share/pixmaps/archlinux-logo.svg"
+custom_image_colorize = true
+
+[bar.default]
+start = ["arch", "workspaces", "active_window"]
