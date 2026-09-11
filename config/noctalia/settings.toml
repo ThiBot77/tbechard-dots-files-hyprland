@@ -12,14 +12,13 @@ order = [ "default" ]
     radius_top_left = 0
     radius_top_right = 0
     shadow = false
-    start = [ "arch", "workspaces", "active_window" ]
+    start = [ "arch", "workspaces", "active_window", "widget" ]
     thickness = 38
-
-        [bar.default.monitor.ff]
 
 [dock]
 enabled = true
 icon_size = 30
+pinned = [ "google-chrome", "org.gnome.Nautilus", "code", "filezilla", "anydesk", "discord" ]
 reserve_space = false
 smart_auto_hide = true
 
@@ -30,19 +29,42 @@ blurred_desktop = true
 enabled = true
 schema_version = 2
 widget_order = [
+    "lockscreen-clock@DP-5",
+    "lockscreen-volume@DP-5",
+    "lockscreen-sysmon@DP-5",
+    "lockscreen-viz@DP-5",
+    "lockscreen-label@DP-5",
     "lockscreen-login-box@DP-5",
     "lockscreen-login-box@DP-3",
-    "lockscreen-login-box@eDP-1",
-    "lockscreen-widget-0000000000000002",
-    "lockscreen-widget-0000000000000003",
-    "lockscreen-widget-0000000000000004",
-    "lockscreen-widget-0000000000000005"
+    "lockscreen-login-box@eDP-1"
 ]
 
     [lockscreen_widgets.grid]
     cell_size = 16
     major_interval = 4
     visible = true
+
+    [lockscreen_widgets.widget."lockscreen-clock@DP-5"]
+    box_height = 220.0
+    box_width = 560.0
+    cx = 960.0
+    cy = 300.0
+    output = "DP-5"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "clock"
+
+    [lockscreen_widgets.widget."lockscreen-label@DP-5"]
+    box_height = 44.0
+    box_width = 400.0
+    cx = 960.0
+    cy = 120.0
+    output = "DP-5"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "label"
 
     [lockscreen_widgets.widget."lockscreen-login-box@DP-3"]
     box_height = 196.0
@@ -99,10 +121,10 @@ widget_order = [
         show_weather = true
 
     [lockscreen_widgets.widget."lockscreen-login-box@eDP-1"]
-    box_height = 196.0
-    box_width = 810.0
-    cx = 1488.0
-    cy = 938.0
+    box_height = 70.0
+    box_width = 400.0
+    cx = 960.0
+    cy = 906.0
     output = "eDP-1"
     placement_height = 1080.0
     placement_width = 1920.0
@@ -115,63 +137,48 @@ widget_order = [
         background_radius = 12.0
         center_password_text = false
         input_opacity = 1.0
-        input_radius = 6.0
-        layout = "regular"
+        input_radius = 14.0
+        layout = "compact"
         show_caps_lock = true
         show_keyboard_layout = true
         show_login_button = true
         show_media = true
         show_session_buttons = true
-        show_unlock_hint = true
+        show_unlock_hint = false
         show_weather = true
 
-    [lockscreen_widgets.widget.lockscreen-widget-0000000000000002]
-    box_height = 112.0
-    box_width = 320.0
-    cx = 224.0
-    cy = 103.0
-    output = "eDP-1"
+    [lockscreen_widgets.widget."lockscreen-sysmon@DP-5"]
+    box_height = 100.0
+    box_width = 240.0
+    cx = 1090.0
+    cy = 470.0
+    output = "DP-5"
     placement_height = 1080.0
     placement_width = 1920.0
     rotation = 0.0
-    type = "sysmon"
+    type = "system_monitor"
 
-        [lockscreen_widgets.widget.lockscreen-widget-0000000000000002.settings]
-        stat = "cpu_usage"
-        stat2 = "cpu_temp"
-
-    [lockscreen_widgets.widget.lockscreen-widget-0000000000000003]
-    box_height = 0.0
-    box_width = 0.0
-    cx = 1712.0
-    cy = 684.0
-    output = "eDP-1"
+    [lockscreen_widgets.widget."lockscreen-viz@DP-5"]
+    box_height = 150.0
+    box_width = 720.0
+    cx = 960.0
+    cy = 740.0
+    output = "DP-5"
     placement_height = 1080.0
     placement_width = 1920.0
     rotation = 0.0
-    type = "media_player"
+    type = "fancy_audio_visualizer"
 
-    [lockscreen_widgets.widget.lockscreen-widget-0000000000000004]
-    box_height = 0.0
-    box_width = 0.0
-    cx = 1572.0
-    cy = 255.0
-    output = "eDP-1"
+    [lockscreen_widgets.widget."lockscreen-volume@DP-5"]
+    box_height = 100.0
+    box_width = 240.0
+    cx = 830.0
+    cy = 470.0
+    output = "DP-5"
     placement_height = 1080.0
     placement_width = 1920.0
     rotation = 0.0
-    type = "calendar"
-
-    [lockscreen_widgets.widget.lockscreen-widget-0000000000000005]
-    box_height = 0.0
-    box_width = 0.0
-    cx = 146.0
-    cy = 231.5
-    output = "eDP-1"
-    placement_height = 1080.0
-    placement_width = 1920.0
-    rotation = 0.0
-    type = "clock"
+    type = "volume"
 
 [plugins]
 enabled = [ "yuuto/arch-updater" ]
@@ -184,7 +191,7 @@ lang = "fr"
 
 [theme]
 builtin = "Nord"
-community_palette = "Breeze"
+community_palette = "Neon Surf"
 shell_mode = "dark"
 source = "wallpaper"
 wallpaper_scheme = "m3-tonal-spot"
@@ -212,3 +219,6 @@ directory = "__HOME__/Images/Wallpapers"
 
 [widget.taskbar]
 item_spacing = 15
+
+[widget.widget]
+type = "yuuto/arch-updater:widget"
