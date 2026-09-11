@@ -10,3 +10,6 @@ starship
 fastfetch
 network-manager-applet
 networkmanager-openvpn
+hyprlock
+hypridle
+sddm

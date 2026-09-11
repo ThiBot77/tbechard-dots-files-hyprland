@@ -71,6 +71,9 @@ widget_order = [ "desktop-widget-0000000000000001", "desktop-widget-000000000000
 
 [dock]
 enabled = true
+cross_axis_padding = 4
+item_spacing = 4
+main_axis_padding = 8
 icon_size = 30
 margin_edge = 10
 pinned = [ "google-chrome", "org.gnome.Nautilus", "code", "filezilla", "anydesk", "discord" ]
@@ -81,6 +84,7 @@ smart_auto_hide = true
 auto_locate = true
 
 [lockscreen]
+enabled = false
 monitors = [ "eDP-1" ]
 
 [lockscreen_widgets]
@@ -186,7 +190,7 @@ lang = "fr"
 [theme]
 builtin = "Nord"
 community_palette = "Neon Surf"
-pure_black_dark = true
+pure_black_dark = false
 shell_mode = "dark"
 source = "wallpaper"
 wallpaper_scheme = "m3-tonal-spot"

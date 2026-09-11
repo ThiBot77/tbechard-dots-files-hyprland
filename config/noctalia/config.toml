@@ -2,6 +2,10 @@
 input_path  = "templates/fastfetch.jsonc"
 output_path = "~/.config/fastfetch/config.jsonc"
 
+[theme.templates.user.hyprlock]
+input_path  = "templates/hyprlock.conf"
+output_path = "~/.config/hypr/hyprlock.conf"
+
 [theme.templates.user.starship]
 input_path  = "templates/starship.toml"
 output_path = "~/.config/starship.toml"

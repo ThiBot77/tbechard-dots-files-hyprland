@@ -260,16 +260,89 @@ LUA
     ok "SUPER+, opens the noctalia settings"
 fi
 
-if grep -qF 'session lock' "$HYPR_LUA"; then
-    skip "Lock keys already bound"
+if grep -qF 'loginctl lock-session' "$HYPR_LUA"; then
+    skip "Lock keys already go through logind"
 else
     cp -a "$HYPR_LUA" "$HYPR_LUA.avant-lock-$STAMP"
+    python3 - "$HYPR_LUA" <<'PYEOF'
+import sys
+path = sys.argv[1]
+s = open(path).read()
+
+# logind, not hyprlock directly: idle, the key and sleep all raise the same
+# signal, and hypridle answers the three with one lock_cmd.
+noctalia = """hl.bind("SUPER + L", hl.dsp.exec_cmd("noctalia msg session lock"), { locked = true })
+hl.bind("XF86PowerOff", hl.dsp.exec_cmd("noctalia msg session lock"), { locked = true })"""
+logind = """hl.bind("SUPER + L", hl.dsp.exec_cmd("loginctl lock-session"), { locked = true })
+hl.bind("XF86PowerOff", hl.dsp.exec_cmd("loginctl lock-session"), { locked = true })"""
+
+if noctalia in s:
+    s = s.replace(noctalia, logind)
+else:
+    s = s.rstrip("\n") + "\n\n" + logind + "\n"
+open(path, "w").write(s)
+PYEOF
+    ok "SUPER+L and the power key lock through logind"
+fi
+
+if grep -qF 'hl.exec_cmd("hypridle")' "$HYPR_LUA"; then
+    skip "hypridle already autostarted"
+else
+    cp -a "$HYPR_LUA" "$HYPR_LUA.avant-hypridle-$STAMP"
     cat >> "$HYPR_LUA" <<'LUA'
 
-hl.bind("SUPER + L", hl.dsp.exec_cmd("noctalia msg session lock"), { locked = true })
-hl.bind("XF86PowerOff", hl.dsp.exec_cmd("noctalia msg session lock"), { locked = true })
+hl.on("hyprland.start", function()
+  hl.exec_cmd("hypridle")
+end)
 LUA
-    ok "SUPER+L and the power key lock the screen"
+    ok "hypridle autostarted"
+fi
+
+QUOTES_SRC="$REPO/config/hypr/quotes.txt"
+QUOTES_DEST="$HYPR_DIR/quotes.txt"
+
+if [ ! -f "$QUOTES_SRC" ]; then
+    skip "config/hypr/quotes.txt missing from the repo"
+elif cmp -s "$QUOTES_SRC" "$QUOTES_DEST"; then
+    skip "Lock screen quotes already up to date"
+else
+    mkdir -p "$HYPR_DIR"
+    cp -a "$QUOTES_SRC" "$QUOTES_DEST"
+    ok "Lock screen quotes deployed ($(grep -c . "$QUOTES_SRC") lines)"
+fi
+
+AVATAR_SRC="$REPO/config/hypr/avatar.png"
+AVATAR_DEST="$HOME/.face.icon"
+
+if [ -f "$AVATAR_DEST" ]; then
+    skip "Lock screen avatar already in place"
+elif [ -f "$AVATAR_SRC" ]; then
+    cp -a "$AVATAR_SRC" "$AVATAR_DEST"
+    ok "Lock screen avatar installed from the repo"
+elif [ -f "$HOME/.config/fastfetch/avatar.png" ]; then
+    cp -a "$HOME/.config/fastfetch/avatar.png" "$AVATAR_DEST"
+    ok "Lock screen avatar taken from the fastfetch one"
+else
+    skip "No avatar found, hyprlock will show an empty frame. Drop a PNG at ~/.face.icon"
+fi
+
+HYPRIDLE_SRC="$REPO/config/hypr/hypridle.conf"
+HYPRIDLE_DEST="$HYPR_DIR/hypridle.conf"
+
+if [ ! -f "$HYPRIDLE_SRC" ]; then
+    skip "config/hypr/hypridle.conf missing from the repo"
+elif cmp -s "$HYPRIDLE_SRC" "$HYPRIDLE_DEST"; then
+    skip "hypridle.conf already up to date"
+else
+    if [ -f "$HYPRIDLE_DEST" ]; then
+        cp -a "$HYPRIDLE_DEST" "$HYPRIDLE_DEST.overwritten-$STAMP"
+    fi
+    cp -a "$HYPRIDLE_SRC" "$HYPRIDLE_DEST"
+    pkill -x hypridle 2>/dev/null || true
+    if [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+        setsid hypridle >/dev/null 2>&1 &
+    fi
+    ok "hypridle.conf deployed: lock at 10 min, screens off at 15, lock before sleep"
 fi
 
 # --- Noctalia config --------------------------------------------------------
@@ -364,6 +437,113 @@ else
     fi
     SCREENS="$(grep -oE '"(eDP|DP|HDMI)-[0-9]+"' "$SETTINGS_SRC" | sort -u | tr -d '"' | tr '\n' ' ')"
     [ -n "$SCREENS" ] && echo "  Per-monitor entries expect: $SCREENS"
+fi
+
+# --- Icons and cursor -------------------------------------------------------
+ICON_THEME="Tela"
+CURSOR_THEME="Bibata-Modern-Ice"
+CURSOR_SIZE=24
+
+icon_dir() {
+    [ -d "/usr/share/icons/$1" ] || [ -d "$HOME/.local/share/icons/$1" ]
+}
+
+if ! icon_dir "$ICON_THEME"; then
+    skip "Icon theme $ICON_THEME not installed, see packages/aur.txt"
+elif ! icon_dir "$CURSOR_THEME"; then
+    skip "Cursor theme $CURSOR_THEME not installed, see packages/aur.txt"
+else
+    CURSOR_INDEX="$(printf '[Icon Theme]\nName=Default\nComment=Default cursor\nInherits=%s\n' "$CURSOR_THEME")"
+    THEMED=0
+
+    # No settings.ini here: it outranks dconf, and noctalia drives the GTK theme
+    # and dark mode through dconf alone.
+    for d in "$HOME/.config/gtk-3.0" "$HOME/.config/gtk-4.0"; do
+        f="$d/settings.ini"
+        [ -f "$f" ] || continue
+        grep -q 'gtk-cursor-theme-name' "$f" || continue
+        grep -q 'gtk-theme-name' "$f" && continue
+        rm "$f"
+        THEMED=1
+    done
+
+    mkdir -p "$HOME/.icons/default"
+    if ! printf '%s\n' "$CURSOR_INDEX" | cmp -s - "$HOME/.icons/default/index.theme"; then
+        printf '%s\n' "$CURSOR_INDEX" > "$HOME/.icons/default/index.theme"
+        THEMED=1
+    fi
+
+    # Qt and anything launched outside the session read the env, not dconf.
+    if ! grep -qF 'XCURSOR_THEME' "$HYPR_LUA"; then
+        cp -a "$HYPR_LUA" "$HYPR_LUA.avant-cursor-$STAMP"
+        cat >> "$HYPR_LUA" <<LUA
+
+hl.env("XCURSOR_THEME", "$CURSOR_THEME")
+LUA
+        THEMED=1
+    fi
+
+    if command -v gsettings >/dev/null; then
+        for pair in "icon-theme $ICON_THEME" "cursor-theme $CURSOR_THEME"; do
+            key="${pair%% *}"; val="${pair#* }"
+            [ "$(gsettings get org.gnome.desktop.interface "$key" 2>/dev/null)" = "'$val'" ] && continue
+            gsettings set org.gnome.desktop.interface "$key" "$val"
+            THEMED=1
+        done
+        if [ "$(gsettings get org.gnome.desktop.interface cursor-size 2>/dev/null)" != "$CURSOR_SIZE" ]; then
+            gsettings set org.gnome.desktop.interface cursor-size "$CURSOR_SIZE"
+            THEMED=1
+        fi
+    fi
+
+    if [ "$THEMED" = "0" ]; then
+        skip "Icons on $ICON_THEME, cursor on $CURSOR_THEME already"
+    else
+        if [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+            hyprctl setcursor "$CURSOR_THEME" "$CURSOR_SIZE" >/dev/null 2>&1 || true
+        fi
+        ok "Icons on $ICON_THEME, cursor on $CURSOR_THEME at ${CURSOR_SIZE}px"
+    fi
+fi
+
+# --- SDDM greeter -----------------------------------------------------------
+SDDM_SRC="$REPO/sddm"
+SDDM_THEME_DIR="/usr/share/sddm/themes/tbe"
+SDDM_CONF="/etc/sddm.conf.d/zz-tbe.conf"
+
+if [ ! -d "$SDDM_SRC" ]; then
+    skip "sddm/ missing from the repo"
+elif ! command -v sddm >/dev/null; then
+    skip "sddm not installed, see packages/pacman.txt"
+elif diff -rq "$SDDM_SRC/theme" "$SDDM_THEME_DIR" >/dev/null 2>&1 \
+     && cmp -s "$SDDM_SRC/conf.d/zz-tbe.conf" "$SDDM_CONF"; then
+    skip "SDDM greeter already on the tbe theme"
+else
+    # Replaced, not merged: copying on top leaves dropped files behind.
+    sudo rm -rf "$SDDM_THEME_DIR"
+    sudo mkdir -p "$SDDM_THEME_DIR" /etc/sddm.conf.d
+    sudo cp -r "$SDDM_SRC/theme/." "$SDDM_THEME_DIR/"
+    sudo cp "$SDDM_SRC/conf.d/zz-tbe.conf" "$SDDM_CONF"
+    sudo rm -f /etc/sddm.conf.d/10-tbe.conf
+
+    # Every file in the directory is read, not just *.conf, and the last name
+    # wins. Renaming in place leaves it in the race, so move it out.
+    for conf in /etc/sddm.conf.d/*; do
+        [ -f "$conf" ] || continue
+        if [ "$(basename "$conf")" = "zz-tbe.conf" ]; then continue; fi
+        if ! grep -qE '^[[:space:]]*Current[[:space:]]*=' "$conf"; then continue; fi
+        sudo mkdir -p /etc/sddm.conf.d.disabled
+        sudo mv "$conf" /etc/sddm.conf.d.disabled/
+        echo "  $(basename "$conf") also set a theme, moved to /etc/sddm.conf.d.disabled"
+    done
+    ok "SDDM greeter on the tbe theme"
+fi
+
+if systemctl is-enabled sddm >/dev/null 2>&1; then
+    skip "sddm already enabled"
+else
+    sudo systemctl enable sddm
+    ok "sddm enabled"
 fi
 
 # --- zsh --------------------------------------------------------------------
