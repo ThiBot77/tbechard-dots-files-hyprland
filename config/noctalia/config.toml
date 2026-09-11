@@ -1,13 +1,9 @@
 [theme.templates]
-builtin_ids = ["kitty", "gtk3", "gtk4", "btop"]
+builtin_ids = ["kitty", "starship", "gtk3", "gtk4", "btop"]
 
 [theme.templates.user.fastfetch]
 input_path  = "templates/fastfetch.jsonc"
 output_path = "~/.config/fastfetch/config.jsonc"
-
-[theme.templates.user.starship]
-input_path  = "templates/starship.toml"
-output_path = "~/.config/starship.toml"
 
 [hooks]
 colors_changed = "systemctl --user try-restart xdg-desktop-portal-gtk.service"
