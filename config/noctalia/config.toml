@@ -1,0 +1,6 @@
+[theme.templates]
+builtin_ids = ["kitty", "starship", "gtk3", "gtk4", "btop"]
+
+[theme.templates.user.fastfetch]
+input_path  = "templates/fastfetch.jsonc"
+output_path = "~/.config/fastfetch/config.jsonc"

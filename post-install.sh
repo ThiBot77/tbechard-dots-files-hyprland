@@ -142,8 +142,75 @@ hl.config({ input = { kb_layout = "fr" } })
 hl.on("hyprland.start", function()
   hl.exec_cmd("noctalia")
 end)
+
+hl.bind("SUPER + SUPER_L", hl.dsp.exec_cmd("noctalia msg panel-toggle launcher"), { release = true })
 LUA
     ok "hyprland.lua starts noctalia, keyboard set to French"
+fi
+
+if grep -qF '"ampersand"' "$HYPR_LUA"; then
+    skip "Keybinds already rebound"
+else
+    cp -a "$HYPR_LUA" "$HYPR_LUA.avant-binds-$STAMP"
+    python3 - "$HYPR_LUA" <<'PYEOF'
+import sys
+path = sys.argv[1]
+s = open(path).read()
+
+subs = [
+    ('local fileManager = "dolphin"',
+     'local fileManager = "nautilus"'),
+    ('local menu        = "hyprlauncher"',
+     'local menu        = "noctalia msg panel-toggle launcher"'),
+    ('hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))',
+     'hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal))'),
+    ('local closeWindowBind = hl.bind(mainMod .. " + C", hl.dsp.window.close())',
+     'local closeWindowBind = hl.bind(mainMod .. " + Q", hl.dsp.window.close())'),
+    ('''for i = 1, 10 do
+    local key = i % 10 -- 10 maps to key 0
+    hl.bind(mainMod .. " + " .. key,             hl.dsp.focus({ workspace = i}))
+    hl.bind(mainMod .. " + SHIFT + " .. key,     hl.dsp.window.move({ workspace = i }))
+end''',
+     '''-- code:NN registers an empty bind through the Lua API, keysyms do not.
+-- With SHIFT the AZERTY row already yields the digits, so those stay as they are.
+local azerty = { "ampersand", "eacute", "quotedbl", "apostrophe", "parenleft",
+                 "minus", "egrave", "underscore", "ccedilla", "agrave" }
+for i = 1, 10 do
+    hl.bind(mainMod .. " + " .. azerty[i],          hl.dsp.focus({ workspace = i }))
+    hl.bind(mainMod .. " + SHIFT + " .. (i % 10),   hl.dsp.window.move({ workspace = i }))
+end'''),
+]
+
+for old, new in subs:
+    if s.count(old) != 1:
+        sys.exit("pattern missing or ambiguous: %r" % old[:60])
+    s = s.replace(old, new)
+open(path, "w").write(s)
+PYEOF
+    ok "SUPER+T terminal, SUPER+E files, SUPER+Q close, AZERTY workspaces"
+fi
+
+# --- Noctalia config --------------------------------------------------------
+NOCT_DIR="$HOME/.config/noctalia"
+NOCT_SRC="$REPO/config/noctalia"
+
+if [ ! -d "$NOCT_SRC" ]; then
+    skip "config/noctalia missing from the repo"
+elif cmp -s "$NOCT_SRC/config.toml" "$NOCT_DIR/config.toml" \
+     && cmp -s "$NOCT_SRC/templates/fastfetch.jsonc" "$NOCT_DIR/templates/fastfetch.jsonc"; then
+    skip "Noctalia config already up to date"
+else
+    mkdir -p "$NOCT_DIR/templates"
+    [ -f "$NOCT_DIR/config.toml" ] && cp -a "$NOCT_DIR/config.toml" "$NOCT_DIR/config.toml.overwritten-$STAMP"
+    cp -a "$NOCT_SRC/config.toml" "$NOCT_DIR/config.toml"
+    cp -a "$NOCT_SRC/templates/fastfetch.jsonc" "$NOCT_DIR/templates/fastfetch.jsonc"
+    ok "Noctalia templates: kitty, starship, gtk, btop, fastfetch"
+fi
+
+if command -v noctalia >/dev/null && pgrep -x noctalia >/dev/null; then
+    noctalia msg config-reload >/dev/null 2>&1 || true
+    noctalia msg templates-apply >/dev/null 2>&1 || true
+    ok "Templates rendered for the current palette"
 fi
 
 # --- Reload -----------------------------------------------------------------
