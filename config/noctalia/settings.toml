@@ -5,12 +5,12 @@ order = [ "default" ]
 
     [bar.default]
     border = "on_surface_variant"
-    start = [ "arch", "workspaces", "active_window" ]
     end = [ "media", "tray", "clipboard", "network", "bluetooth", "volume", "brightness", "battery", "session" ]
     margin_ends = 0
     radius = 50
     radius_top_left = 0
     radius_top_right = 0
+    start = [ "arch", "workspaces", "active_window" ]
     thickness = 38
 
 [dock]
