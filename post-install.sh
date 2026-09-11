@@ -38,10 +38,9 @@ noctalia and a French keyboard.
 Env:
   SKIP_PACKAGES=1    Leave packages/*.txt alone
   SKIP_NOCTALIA=1    Do not install the noctalia package
-  FORCE_SETTINGS=1   Replace an existing noctalia settings.toml with the repo's.
-                     Without it an existing one is left alone, which means a
-                     machine where noctalia has already started keeps its
-                     defaults and gets none of the bar, dock or widgets.
+  KEEP_SETTINGS=1    Leave this machine's noctalia settings.toml alone.
+                     By default the repo's copy wins and the old one is kept
+                     beside it as .overwritten-<date>.
 EOF
 }
 
@@ -337,17 +336,21 @@ write_settings() {
 
 if [ ! -f "$SETTINGS_SRC" ]; then
     skip "config/noctalia/settings.toml missing from the repo"
-elif [ ! -f "$SETTINGS_DEST" ]; then
-    write_settings
-    ok "Noctalia settings seeded: bar, dock, desktop widgets, lockscreen, theme"
-elif [ "${FORCE_SETTINGS:-0}" = "1" ]; then
-    cp -a "$SETTINGS_DEST" "$SETTINGS_DEST.overwritten-$STAMP"
-    write_settings
-    ok "Noctalia settings replaced, previous one kept as .overwritten-$STAMP"
-    echo "  Per-monitor entries name this machine's connectors. Check the bar and"
-    echo "  the lockscreen if the screens here are not $(grep -oE '"(eDP|DP|HDMI)-[0-9]+"' "$SETTINGS_SRC" | sort -u | tr -d '"' | tr '\n' ' ')"
+elif [ "${KEEP_SETTINGS:-0}" = "1" ]; then
+    skip "Noctalia settings left alone (KEEP_SETTINGS=1)"
+elif [ -f "$SETTINGS_DEST" ] && sed "s|__HOME__|$HOME|g" "$SETTINGS_SRC" | cmp -s - "$SETTINGS_DEST"; then
+    skip "Noctalia settings already match the repo"
 else
-    skip "Noctalia settings already exist. FORCE_SETTINGS=1 to replace them with the repo's"
+    if [ -f "$SETTINGS_DEST" ]; then
+        cp -a "$SETTINGS_DEST" "$SETTINGS_DEST.overwritten-$STAMP"
+        write_settings
+        ok "Noctalia settings deployed, previous one kept as .overwritten-$STAMP"
+    else
+        write_settings
+        ok "Noctalia settings deployed: bar, dock, desktop widgets, lockscreen, theme"
+    fi
+    SCREENS="$(grep -oE '"(eDP|DP|HDMI)-[0-9]+"' "$SETTINGS_SRC" | sort -u | tr -d '"' | tr '\n' ' ')"
+    [ -n "$SCREENS" ] && echo "  Per-monitor entries expect: $SCREENS"
 fi
 
 # --- zsh --------------------------------------------------------------------
