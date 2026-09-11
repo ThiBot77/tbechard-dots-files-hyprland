@@ -230,6 +230,21 @@ LUA
     ok "Screens pinned: laptop, CN41512CCR, CN42023N27"
 fi
 
+if grep -qF 'nm-applet --indicator' "$HYPR_LUA"; then
+    skip "nm-applet already autostarted"
+else
+    cp -a "$HYPR_LUA" "$HYPR_LUA.avant-nmapplet-$STAMP"
+    cat >> "$HYPR_LUA" <<'LUA'
+
+-- Noctalia lists VPNs but cannot edit them, and something has to answer the
+-- secret prompts. --indicator is the StatusNotifier mode the tray widget reads.
+hl.on("hyprland.start", function()
+  hl.exec_cmd("nm-applet --indicator")
+end)
+LUA
+    ok "nm-applet autostarted, secret agent for VPNs"
+fi
+
 if grep -qF 'settings-toggle' "$HYPR_LUA"; then
     skip "Settings key already bound"
 else

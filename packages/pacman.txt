@@ -8,3 +8,5 @@ zsh
 zsh-autosuggestions
 starship
 fastfetch
+network-manager-applet
+networkmanager-openvpn
