@@ -190,6 +190,20 @@ PYEOF
     ok "SUPER+T terminal, SUPER+E files, SUPER+Q close, AZERTY workspaces"
 fi
 
+if grep -qF 'screenshot-region' "$HYPR_LUA"; then
+    skip "Screenshot keys already bound"
+else
+    cp -a "$HYPR_LUA" "$HYPR_LUA.avant-screenshot-$STAMP"
+    cat >> "$HYPR_LUA" <<'LUA'
+
+hl.bind("Print", hl.dsp.exec_cmd("noctalia msg screenshot-region"))
+hl.bind("SHIFT + Print", hl.dsp.exec_cmd("noctalia msg screenshot-annotate"))
+hl.bind("SUPER + Print", hl.dsp.exec_cmd("noctalia msg screenshot-fullscreen"))
+hl.bind("SUPER + SHIFT + Print", hl.dsp.exec_cmd("noctalia msg screenshot-fullscreen all"))
+LUA
+    ok "Print captures a region, Shift annotates, SUPER takes the screen"
+fi
+
 # --- Noctalia config --------------------------------------------------------
 NOCT_DIR="$HOME/.config/noctalia"
 NOCT_SRC="$REPO/config/noctalia"
@@ -211,6 +225,26 @@ if command -v noctalia >/dev/null && pgrep -x noctalia >/dev/null; then
     noctalia msg config-reload >/dev/null 2>&1 || true
     noctalia msg templates-apply >/dev/null 2>&1 || true
     ok "Templates rendered for the current palette"
+fi
+
+# --- zsh --------------------------------------------------------------------
+if [ -d "$HOME/.oh-my-zsh" ]; then
+    skip "oh-my-zsh already in HOME"
+elif [ -d /usr/share/oh-my-zsh ]; then
+    cp -a /usr/share/oh-my-zsh "$HOME/.oh-my-zsh"
+    ok "oh-my-zsh copied from /usr/share into HOME"
+else
+    skip "oh-my-zsh not found, install the oh-my-zsh-git package"
+fi
+
+if [ ! -f "$REPO/config/zsh/.zshrc" ]; then
+    skip "config/zsh/.zshrc missing from the repo"
+elif cmp -s "$REPO/config/zsh/.zshrc" "$HOME/.zshrc"; then
+    skip "zshrc already up to date"
+else
+    [ -f "$HOME/.zshrc" ] && cp -a "$HOME/.zshrc" "$HOME/.zshrc.overwritten-$STAMP"
+    cp -a "$REPO/config/zsh/.zshrc" "$HOME/.zshrc"
+    ok "zshrc deployed from the repo"
 fi
 
 # --- Reload -----------------------------------------------------------------
