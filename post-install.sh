@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-KEYBINDS="$HOME/.config/hypr/config/keybinds.lua"
-SETTINGS="$HOME/.config/hypr/config/settings.lua"
-AUTOSTART="$HOME/.config/hypr/config/autostart.lua"
-KITTY="$HOME/.config/kitty/kitty.conf"
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MATUGEN="$HOME/.local/share/serpantinum/src/assets/matugen"
+HYPR_DIR="$HOME/.config/hypr"
+HYPR_LUA="$HYPR_DIR/hyprland.lua"
+NOCTALIA_LUA="$HYPR_DIR/noctalia.lua"
+HYPR_DEFAULT="/usr/share/hypr/hyprland.lua"
+STAMP="$(date +%Y%m%d-%H%M%S)"
 
 ok()   { printf '\033[32m[ ok ]\033[0m %s\n' "$1"; }
 skip() { printf '\033[90m[ -- ]\033[0m %s\n' "$1"; }
@@ -22,30 +22,35 @@ banner() {
 │    | | | | | | | |_) | |  | | (_| | (__| | | | | | | |  __/   │
 │    |_| |_| |_|_|____/|_|  |_|\__,_|\___|_| |_|_|_| |_|\___|   │
 ├───────────────────────────────────────────────────────────────┤
-│                             S E T U P                         │
+│                      N O C T A L I A                          │
 ├───────────────────────────────────────────────────────────────┤
 
 ART
     printf '\033[0m\n'
 }
 
+usage() {
+    cat <<EOF
+Usage: ${0##*/}
+
+Installs the certificates, the packages and noctalia, then wires noctalia
+into an otherwise stock Hyprland configuration.
+
+Env:
+  SKIP_PACKAGES=1    Leave packages/*.txt alone
+  SKIP_NOCTALIA=1    Do not install the noctalia package
+  RESET_HYPRLAND=1   Move the current ~/.config/hypr aside and start again
+                     from the stock $HYPR_DEFAULT
+EOF
+}
+
+case "${1:-}" in
+    -h|--help) usage; exit 0 ;;
+    "")        ;;
+    *)         usage >&2; die "Unknown argument: $1" ;;
+esac
+
 banner
-
-backup_once() {
-    local dest="$KEYBINDS.avant-post-install"
-    [ -f "$dest" ] || cp -a "$KEYBINDS" "$dest"
-}
-
-patch_lua() {
-    python3 - "$KEYBINDS" "$1" "$2" "$3" <<'PYEOF'
-import sys
-path, old, new, label = sys.argv[1:5]
-s = open(path).read()
-if s.count(old) != 1:
-    sys.exit("pattern missing or ambiguous for %s: upstream changed, fix by hand" % label)
-open(path, "w").write(s.replace(old, new))
-PYEOF
-}
 
 # --- CA certificates --------------------------------------------------------
 CERT_DIR="$REPO/certs"
@@ -77,7 +82,7 @@ else
     fi
 fi
 
-# --- Packages ------------------------------------------------------------------
+# --- Packages ---------------------------------------------------------------
 if [ "${SKIP_PACKAGES:-0}" = "1" ]; then
     skip "Packages skipped (SKIP_PACKAGES=1)"
 elif [ ! -f "$REPO/packages/pacman.txt" ]; then
@@ -107,281 +112,145 @@ else
     fi
 fi
 
-# --- Serpantinum --------------------------------------------------------------
-SERP_INSTALLER="https://raw.githubusercontent.com/ilyamiro/serpantinum/master/install/install.sh"
-
-SERP_VERSION="$(serpantinum --version 2>/dev/null | head -1 || true)"
-
-if [ "${SKIP_SERPANTINUM:-0}" = "1" ]; then
-    skip "Serpantinum install skipped (SKIP_SERPANTINUM=1)"
-elif ! command -v serpantinumd >/dev/null; then
-    echo "  upstream installer: $SERP_INSTALLER"
-    bash -c "$(curl -fsSL "$SERP_INSTALLER")"
-    ok "Serpantinum installed"
-elif [ "${UPDATE_SERPANTINUM:-0}" = "1" ]; then
-    echo "  installed: ${SERP_VERSION:-unknown}"
-    echo "  upstream installer: $SERP_INSTALLER"
-    bash -c "$(curl -fsSL "$SERP_INSTALLER")"
-    ok "Serpantinum updated, the sections below put our own files back"
+# --- Noctalia ---------------------------------------------------------------
+# https://docs.noctalia.dev/noctalia/getting-started/installation/?section=arch
+if [ "${SKIP_NOCTALIA:-0}" = "1" ]; then
+    skip "Noctalia install skipped (SKIP_NOCTALIA=1)"
+elif pacman -Q noctalia >/dev/null 2>&1; then
+    skip "noctalia $(pacman -Q noctalia | cut -d' ' -f2) already installed"
 else
-    skip "${SERP_VERSION:-Serpantinum} already installed (UPDATE_SERPANTINUM=1 to update)"
+    sudo pacman -S --needed --noconfirm noctalia
+    ok "Noctalia installed from [extra]"
 fi
 
-[ -f "$KEYBINDS" ] || die "Missing: $KEYBINDS. Did the serpantinum install fail?"
-[ -f "$SETTINGS" ] || die "Missing: $SETTINGS. Did the serpantinum install fail?"
-[ -f "$AUTOSTART" ] || die "Missing: $AUTOSTART. Did the serpantinum install fail?"
-
-# --- Themed prompt ---------------------------------------------
-if [ ! -d "$MATUGEN" ]; then
-    skip "Serpantinum matugen assets not found"
-elif [ ! -f "$REPO/config/starship/starship.toml.template" ]; then
-    skip "Starship template missing from the repo"
-elif grep -q "templates.starship" "$MATUGEN/config.toml" \
-     && grep -q "templates.starship" "$MATUGEN/config-static.toml" \
-     && cmp -s "$REPO/config/starship/starship.toml.template" "$MATUGEN/templates/starship.toml.template"; then
-    skip "Starship template already in place"
-else
-    cp -a "$REPO/config/starship/starship.toml.template" "$MATUGEN/templates/starship.toml.template"
-    for cfg in config.toml config-static.toml; do
-        [ -f "$MATUGEN/$cfg" ] || continue
-        grep -q "templates.starship" "$MATUGEN/$cfg" || cat >> "$MATUGEN/$cfg" <<'TOML'
-
-[templates.starship]
-input_path = "templates/starship.toml.template"
-output_path = "~/.config/starship.toml"
-TOML
-    done
-    ok "Starship template installed for wallpaper and preset themes"
+# --- A stock Hyprland to build on -------------------------------------------
+if [ "${RESET_HYPRLAND:-0}" = "1" ] && [ -d "$HYPR_DIR" ]; then
+    mv "$HYPR_DIR" "$HYPR_DIR.avant-noctalia-$STAMP"
+    ok "Old config moved to $HYPR_DIR.avant-noctalia-$STAMP"
 fi
 
-# --- Fastfetch ----------------------------------------------------------------
-FF_SRC="$REPO/config/fastfetch/config.jsonc.template"
-FF_DEST="$MATUGEN/templates/fastfetch.jsonc.template"
-
-if [ ! -d "$MATUGEN" ]; then
-    skip "Serpantinum matugen assets not found"
-elif [ ! -f "$FF_SRC" ]; then
-    skip "Fastfetch template missing from the repo"
-elif cmp -s "$FF_SRC" "$FF_DEST"; then
-    skip "Fastfetch template already in place"
+if [ -f "$HYPR_LUA" ]; then
+    skip "hyprland.lua already in place"
+elif [ ! -f "$HYPR_DEFAULT" ]; then
+    die "Missing $HYPR_DEFAULT. Is the hyprland package installed?"
 else
-    cp -a "$FF_SRC" "$FF_DEST"
-    ok "Fastfetch template installed, applied on the next theme render"
+    mkdir -p "$HYPR_DIR"
+    cp -a "$HYPR_DEFAULT" "$HYPR_LUA"
+    ok "Stock Hyprland config seeded from $HYPR_DEFAULT"
 fi
 
-# --- GTK theme ----------------------------------------------------------------
-GTK_SRC="$REPO/config/gtk/gtk.css.template"
-GTK_DEST="$MATUGEN/templates/gtk.css.template"
-GTK_HOOK="systemctl --user try-restart xdg-desktop-portal-gtk.service"
+# --- Noctalia in Hyprland ---------------------------------------------------
+# Straight from https://docs.noctalia.dev/noctalia/compositor-settings/hyprland/
+# Loaded last by hyprland.lua so its binds win over the stock ones.
+noctalia_lua() {
+    cat <<'LUA'
+-- Noctalia, wired into Hyprland.
+-- Generated by post-install.sh, edit hyprland.lua instead if you want it to survive.
+-- https://docs.noctalia.dev/noctalia/compositor-settings/hyprland/
 
-if [ ! -d "$MATUGEN" ]; then
-    skip "Serpantinum matugen assets not found"
-elif [ ! -f "$GTK_SRC" ]; then
-    skip "GTK template missing from the repo"
-elif grep -q "try-restart xdg-desktop-portal-gtk" "$MATUGEN/config.toml" \
-     && grep -q "try-restart xdg-desktop-portal-gtk" "$MATUGEN/config-static.toml" \
-     && cmp -s "$GTK_SRC" "$GTK_DEST"; then
-    skip "GTK template already in place"
+---- AUTOSTART ----
+
+hl.on("hyprland.start", function()
+  hl.exec_cmd("noctalia")
+end)
+
+---- COMPOSITOR SETTINGS ----
+
+hl.config({
+  general = {
+    gaps_in = 5,
+    gaps_out = 10,
+  },
+  decoration = {
+    rounding = 20,
+    rounding_power = 2,
+    shadow = {
+      enabled = true,
+      range = 4,
+      render_power = 3,
+      color = 0xee1a1a1a,
+    },
+    blur = {
+      enabled = true,
+      size = 3,
+      passes = 2,
+      vibrancy = 0.1696,
+    },
+  },
+})
+
+---- PERSISTENT WORKSPACES ----
+
+-- Keeps empty workspaces visible in the noctalia bar instead of only the ones
+-- holding a window. Set your own monitor first, `hyprctl monitors` lists them.
+-- hl.workspace_rule({ workspace = "1", monitor = "DP-1", persistent = true, default_name = "web" })
+-- hl.workspace_rule({ workspace = "2", monitor = "DP-1", persistent = true, default_name = "code" })
+-- hl.workspace_rule({ workspace = "3", monitor = "DP-1", persistent = true, default_name = "chat" })
+-- hl.workspace_rule({ workspace = "4", monitor = "DP-1", persistent = true, default_name = "game" })
+-- hl.workspace_rule({ workspace = "5", monitor = "DP-1", persistent = true, default_name = "design" })
+
+---- IPC KEYBINDS ----
+
+local mainMod = "SUPER"
+local ipc = "noctalia msg "
+
+hl.bind(mainMod .. "+Space", hl.dsp.exec_cmd(ipc .. "panel-toggle launcher"))
+hl.bind(mainMod .. "+S", hl.dsp.exec_cmd(ipc .. "panel-toggle control-center"))
+hl.bind(mainMod .. "+comma", hl.dsp.exec_cmd(ipc .. "settings-toggle"))
+hl.bind("ALT + Tab", hl.dsp.exec_cmd(ipc .. "window-switcher"))
+
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(ipc .. "volume-up"))
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(ipc .. "volume-down"))
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd(ipc .. "volume-mute"))
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(ipc .. "brightness-up"))
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(ipc .. "brightness-down"))
+
+---- NOCTALIA SETTINGS WINDOW ----
+
+hl.window_rule({
+  match = { class = "dev.noctalia.Noctalia" },
+  float = true,
+  size = { 1080, 920 },
+})
+
+---- BLUR ----
+
+-- Hyprland's own layer animations are off here so they do not fight noctalia's.
+hl.layer_rule({
+  name = "noctalia",
+  match = {
+    namespace = "^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd|window-switcher)$",
+  },
+  no_anim = true,
+  ignore_alpha = 0.5,
+  blur = true,
+  blur_popups = true,
+})
+LUA
+}
+
+if [ -f "$NOCTALIA_LUA" ] && noctalia_lua | cmp -s - "$NOCTALIA_LUA"; then
+    skip "noctalia.lua already up to date"
 else
-    cp -a "$GTK_SRC" "$GTK_DEST"
-    for d in "$HOME/.config/gtk-3.0" "$HOME/.config/gtk-4.0"; do
-        [ -f "$d/gtk.css" ] || continue
-        grep -q "generated by matugen" "$d/gtk.css" && continue
-        [ -f "$d/gtk.css.avant-post-install" ] || cp -a "$d/gtk.css" "$d/gtk.css.avant-post-install"
-    done
-    for cfg in config.toml config-static.toml; do
-        [ -f "$MATUGEN/$cfg" ] || continue
-        python3 - "$MATUGEN/$cfg" "$GTK_HOOK" <<'PYEOF'
-import re, sys
-path, hook = sys.argv[1:3]
-s = open(path).read()
-s = re.sub(r'\n*\[templates\.gtk[34]\][^\[]*', '\n', s).rstrip()
-for n, out in (("gtk3", "gtk-3.0"), ("gtk4", "gtk-4.0")):
-    s += '\n\n[templates.%s]\ninput_path = "templates/gtk.css.template"\noutput_path = "~/.config/%s/gtk.css"' % (n, out)
-    if n == "gtk3":
-        s += '\npost_hook = "%s"' % hook
-open(path, "w").write(s + "\n")
-PYEOF
-    done
-    $GTK_HOOK >/dev/null 2>&1 || true
-    ok "GTK template installed, re-pick your wallpaper or preset to render it"
+    [ -f "$NOCTALIA_LUA" ] && cp -a "$NOCTALIA_LUA" "$NOCTALIA_LUA.overwritten-$STAMP"
+    noctalia_lua > "$NOCTALIA_LUA"
+    ok "noctalia.lua written: autostart, keybinds, blur"
 fi
 
-# --- oh-my-zsh ----------------------------------------------------------------
-if [ -d "$HOME/.oh-my-zsh" ]; then
-    skip "oh-my-zsh already in HOME"
-elif [ -d /usr/share/oh-my-zsh ]; then
-    cp -a /usr/share/oh-my-zsh "$HOME/.oh-my-zsh"
-    ok "oh-my-zsh copied from /usr/share into HOME"
+if grep -qF 'require("noctalia")' "$HYPR_LUA"; then
+    skip "hyprland.lua already requires noctalia"
 else
-    skip "oh-my-zsh not found, install the oh-my-zsh-git package"
+    cp -a "$HYPR_LUA" "$HYPR_LUA.avant-noctalia-$STAMP"
+    cat >> "$HYPR_LUA" <<'LUA'
+
+
+-- Noctalia, last so its binds win over the stock ones above.
+require("noctalia")
+LUA
+    ok "hyprland.lua now requires noctalia"
 fi
 
-# --- zsh ----------------------------------------------------------------------
-if [ ! -f "$REPO/config/zsh/.zshrc" ]; then
-    skip "config/zsh/.zshrc missing from the repo"
-elif cmp -s "$REPO/config/zsh/.zshrc" "$HOME/.zshrc"; then
-    skip "zshrc already up to date"
-else
-    [ -f "$HOME/.zshrc" ] && [ ! -f "$HOME/.zshrc.avant-post-install" ] \
-        && cp -a "$HOME/.zshrc" "$HOME/.zshrc.avant-post-install"
-    cp -a "$REPO/config/zsh/.zshrc" "$HOME/.zshrc"
-    ok "zshrc deployed from the repo"
-fi
-
-# --- Terminal settings -----------------------------------------------------
-if [ ! -f "$KITTY" ]; then
-    skip "kitty.conf missing"
-elif grep -qF 'font_size        10.5' "$KITTY"; then
-    skip "Kitty settings already in place"
-else
-    [ -f "$KITTY.avant-post-install" ] || cp -a "$KITTY" "$KITTY.avant-post-install"
-    python3 - "$KITTY" <<'PYEOF'
-import sys
-path = sys.argv[1]
-s = open(path).read()
-subs = [
-    ("font_family      JetBrains Mono",   "font_family      FiraCode Nerd Font"),
-    ("font_size        16.0",             "font_size        10.5"),
-    ("background_opacity 1.0",            "background_opacity 0.70\ndynamic_background_opacity yes"),
-    ("window_padding_width 4",            "window_padding_width 24"),
-    ("scrollback_lines 2000",             "scrollback_lines 10000"),
-    ("cursor_trail 1",                    "cursor_shape beam\ncursor_blink_interval 0"),
-]
-missing = [old for old, _ in subs if s.count(old) != 1]
-if missing:
-    sys.exit("kitty patterns not found (%s): upstream changed, fix by hand" % ", ".join(missing))
-for old, new in subs:
-    s = s.replace(old, new)
-open(path, "w").write(s)
-PYEOF
-    ok "Kitty: font, size 10.5, opacity 0.70, 24px padding"
-fi
-
-# --- NetworkManager secret agent ------------------------------------------
-if grep -qF 'nm-applet' "$AUTOSTART"; then
-    skip "nm-applet already autostarted"
-else
-    [ -f "$AUTOSTART.avant-post-install" ] || cp -a "$AUTOSTART" "$AUTOSTART.avant-post-install"
-    python3 - "$AUTOSTART" <<'PYEOF'
-import sys
-path = sys.argv[1]
-s = open(path).read()
-old = '  hl.exec_cmd("serpantinumd start")'
-if s.count(old) != 1:
-    sys.exit("autostart pattern not found: upstream changed, fix by hand")
-open(path, "w").write(s.replace(old, '  hl.exec_cmd("nm-applet")\n' + old))
-PYEOF
-    pgrep -x nm-applet >/dev/null || (nohup nm-applet >/dev/null 2>&1 &)
-    ok "nm-applet autostarted, secret agent for VPNs"
-fi
-
-# --- Keyboard layout ------------------------------------------------------
-if grep -qF 'kb_layout = "fr' "$SETTINGS"; then
-    skip "Keyboard already French"
-else
-    [ -f "$SETTINGS.avant-post-install" ] || cp -a "$SETTINGS" "$SETTINGS.avant-post-install"
-    python3 - "$SETTINGS" <<'PYEOF'
-import sys
-path = sys.argv[1]
-s = open(path).read()
-old = '    kb_layout = "us",'
-if s.count(old) != 1:
-    sys.exit("kb_layout pattern not found: upstream changed, fix by hand")
-open(path, "w").write(s.replace(old, '    kb_layout = "fr,us",'))
-PYEOF
-    ok "Keyboard set to French, us as second group"
-fi
-
-# --- Terminal on SUPER+T -----------------------------------------------------
-if grep -qF 'mainMod .. " + T", hl.dsp.exec_cmd(terminal)' "$KEYBINDS"; then
-    skip "SUPER+T already bound"
-else
-    backup_once
-    patch_lua 'hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))' \
-              'hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal))' \
-              "SUPER+T"
-    ok "SUPER+T opens the terminal"
-fi
-
-# --- Launcher on SUPER+A ------------------------------------------------------
-if grep -qF '" + A", hl.dsp.exec_cmd("serpantinum msg toggle launcher")' "$KEYBINDS"; then
-    skip "SUPER+A already bound"
-else
-    backup_once
-    patch_lua 'hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("serpantinum msg toggle autohide"))' \
-              'hl.bind(mainMod .. " + SHIFT + A", hl.dsp.exec_cmd("serpantinum msg toggle autohide"))' \
-              "deplacement de l autohide"
-    patch_lua 'hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("serpantinum msg toggle launcher"))' \
-              'hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("serpantinum msg toggle launcher"))
-hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("serpantinum msg toggle launcher"))' \
-              "SUPER+A"
-    ok "SUPER+A opens the launcher, autohide moved to SUPER+SHIFT+A"
-fi
-
-# --- AZERTY workspaces -----------------------------------------------------
-if grep -qF 'numberkey' "$KEYBINDS"; then
-    skip "AZERTY workspaces already bound"
-else
-    backup_once
-    patch_lua 'for i = 1, 10 do
-  local ws = tostring(i)
-  local key = tostring(i % 10)
-  hl.bind(mainMod .. " + " .. key, hl.dsp.exec_cmd("serpantinum msg workspace " .. ws))
-  hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.exec_cmd("serpantinum msg workspace " .. ws .. " move"))
-end' \
-              'local numberkey = { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }
-for i = 1, 10 do
-  local ws = tostring(i)
-  hl.bind(mainMod .. " + code:" .. numberkey[i], hl.dsp.exec_cmd("serpantinum msg workspace " .. ws))
-  hl.bind(mainMod .. " + SHIFT + code:" .. numberkey[i], hl.dsp.exec_cmd("serpantinum msg workspace " .. ws .. " move"))
-end' \
-              "workspaces AZERTY"
-    ok "Workspaces on the & e \" ( row without Shift"
-fi
-
-# --- File picker --------------------------------------------------------------
-PORTALS="$HOME/.config/xdg-desktop-portal/hyprland-portals.conf"
-FILECHOOSER="org.freedesktop.impl.portal.FileChooser"
-FILEMANAGER="org.gnome.Nautilus.desktop"
-
-if ! pacman -Q xdg-desktop-portal-gtk >/dev/null 2>&1; then
-    skip "xdg-desktop-portal-gtk missing, add it to packages/pacman.txt"
-elif [ ! -f "/usr/share/applications/$FILEMANAGER" ]; then
-    skip "Nautilus missing, add it to packages/pacman.txt"
-elif grep -qE "^[[:space:]]*$FILECHOOSER[[:space:]]*=[[:space:]]*gtk[[:space:]]*$" "$PORTALS" 2>/dev/null \
-     && [ "$(xdg-mime query default inode/directory 2>/dev/null)" = "$FILEMANAGER" ]; then
-    skip "GTK file picker already the default"
-else
-    mkdir -p "$(dirname "$PORTALS")"
-    if [ -f "$PORTALS" ] && [ ! -f "$PORTALS.avant-post-install" ]; then
-        cp -a "$PORTALS" "$PORTALS.avant-post-install"
-    fi
-    python3 - "$PORTALS" "$FILECHOOSER" <<'PYEOF'
-import os, sys
-path, key = sys.argv[1:3]
-lines = open(path).read().splitlines() if os.path.exists(path) else ["[preferred]", "default = hyprland;gtk"]
-if "[preferred]" not in lines:
-    lines.insert(0, "[preferred]")
-out, done = [], False
-for line in lines:
-    if line.split("=")[0].strip() == key:
-        if done:
-            continue
-        line, done = "%s = gtk" % key, True
-    out.append(line)
-    if line.strip() == "[preferred]" and not done:
-        out.append("%s = gtk" % key)
-        done = True
-open(path, "w").write("\n".join(out) + "\n")
-PYEOF
-    xdg-mime default "$FILEMANAGER" inode/directory
-    systemctl --user restart xdg-desktop-portal.service >/dev/null 2>&1 || true
-    ok "File picker set to GTK, Nautilus opens directories"
-fi
-
-# --- Reload -------------------------------------------------------------
+# --- Reload -----------------------------------------------------------------
 if command -v hyprctl >/dev/null && [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
     hyprctl reload >/dev/null && ok "Hyprland reloaded"
 else

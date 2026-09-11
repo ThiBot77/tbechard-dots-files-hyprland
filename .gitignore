@@ -1,6 +1,0 @@
-# Etat spicetify : chemins absolus propres a la machine. Seul le theme est
-# versionne.
-config/spicetify/.config/spicetify/config-xpui.ini
-config/spicetify/.config/spicetify/Backup/
-config/spicetify/.config/spicetify/CustomApps/
-config/spicetify/.config/spicetify/Extensions/
