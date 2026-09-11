@@ -88,28 +88,6 @@ Host fr-vm-k8s-prd-wrk-01
 Host fr-vm-k8s-prd-wrk-02
     HostName    10.10.25.203
 
-# ── Auchan MyOffer (via bastion PAM) ──────────────────────────────────────────
-Host myoffer-app
-    HostName    access.pam.ari.internal.auchan.com
-    User        XFR5203001@aucusr@10.150.32.33
-
-Host myoffer-db
-    HostName    access.pam.ari.internal.auchan.com
-    User        XFR5203001@aucusr@10.150.32.34
-
-Host myoffer-ref
-    HostName    access.pam.ari.internal.auchan.com
-    User        XFR5203001@aucusr@ua-vm-np-myo-120.tech.internal.auchan.com
-
-Host myoffer-*
-    Port                        22
-    PubkeyAuthentication        no
-    PreferredAuthentications    keyboard-interactive,password
-    StrictHostKeyChecking       no
-    # Le proxy CyberArk PSM n'accepte pas le multiplexage (Invalid session state)
-    ControlMaster               no
-    ControlPath                 none
-
 # ── Auchan ANEE (via bastion PAM) ─────────────────────────────────────────────
 Host ane-app
     HostName    access.pam.ari.internal.auchan.com

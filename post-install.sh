@@ -354,12 +354,11 @@ elif grep -qE 'PRIVATE KEY' "$SSH_SRC"; then
 else
     mkdir -p "$SSH_DIR"
     chmod 700 "$SSH_DIR"
-    if cmp -s "$SSH_SRC" "$SSH_DIR/config"; then
-        skip "ssh config already up to date"
+    if [ -f "$SSH_DIR/config" ]; then
+        skip "ssh config already exists, left alone"
     else
-        [ -f "$SSH_DIR/config" ] && cp -a "$SSH_DIR/config" "$SSH_DIR/config.overwritten-$STAMP"
         install -m 600 "$SSH_SRC" "$SSH_DIR/config"
-        ok "ssh config deployed ($(grep -cE '^[[:space:]]*Host[[:space:]]' "$SSH_SRC") hosts)"
+        ok "ssh config seeded ($(grep -cE '^[[:space:]]*Host[[:space:]]' "$SSH_SRC") hosts)"
     fi
     for k in "$SSH_DIR"/id_*; do
         [ -f "$k" ] || continue
