@@ -172,12 +172,13 @@ subs = [
     hl.bind(mainMod .. " + SHIFT + " .. key,     hl.dsp.window.move({ workspace = i }))
 end''',
      '''-- code:NN registers an empty bind through the Lua API, keysyms do not.
--- With SHIFT the AZERTY row already yields the digits, so those stay as they are.
+-- SHIFT does not turn the row into digits for bind matching either, so the
+-- move binds name the same keysyms.
 local azerty = { "ampersand", "eacute", "quotedbl", "apostrophe", "parenleft",
                  "minus", "egrave", "underscore", "ccedilla", "agrave" }
 for i = 1, 10 do
     hl.bind(mainMod .. " + " .. azerty[i],          hl.dsp.focus({ workspace = i }))
-    hl.bind(mainMod .. " + SHIFT + " .. (i % 10),   hl.dsp.window.move({ workspace = i }))
+    hl.bind(mainMod .. " + SHIFT + " .. azerty[i],   hl.dsp.window.move({ workspace = i }))
 end'''),
 ]
 
