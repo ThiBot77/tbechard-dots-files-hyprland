@@ -110,14 +110,21 @@ fi
 # --- Serpantinum --------------------------------------------------------------
 SERP_INSTALLER="https://raw.githubusercontent.com/ilyamiro/serpantinum/master/install/install.sh"
 
-if command -v serpantinumd >/dev/null; then
-    skip "Serpantinum already installed"
-elif [ "${SKIP_SERPANTINUM:-0}" = "1" ]; then
+SERP_VERSION="$(serpantinum --version 2>/dev/null | head -1 || true)"
+
+if [ "${SKIP_SERPANTINUM:-0}" = "1" ]; then
     skip "Serpantinum install skipped (SKIP_SERPANTINUM=1)"
-else
+elif ! command -v serpantinumd >/dev/null; then
     echo "  upstream installer: $SERP_INSTALLER"
     bash -c "$(curl -fsSL "$SERP_INSTALLER")"
     ok "Serpantinum installed"
+elif [ "${UPDATE_SERPANTINUM:-0}" = "1" ]; then
+    echo "  installed: ${SERP_VERSION:-unknown}"
+    echo "  upstream installer: $SERP_INSTALLER"
+    bash -c "$(curl -fsSL "$SERP_INSTALLER")"
+    ok "Serpantinum updated, the sections below put our own files back"
+else
+    skip "${SERP_VERSION:-Serpantinum} already installed (UPDATE_SERPANTINUM=1 to update)"
 fi
 
 [ -f "$KEYBINDS" ] || die "Missing: $KEYBINDS. Did the serpantinum install fail?"
