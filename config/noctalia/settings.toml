@@ -5,6 +5,7 @@ order = [ "default" ]
 
     [bar.default]
     border = "on_surface_variant"
+    center = [ "control-center", "clock" ]
     end = [ "media", "tray", "clipboard", "network", "bluetooth", "volume", "brightness", "battery", "session" ]
     margin_ends = 0
     radius = 80
@@ -15,9 +16,12 @@ order = [ "default" ]
     start = [ "arch", "workspaces", "active_window", "widget" ]
     thickness = 40
 
+[control_center]
+sidebar = "full"
+
 [desktop_widgets]
 schema_version = 2
-widget_order = [ "desktop-widget-0000000000000001" ]
+widget_order = [ "desktop-widget-0000000000000001", "desktop-widget-0000000000000003", "desktop-widget-0000000000000004" ]
 
     [desktop_widgets.grid]
     cell_size = 16
@@ -27,8 +31,8 @@ widget_order = [ "desktop-widget-0000000000000001" ]
     [desktop_widgets.widget.desktop-widget-0000000000000001]
     box_height = 240.0
     box_width = 256.0
-    cx = 1760.0
-    cy = 180.0
+    cx = 1776.0
+    cy = 244.0
     output = "eDP-1"
     placement_height = 1080.0
     placement_width = 1920.0
@@ -39,12 +43,42 @@ widget_order = [ "desktop-widget-0000000000000001" ]
         background = false
         clock_style = "analog"
 
+    [desktop_widgets.widget.desktop-widget-0000000000000003]
+    box_height = 0.0
+    box_width = 0.0
+    cx = 192.0
+    cy = 982.0
+    output = "eDP-1"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "media_player"
+
+    [desktop_widgets.widget.desktop-widget-0000000000000004]
+    box_height = 0.0
+    box_width = 0.0
+    cx = 1792.0
+    cy = 982.0
+    output = "eDP-1"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "sysmon"
+
+        [desktop_widgets.widget.desktop-widget-0000000000000004.settings]
+        stat = "cpu_usage"
+        stat2 = "cpu_temp"
+
 [dock]
 enabled = true
 icon_size = 30
+margin_edge = 10
 pinned = [ "google-chrome", "org.gnome.Nautilus", "code", "filezilla", "anydesk", "discord" ]
 reserve_space = false
 smart_auto_hide = true
+
+[location]
+auto_locate = true
 
 [lockscreen]
 monitors = [ "eDP-1" ]
@@ -52,11 +86,7 @@ monitors = [ "eDP-1" ]
 [lockscreen_widgets]
 enabled = true
 schema_version = 2
-widget_order = [
-    "lockscreen-login-box@DP-3",
-    "lockscreen-login-box@DP-5",
-    "lockscreen-login-box@eDP-1"
-]
+widget_order = [ "lockscreen-login-box@DP-3", "lockscreen-login-box@DP-5", "lockscreen-login-box@eDP-1" ]
 
     [lockscreen_widgets.grid]
     cell_size = 24
@@ -133,7 +163,7 @@ widget_order = [
         background_opacity = 0.0
         background_radius = 15.0
         center_password_text = true
-        input_opacity = 0.8
+        input_opacity = 0.80000000000000004
         input_radius = 32.0
         layout = "compact"
         show_caps_lock = true
@@ -156,12 +186,14 @@ lang = "fr"
 [theme]
 builtin = "Nord"
 community_palette = "Neon Surf"
+pure_black_dark = true
 shell_mode = "dark"
 source = "wallpaper"
 wallpaper_scheme = "m3-tonal-spot"
 
     [theme.templates]
-    builtin_ids = [ "btop", "cava", "gtk3", "gtk4", "kitty" ]
+    builtin_ids = [ "btop", "cava", "gtk3", "gtk4", "hyprland", "kitty" ]
+    community_ids = [ "vscode" ]
 
 [wallpaper]
 directory = "__HOME__/Images/Wallpapers"
@@ -180,6 +212,9 @@ directory = "__HOME__/Images/Wallpapers"
 
     [wallpaper.monitors.eDP-1]
     path = "__HOME__/Images/Wallpapers/wallhaven-391k7d.jpg"
+
+[widget.bluetooth]
+show_label = true
 
 [widget.taskbar]
 item_spacing = 15
