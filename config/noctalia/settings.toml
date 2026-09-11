@@ -5,8 +5,8 @@ order = [ "default" ]
 
     [bar.default]
     border = "on_surface_variant"
-    center = [ "clock", "media", "notifications" ]
-    end = [ "tray", "clipboard", "network", "bluetooth", "volume", "brightness", "battery", "session" ]
+    start = [ "arch", "workspaces", "active_window" ]
+    end = [ "media", "tray", "clipboard", "network", "bluetooth", "volume", "brightness", "battery", "session" ]
     margin_ends = 0
     radius = 50
     radius_top_left = 0
@@ -202,3 +202,6 @@ directory = "__HOME__/Images/Wallpapers"
 
     [wallpaper.monitors.eDP-1]
     path = "__HOME__/Images/Wallpapers/wallhaven-391k7d.jpg"
+
+[widget.taskbar]
+item_spacing = 15
