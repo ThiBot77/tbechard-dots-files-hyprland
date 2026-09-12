@@ -506,6 +506,24 @@ LUA
     fi
 fi
 
+# --- Portals ----------------------------------------------------------------
+PORTAL_SRC="$REPO/config/xdg-desktop-portal/hyprland-portals.conf"
+PORTAL_DEST="$HOME/.config/xdg-desktop-portal/hyprland-portals.conf"
+
+if [ ! -f "$PORTAL_SRC" ]; then
+    skip "config/xdg-desktop-portal missing from the repo"
+elif cmp -s "$PORTAL_SRC" "$PORTAL_DEST"; then
+    skip "Portal preferences already up to date"
+else
+    mkdir -p "$(dirname "$PORTAL_DEST")"
+    if [ -f "$PORTAL_DEST" ]; then
+        cp -a "$PORTAL_DEST" "$PORTAL_DEST.overwritten-$STAMP"
+    fi
+    cp -a "$PORTAL_SRC" "$PORTAL_DEST"
+    systemctl --user restart xdg-desktop-portal.service 2>/dev/null || true
+    ok "File chooser portal on the GTK backend, not the unthemed Qt one"
+fi
+
 # --- SDDM greeter -----------------------------------------------------------
 SDDM_SRC="$REPO/sddm"
 SDDM_THEME_DIR="/usr/share/sddm/themes/tbe"
