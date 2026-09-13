@@ -19,3 +19,4 @@ qt6-multimedia-ffmpeg
 qt6-imageformats
 playerctl
 ttf-jetbrains-mono-nerd
+kitty

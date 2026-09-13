@@ -3,7 +3,15 @@
 set -euo pipefail
 
 COVER="/tmp/hyprlock-cover"
-PLACEHOLDER="$HOME/.face.icon"
+
+# Noctalia writes the avatar to AccountsService, so that copy wins: changing it
+# in its settings then reaches the lock screen and the greeter alike.
+avatar() {
+    for p in "/var/lib/AccountsService/icons/$USER" "$HOME/.face.icon" "$HOME/Pictures/avatar.png"; do
+        [ -r "$p" ] && { echo "$p"; return; }
+    done
+}
+PLACEHOLDER="$(avatar)"
 
 # Spotify first, then whatever else is around: the browser registers a player
 # even with no media, and would win a plain "first in the list".
