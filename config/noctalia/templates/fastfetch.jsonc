@@ -1,127 +1,91 @@
 {
-  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/master/doc/json_schema.json",
-  "logo": {
-    "type": "small",
-    "color": {
-      "1": "{{colors.primary.default.hex}}",
-      "2": "{{colors.tertiary.default.hex}}",
-      "3": "{{colors.secondary.default.hex}}"
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+        "source": "~/.face.icon",
+        "type": "kitty",
+        "height": 12,
+        "padding": {
+            "top": 2
+        }
     },
-    "padding": {
-      "top": 1,
-      "left": 2,
-      "right": 3
-    }
-  },
-  "display": {
-    "separator": "  ",
-    "color": {
-      "separator": "{{colors.on_surface.default.hex}}"
+    "display": {
+        "separator": " "
     },
-    "percent": {
-      "type": ["num", "bar"]
-    },
-    "bar": {
-      "char": {
-        "elapsed": "━",
-        "total": "─"
-      },
-      "width": 12
-    }
-  },
-  "modules": [
-    "break",
-    {
-      "type": "title",
-      "format": "{1}@{2}",
-      "color": {
-        "user": "{{colors.primary.default.hex}}",
-        "host": "{{colors.tertiary.default.hex}}"
-      }
-    },
-    {
-      "type": "os",
-      "key": " os  ",
-      "keyColor": "{{colors.primary.default.hex}}"
-    },
-    {
-      "type": "kernel",
-      "key": " ker ",
-      "format": "{release}",
-      "keyColor": "{{colors.primary.default.hex}}"
-    },
-    {
-      "type": "uptime",
-      "key": "󰅐 up  ",
-      "keyColor": "{{colors.primary.default.hex}}"
-    },
-    {
-      "type": "packages",
-      "key": "󰏖 pkg ",
-      "keyColor": "{{colors.primary.default.hex}}"
-    },
-    "break",
-    {
-      "type": "wm",
-      "key": " wm  ",
-      "keyColor": "{{colors.tertiary.default.hex}}"
-    },
-    {
-      "type": "terminal",
-      "key": " term",
-      "keyColor": "{{colors.tertiary.default.hex}}"
-    },
-    {
-      "type": "shell",
-      "key": "󱆃 sh  ",
-      "keyColor": "{{colors.tertiary.default.hex}}"
-    },
-    "break",
-    {
-      "type": "cpu",
-      "key": "󰻠 cpu ",
-      "keyColor": "{{colors.secondary.default.hex}}"
-    },
-    {
-      "type": "gpu",
-      "key": "󰍛 gpu ",
-      "keyColor": "{{colors.secondary.default.hex}}"
-    },
-    {
-      "type": "memory",
-      "key": " ram ",
-      "keyColor": "{{colors.secondary.default.hex}}"
-    },
-    {
-      "type": "disk",
-      "key": " disk",
-      "folders": "/",
-      "keyColor": "{{colors.secondary.default.hex}}"
-    },
-    {
-      "type": "display",
-      "key": "󰍹 disp",
-      "compactType": "original-with-refresh-rate",
-      "keyColor": "{{colors.secondary.default.hex}}"
-    },
-    "break",
-    {
-      "type": "localip",
-      "key": "󰩟 ip  ",
-      "showIpv6": false,
-      "showSpeed": false,
-      "keyColor": "{{colors.inverse_primary.default.hex}}"
-    },
-    {
-      "type": "datetime",
-      "key": "󰃰 date",
-      "format": "{year}-{month-pretty}-{day-pretty} {hour-pretty}:{minute-pretty}",
-      "keyColor": "{{colors.inverse_primary.default.hex}}"
-    },
-    "break",
-    {
-      "type": "colors",
-      "symbol": "circle"
-    }
-  ]
+    "modules": [
+        "break",
+        {
+            "type": "title",
+            "keyWidth": 10
+        },
+        "break",
+        {
+            "type": "os",
+            "key": " ",
+            "keyColor": "{{colors.primary.default.hex}}"
+        },
+        {
+            "type": "kernel",
+            "key": " ",
+            "keyColor": "{{colors.primary.default.hex}}"
+        },
+        {
+            "type": "packages",
+            "format": "{pacman} (pacman)",
+            "key": " ",
+            "keyColor": "{{colors.primary.default.hex}}"
+        },
+        {
+            "type": "shell",
+            "key": " ",
+            "keyColor": "{{colors.primary.default.hex}}"
+        },
+        {
+            "type": "terminal",
+            "key": " ",
+            "keyColor": "{{colors.primary.default.hex}}"
+        },
+        {
+            "type": "wm",
+            "key": " ",
+            "keyColor": "{{colors.primary.default.hex}}"
+        },
+        {
+            "type": "cursor",
+            "key": " ",
+            "keyColor": "{{colors.primary.default.hex}}"
+        },
+        {
+            "type": "terminalfont",
+            "key": " ",
+            "keyColor": "{{colors.primary.default.hex}}"
+        },
+        {
+            "type": "uptime",
+            "key": " ",
+            "keyColor": "{{colors.primary.default.hex}}"
+        },
+        {
+            "type": "datetime",
+            "format": "{1}-{3}-{11}",
+            "key": " ",
+            "keyColor": "{{colors.primary.default.hex}}"
+        },
+        {
+            "type": "media",
+            "key": "󰝚 ",
+            "keyColor": "{{colors.primary.default.hex}}"
+        },
+        {
+            "type": "player",
+            "key": " ",
+            "keyColor": "{{colors.primary.default.hex}}"
+        },
+        "break",
+        {
+            "type": "custom",
+            "format": "\u001b[90m  \u001b[31m  \u001b[32m  \u001b[33m  \u001b[34m  \u001b[35m  \u001b[36m  \u001b[37m"
+        },
+        "break",
+        "break"
+    ]
 }

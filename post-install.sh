@@ -82,6 +82,21 @@ else
     fi
 fi
 
+# --- AUR helper -------------------------------------------------------------
+if command -v yay >/dev/null; then
+    skip "yay already installed"
+elif [ "${SKIP_PACKAGES:-0}" = "1" ]; then
+    skip "yay bootstrap skipped (SKIP_PACKAGES=1)"
+else
+    # A fresh Arch has no AUR helper, and packages/aur.txt needs one.
+    sudo pacman -S --needed --noconfirm git base-devel
+    YAY_TMP="$(mktemp -d)"
+    git clone -q https://aur.archlinux.org/yay-bin.git "$YAY_TMP/yay-bin"
+    (cd "$YAY_TMP/yay-bin" && makepkg -si --noconfirm)
+    rm -rf "$YAY_TMP"
+    ok "yay built from the AUR"
+fi
+
 # --- Packages ---------------------------------------------------------------
 if [ "${SKIP_PACKAGES:-0}" = "1" ]; then
     skip "Packages skipped (SKIP_PACKAGES=1)"
@@ -296,6 +311,19 @@ hl.on("hyprland.start", function()
 end)
 LUA
     ok "hypridle autostarted"
+fi
+
+MUSIC_SRC="$REPO/config/hypr/hyprlock-music.sh"
+MUSIC_DEST="$HYPR_DIR/hyprlock-music.sh"
+
+if [ ! -f "$MUSIC_SRC" ]; then
+    skip "config/hypr/hyprlock-music.sh missing from the repo"
+elif cmp -s "$MUSIC_SRC" "$MUSIC_DEST"; then
+    skip "Lock screen media helper already up to date"
+else
+    mkdir -p "$HYPR_DIR"
+    install -m 755 "$MUSIC_SRC" "$MUSIC_DEST"
+    ok "Lock screen media helper deployed"
 fi
 
 QUOTES_SRC="$REPO/config/hypr/quotes.txt"
@@ -526,35 +554,41 @@ fi
 
 # --- SDDM greeter -----------------------------------------------------------
 SDDM_SRC="$REPO/sddm"
-SDDM_THEME_DIR="/usr/share/sddm/themes/tbe"
-SDDM_CONF="/etc/sddm.conf.d/zz-tbe.conf"
+SDDM_THEME_DIR="/usr/share/sddm/themes/silent"
+SDDM_CONF="/etc/sddm.conf.d/zz-silent.conf"
 
-if [ ! -d "$SDDM_SRC" ]; then
-    skip "sddm/ missing from the repo"
+if [ ! -d "$SDDM_SRC/silent" ]; then
+    skip "sddm/silent missing from the repo"
 elif ! command -v sddm >/dev/null; then
     skip "sddm not installed, see packages/pacman.txt"
-elif diff -rq "$SDDM_SRC/theme" "$SDDM_THEME_DIR" >/dev/null 2>&1 \
-     && cmp -s "$SDDM_SRC/conf.d/zz-tbe.conf" "$SDDM_CONF"; then
-    skip "SDDM greeter already on the tbe theme"
+elif diff -rq "$SDDM_SRC/silent" "$SDDM_THEME_DIR" >/dev/null 2>&1 \
+     && cmp -s "$SDDM_SRC/conf.d/zz-silent.conf" "$SDDM_CONF" \
+     && [ -d /usr/share/fonts/redhat ]; then
+    skip "SDDM greeter already on the silent theme"
 else
     # Replaced, not merged: copying on top leaves dropped files behind.
     sudo rm -rf "$SDDM_THEME_DIR"
     sudo mkdir -p "$SDDM_THEME_DIR" /etc/sddm.conf.d
-    sudo cp -r "$SDDM_SRC/theme/." "$SDDM_THEME_DIR/"
-    sudo cp "$SDDM_SRC/conf.d/zz-tbe.conf" "$SDDM_CONF"
-    sudo rm -f /etc/sddm.conf.d/10-tbe.conf
+    sudo cp -r "$SDDM_SRC/silent/." "$SDDM_THEME_DIR/"
+    sudo cp "$SDDM_SRC/conf.d/zz-silent.conf" "$SDDM_CONF"
+    sudo rm -f /etc/sddm.conf.d/10-tbe.conf /etc/sddm.conf.d/zz-tbe.conf
+    sudo rm -rf /usr/share/sddm/themes/tbe
+
+    # The greeter runs as the sddm user, so its fonts have to be system-wide.
+    sudo cp -r "$SDDM_SRC/silent/fonts/redhat" "$SDDM_SRC/silent/fonts/redhat-vf" /usr/share/fonts/
+    sudo fc-cache -f >/dev/null 2>&1 || true
 
     # Every file in the directory is read, not just *.conf, and the last name
     # wins. Renaming in place leaves it in the race, so move it out.
     for conf in /etc/sddm.conf.d/*; do
         [ -f "$conf" ] || continue
-        if [ "$(basename "$conf")" = "zz-tbe.conf" ]; then continue; fi
+        if [ "$(basename "$conf")" = "zz-silent.conf" ]; then continue; fi
         if ! grep -qE '^[[:space:]]*Current[[:space:]]*=' "$conf"; then continue; fi
         sudo mkdir -p /etc/sddm.conf.d.disabled
         sudo mv "$conf" /etc/sddm.conf.d.disabled/
         echo "  $(basename "$conf") also set a theme, moved to /etc/sddm.conf.d.disabled"
     done
-    ok "SDDM greeter on the tbe theme"
+    ok "SDDM greeter on the silent theme, RedHat fonts installed"
 fi
 
 if systemctl is-enabled sddm >/dev/null 2>&1; then
