@@ -602,33 +602,6 @@ else
     ok "sddm enabled"
 fi
 
-# --- Arcacloud VPN ----------------------------------------------------------
-OVPN_SRC="$REPO/config/openvpn/arcacloud.ovpn"
-OVPN_DEST="$HOME/.config/openvpn/arcacloud.ovpn"
-VPN_BIN="$HOME/.local/bin/vpn-arcacloud"
-VPN_DESKTOP="$HOME/.local/share/applications/vpn-arcacloud.desktop"
-
-if [ ! -f "$OVPN_SRC" ]; then
-    skip "config/openvpn/arcacloud.ovpn missing from the repo"
-elif grep -qE 'BEGIN.*PRIVATE KEY' "$OVPN_SRC"; then
-    die "$OVPN_SRC has a key inlined. Keep certificates out of the repo."
-else
-    mkdir -p "$(dirname "$OVPN_DEST")" "$(dirname "$VPN_BIN")" "$(dirname "$VPN_DESKTOP")"
-    sed "s|__HOME__|$HOME|g" "$OVPN_SRC" > "$OVPN_DEST"
-    chmod 600 "$OVPN_DEST"
-    install -m 755 "$REPO/bin/vpn-arcacloud" "$VPN_BIN"
-    sed "s|__HOME__|$HOME|g" "$REPO/config/applications/vpn-arcacloud.desktop" > "$VPN_DESKTOP"
-    ok "Arcacloud VPN: profile, vpn-arcacloud, launcher entry"
-
-    CERT_DIR="$HOME/.local/share/networkmanagement/certificates/nm-openvpn"
-    MISSING_CERTS=0
-    for c in ca cert key tls-crypt-v2; do
-        [ -r "$CERT_DIR/profile-userlocked-$c.pem" ] || MISSING_CERTS=1
-    done
-    [ "$MISSING_CERTS" = "1" ] && \
-        echo "  Certificates absent from $CERT_DIR. Copy them across by hand, they are not in the repo."
-fi
-
 # --- zsh --------------------------------------------------------------------
 if [ -d "$HOME/.oh-my-zsh" ]; then
     skip "oh-my-zsh already in HOME"

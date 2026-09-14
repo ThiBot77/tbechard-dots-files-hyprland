@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=VPN Arcacloud
-Comment=OpenVPN avec code Authenticator
-Exec=kitty --title "VPN Arcacloud" -e __HOME__/.local/bin/vpn-arcacloud
-Icon=network-vpn
-Terminal=false
-Categories=Network;
