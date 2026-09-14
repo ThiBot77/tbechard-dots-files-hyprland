@@ -88,7 +88,6 @@ if command -v yay >/dev/null; then
 elif [ "${SKIP_PACKAGES:-0}" = "1" ]; then
     skip "yay bootstrap skipped (SKIP_PACKAGES=1)"
 else
-    # A fresh Arch has no AUR helper, and packages/aur.txt needs one.
     sudo pacman -S --needed --noconfirm git base-devel
     YAY_TMP="$(mktemp -d)"
     git clone -q https://aur.archlinux.org/yay-bin.git "$YAY_TMP/yay-bin"
@@ -189,10 +188,7 @@ subs = [
     hl.bind(mainMod .. " + " .. key,             hl.dsp.focus({ workspace = i}))
     hl.bind(mainMod .. " + SHIFT + " .. key,     hl.dsp.window.move({ workspace = i }))
 end''',
-     '''-- code:NN registers an empty bind through the Lua API, keysyms do not.
--- SHIFT does not turn the row into digits for bind matching either, so the
--- move binds name the same keysyms.
-local azerty = { "ampersand", "eacute", "quotedbl", "apostrophe", "parenleft",
+     '''local azerty = { "ampersand", "eacute", "quotedbl", "apostrophe", "parenleft",
                  "minus", "egrave", "underscore", "ccedilla", "agrave" }
 for i = 1, 10 do
     hl.bind(mainMod .. " + " .. azerty[i],          hl.dsp.focus({ workspace = i }))
@@ -240,8 +236,6 @@ else
     cp -a "$HYPR_LUA" "$HYPR_LUA.avant-monitors-$STAMP"
     cat >> "$HYPR_LUA" <<'LUA'
 
--- Pinned by description: DP-3 and DP-5 swap between boots, the panel serial does not.
--- A rule for a screen that is not plugged in is ignored, so this travels.
 hl.monitor({ output = "desc:LG Display 0x0764",              mode = "1920x1080@60.02", position = "0x0",    scale = 1 })
 hl.monitor({ output = "desc:HP Inc. HP E24 G4 CN41512CCR",   mode = "1920x1080@60",    position = "1920x0", scale = 1 })
 hl.monitor({ output = "desc:HP Inc. HP E24 G4 CN42023N27",   mode = "1920x1080@60",    position = "3840x0", scale = 1 })
@@ -255,8 +249,6 @@ else
     cp -a "$HYPR_LUA" "$HYPR_LUA.avant-nmapplet-$STAMP"
     cat >> "$HYPR_LUA" <<'LUA'
 
--- Noctalia lists VPNs but cannot edit them, and something has to answer the
--- secret prompts. --indicator is the StatusNotifier mode the tray widget reads.
 hl.on("hyprland.start", function()
   hl.exec_cmd("nm-applet --indicator")
 end)
@@ -284,8 +276,6 @@ import sys
 path = sys.argv[1]
 s = open(path).read()
 
-# logind, not hyprlock directly: idle, the key and sleep all raise the same
-# signal, and hypridle answers the three with one lock_cmd.
 noctalia = """hl.bind("SUPER + L", hl.dsp.exec_cmd("noctalia msg session lock"), { locked = true })
 hl.bind("XF86PowerOff", hl.dsp.exec_cmd("noctalia msg session lock"), { locked = true })"""
 logind = """hl.bind("SUPER + L", hl.dsp.exec_cmd("loginctl lock-session"), { locked = true })
@@ -432,8 +422,6 @@ SETTINGS_SRC="$REPO/config/noctalia/settings.toml"
 SETTINGS_DEST="$HOME/.local/state/noctalia/settings.toml"
 
 write_settings() {
-    # Noctalia owns this file while it runs and writes its own copy back over
-    # anything put there, so it has to be down for the swap.
     local was_running=0
     if pgrep -x noctalia >/dev/null; then
         was_running=1
@@ -467,6 +455,29 @@ else
     [ -n "$SCREENS" ] && echo "  Per-monitor entries expect: $SCREENS"
 fi
 
+# --- Tela icons -------------------------------------------------------------
+TELA_SRC="$REPO/packages/tela-icon-theme"
+
+if [ "${SKIP_PACKAGES:-0}" = "1" ]; then
+    skip "Tela skipped (SKIP_PACKAGES=1)"
+elif [ ! -f "$TELA_SRC/PKGBUILD" ]; then
+    skip "packages/tela-icon-theme/PKGBUILD missing from the repo"
+elif pacman -Qq tela-icon-theme-standard >/dev/null 2>&1; then
+    skip "Tela icons already installed"
+elif ! command -v makepkg >/dev/null; then
+    skip "makepkg missing, install base-devel"
+else
+    TELA_BUILD="$(mktemp -d)"
+    trap 'rm -rf "$TELA_BUILD"' EXIT
+    cp "$TELA_SRC/PKGBUILD" "$TELA_BUILD/"
+    echo "  building from $TELA_SRC/PKGBUILD, a minute or so"
+    ( cd "$TELA_BUILD" && makepkg -si --noconfirm --needed ) \
+        || die "Tela build failed. See the output above."
+    rm -rf "$TELA_BUILD"
+    trap - EXIT
+    ok "Tela icons installed, standard colour only"
+fi
+
 # --- Icons and cursor -------------------------------------------------------
 ICON_THEME="Tela"
 CURSOR_THEME="Bibata-Modern-Ice"
@@ -484,8 +495,6 @@ else
     CURSOR_INDEX="$(printf '[Icon Theme]\nName=Default\nComment=Default cursor\nInherits=%s\n' "$CURSOR_THEME")"
     THEMED=0
 
-    # No settings.ini here: it outranks dconf, and noctalia drives the GTK theme
-    # and dark mode through dconf alone.
     for d in "$HOME/.config/gtk-3.0" "$HOME/.config/gtk-4.0"; do
         f="$d/settings.ini"
         [ -f "$f" ] || continue
@@ -501,7 +510,6 @@ else
         THEMED=1
     fi
 
-    # Qt and anything launched outside the session read the env, not dconf.
     if ! grep -qF 'XCURSOR_THEME' "$HYPR_LUA"; then
         cp -a "$HYPR_LUA" "$HYPR_LUA.avant-cursor-$STAMP"
         cat >> "$HYPR_LUA" <<LUA
@@ -566,7 +574,6 @@ elif diff -rq "$SDDM_SRC/silent" "$SDDM_THEME_DIR" >/dev/null 2>&1 \
      && [ -d /usr/share/fonts/redhat ]; then
     skip "SDDM greeter already on the silent theme"
 else
-    # Replaced, not merged: copying on top leaves dropped files behind.
     sudo rm -rf "$SDDM_THEME_DIR"
     sudo mkdir -p "$SDDM_THEME_DIR" /etc/sddm.conf.d
     sudo cp -r "$SDDM_SRC/silent/." "$SDDM_THEME_DIR/"
@@ -574,12 +581,9 @@ else
     sudo rm -f /etc/sddm.conf.d/10-tbe.conf /etc/sddm.conf.d/zz-tbe.conf
     sudo rm -rf /usr/share/sddm/themes/tbe
 
-    # The greeter runs as the sddm user, so its fonts have to be system-wide.
     sudo cp -r "$SDDM_SRC/silent/fonts/redhat" "$SDDM_SRC/silent/fonts/redhat-vf" /usr/share/fonts/
     sudo fc-cache -f >/dev/null 2>&1 || true
 
-    # Every file in the directory is read, not just *.conf, and the last name
-    # wins. Renaming in place leaves it in the race, so move it out.
     for conf in /etc/sddm.conf.d/*; do
         [ -f "$conf" ] || continue
         if [ "$(basename "$conf")" = "zz-silent.conf" ]; then continue; fi

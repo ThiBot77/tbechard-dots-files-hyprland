@@ -5,5 +5,4 @@ zen-browser-bin
 anydesk-bin
 oh-my-zsh-git
 forticlient-vpn
-tela-icon-theme-git
 bibata-cursor-theme-bin

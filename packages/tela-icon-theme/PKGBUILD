@@ -1,0 +1,34 @@
+# Based on the AUR tela-icon-theme-git by Mark Wagie, without install.sh -a.
+pkgname=tela-icon-theme-standard
+pkgver=r0
+pkgrel=1
+pkgdesc="A flat colorful design icon theme, standard colour only."
+arch=('any')
+url="https://github.com/vinceliuice/Tela-icon-theme"
+license=('GPL-3.0-or-later')
+depends=(
+  'gtk-update-icon-cache'
+  'hicolor-icon-theme'
+)
+makedepends=('git')
+provides=('tela-icon-theme')
+conflicts=('tela-icon-theme' 'tela-icon-theme-git')
+options=('!strip')
+source=('git+https://github.com/vinceliuice/Tela-icon-theme.git')
+sha256sums=('SKIP')
+
+pkgver() {
+  cd Tela-icon-theme
+  git describe --long --tags --abbrev=7 | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+prepare() {
+  cd Tela-icon-theme
+  sed -i '/gtk-update-icon-cache/d' install.sh
+}
+
+package() {
+  cd Tela-icon-theme
+  install -d "$pkgdir/usr/share/icons"
+  ./install.sh -d "$pkgdir/usr/share/icons"
+}
