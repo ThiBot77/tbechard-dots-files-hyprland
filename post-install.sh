@@ -649,6 +649,18 @@ else
     fi
 fi
 
+# --- claude -----------------------------------------------------------------
+if [ ! -f "$REPO/config/claude/CLAUDE.md" ]; then
+    skip "config/claude/CLAUDE.md missing from the repo"
+elif cmp -s "$REPO/config/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"; then
+    skip "CLAUDE.md already up to date"
+else
+    mkdir -p "$HOME/.claude"
+    [ -f "$HOME/.claude/CLAUDE.md" ] && cp -a "$HOME/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md.overwritten-$STAMP"
+    cp -a "$REPO/config/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+    ok "CLAUDE.md deployed from the repo"
+fi
+
 # --- Reload -----------------------------------------------------------------
 if command -v hyprctl >/dev/null && [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
     hyprctl reload >/dev/null && ok "Hyprland reloaded"
