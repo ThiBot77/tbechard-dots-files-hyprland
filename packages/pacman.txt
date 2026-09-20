@@ -1,3 +1,4 @@
+7zip
 ansible
 brightnessctl
 btop
@@ -9,8 +10,11 @@ discord
 docker
 docker-compose
 fastfetch
+fd
+ffmpeg
 filezilla
 firefox
+fzf
 git
 gnome-keyring
 go-yq
@@ -21,6 +25,7 @@ htop
 hypridle
 hyprlock
 hyprpolkitagent
+imagemagick
 jq
 k9s
 kitty
@@ -33,12 +38,15 @@ noto-fonts-emoji
 packer
 pipewire-alsa
 playerctl
+poppler
 power-profiles-daemon
 python-pip
 qt6-imageformats
 qt6-multimedia-ffmpeg
 qt6-svg
 qt6-virtualkeyboard
+resvg
+ripgrep
 rsync
 sddm
 starship
@@ -55,6 +63,7 @@ xdg-desktop-portal-hyprland
 xdg-user-dirs-gtk
 xdg-utils
 yazi
+zoxide
 zram-generator
 zsh
 zsh-autosuggestions
