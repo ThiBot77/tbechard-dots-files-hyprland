@@ -54,6 +54,7 @@ wl-clipboard
 xdg-desktop-portal-hyprland
 xdg-user-dirs-gtk
 xdg-utils
+yazi
 zram-generator
 zsh
 zsh-autosuggestions
