@@ -1,8 +1,11 @@
+adw-gtk-theme-git
+anydesk-bin
+bibata-cursor-theme-bin
+forticlient-vpn
 google-chrome
+gtk-engine-murrine
+oh-my-zsh-git
 spotify
+tela-icon-theme-git
 visual-studio-code-bin
 zen-browser-bin
-anydesk-bin
-oh-my-zsh-git
-forticlient-vpn
-bibata-cursor-theme-bin
