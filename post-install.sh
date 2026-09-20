@@ -230,6 +230,18 @@ LUA
     ok "Window borders off"
 fi
 
+if grep -qF 'hyprpolkitagent' "$HYPR_LUA"; then
+    skip "Polkit agent already started"
+else
+    cp -a "$HYPR_LUA" "$HYPR_LUA.avant-polkit-$STAMP"
+    cat >> "$HYPR_LUA" <<'LUA'
+
+-- Without an agent, pkexec apps (Ventoy...) never show a password prompt.
+hl.exec_cmd("systemctl --user start hyprpolkitagent.service")
+LUA
+    ok "Polkit agent starts with the session"
+fi
+
 if grep -qF 'CN41512CCR' "$HYPR_LUA"; then
     skip "Desk layout already pinned"
 else
@@ -241,19 +253,6 @@ hl.monitor({ output = "desc:HP Inc. HP E24 G4 CN41512CCR",   mode = "1920x1080@6
 hl.monitor({ output = "desc:HP Inc. HP E24 G4 CN42023N27",   mode = "1920x1080@60",    position = "3840x0", scale = 1 })
 LUA
     ok "Screens pinned: laptop, CN41512CCR, CN42023N27"
-fi
-
-if grep -qF 'nm-applet --indicator' "$HYPR_LUA"; then
-    skip "nm-applet already autostarted"
-else
-    cp -a "$HYPR_LUA" "$HYPR_LUA.avant-nmapplet-$STAMP"
-    cat >> "$HYPR_LUA" <<'LUA'
-
-hl.on("hyprland.start", function()
-  hl.exec_cmd("nm-applet --indicator")
-end)
-LUA
-    ok "nm-applet autostarted, secret agent for VPNs"
 fi
 
 if grep -qF 'settings-toggle' "$HYPR_LUA"; then
