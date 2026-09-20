@@ -1,0 +1,12 @@
+{
+  "workbench.colorTheme": "GitHub Dark Default",
+  "chat.viewSessions.orientation": "stacked",
+  "claudeCode.preferredLocation": "panel",
+  "workbench.iconTheme": "material-icon-theme",
+  "terminal.external.linuxExec": "kitty",
+  "window.confirmSaveUntitledWorkspace": false,
+  "security.workspace.trust.untrustedFiles": "open",
+  "material-code.primaryColor": "#F64360",
+  "claudeCode.hideOnboarding": true,
+  "terminal.integrated.fontFamily": "FiraCode Nerd Font"
+}
