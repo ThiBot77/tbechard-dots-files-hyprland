@@ -1,5 +1,8 @@
 7zip
+accountsservice
 ansible
+bluez
+bluez-utils
 brightnessctl
 btop
 cmatrix

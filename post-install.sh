@@ -48,9 +48,10 @@ noctalia and a French keyboard.
 Env:
   SKIP_PACKAGES=1    Leave packages/*.txt alone
   SKIP_NOCTALIA=1    Do not install the noctalia package
-  KEEP_SETTINGS=1    Leave this machine's noctalia settings.toml alone.
-                     By default the repo's copy wins and the old one is kept
-                     beside it as .overwritten-<date>.
+  FORCE_SETTINGS=1   Overwrite this machine's noctalia settings.toml with the
+                     repo's copy, keeping the old one beside it as
+                     .overwritten-<date>. By default an existing file is left
+                     alone: its per-monitor entries are machine-specific.
 EOF
 }
 
@@ -134,6 +135,40 @@ else
         }
         ok "Packages installed"
     fi
+fi
+
+if systemctl is-enabled --quiet bluetooth.service 2>/dev/null; then
+    skip "Bluetooth service already enabled"
+else
+    sudo systemctl enable --now bluetooth.service
+    # WirePlumber only probes bluez at startup: without this, headsets stay
+    # invisible as audio sinks until the next reboot.
+    systemctl --user restart wireplumber
+    ok "Bluetooth service enabled"
+fi
+
+if systemctl is-enabled --quiet accounts-daemon.service 2>/dev/null; then
+    skip "AccountsService already enabled"
+else
+    sudo systemctl enable --now accounts-daemon.service
+    ok "AccountsService enabled"
+fi
+
+if [ "$(timedatectl show -p Timezone --value)" = "Europe/Paris" ]; then
+    skip "Timezone already Europe/Paris"
+else
+    sudo timedatectl set-timezone Europe/Paris
+    ok "Timezone set to Europe/Paris"
+fi
+
+if [ "$SHELL" = "/usr/bin/zsh" ] || [ "$SHELL" = "/bin/zsh" ]; then
+    skip "Default shell already zsh"
+else
+    chsh -s /usr/bin/zsh
+    # The user manager caches SHELL from login: without this, apps it activates
+    # keep spawning the old shell until the next reboot.
+    systemctl --user set-environment SHELL=/usr/bin/zsh
+    ok "Default shell set to zsh (log out and back in for it to take effect)"
 fi
 
 # --- Noctalia ---------------------------------------------------------------
@@ -265,6 +300,18 @@ LUA
     ok "Screens pinned: laptop, CN41512CCR, CN42023N27"
 fi
 
+if grep -qF 'LEN140WUXGA' "$HYPR_LUA"; then
+    skip "Lenovo screen already pinned"
+else
+    cp -a "$HYPR_LUA" "$HYPR_LUA.avant-monitors-$STAMP"
+    cat >> "$HYPR_LUA" <<'LUA'
+
+-- 16/15: the only scale near 1.1 that keeps 1920x1200 a whole number of pixels.
+hl.monitor({ output = "desc:Lenovo Group Limited LEN140WUXGA", mode = "1920x1200@60.00", position = "0x0", scale = 1.0666667 })
+LUA
+    ok "Screen pinned: Lenovo laptop panel, scale 16/15"
+fi
+
 if grep -qF 'settings-toggle' "$HYPR_LUA"; then
     skip "Settings key already bound"
 else
@@ -351,6 +398,19 @@ elif [ -f "$HOME/.config/fastfetch/avatar.png" ]; then
     ok "Lock screen avatar taken from the fastfetch one"
 else
     skip "No avatar found, hyprlock will show an empty frame. Drop a PNG at ~/.face.icon"
+fi
+
+# SDDM reads the AccountsService copy, not ~/.face.icon: the greeter runs as
+# its own user and can't traverse a 700 home directory.
+if [ -f "$AVATAR_DEST" ] && command -v gdbus >/dev/null && systemctl is-active --quiet accounts-daemon.service; then
+    if [ -f "/var/lib/AccountsService/icons/$USER" ]; then
+        skip "Avatar already registered with AccountsService"
+    else
+        gdbus call --system --dest org.freedesktop.Accounts \
+            --object-path "/org/freedesktop/Accounts/User$(id -u)" \
+            --method org.freedesktop.Accounts.User.SetIconFile "$AVATAR_DEST" >/dev/null
+        ok "Avatar registered with AccountsService (SDDM will pick it up)"
+    fi
 fi
 
 HYPRIDLE_SRC="$REPO/config/hypr/hypridle.conf"
@@ -447,8 +507,8 @@ write_settings() {
 
 if [ ! -f "$SETTINGS_SRC" ]; then
     skip "config/noctalia/settings.toml missing from the repo"
-elif [ "${KEEP_SETTINGS:-0}" = "1" ]; then
-    skip "Noctalia settings left alone (KEEP_SETTINGS=1)"
+elif [ -f "$SETTINGS_DEST" ] && [ "${FORCE_SETTINGS:-0}" != "1" ]; then
+    skip "Noctalia settings left alone (FORCE_SETTINGS=1 to overwrite)"
 elif [ -f "$SETTINGS_DEST" ] && sed "s|__HOME__|$HOME|g" "$SETTINGS_SRC" | cmp -s - "$SETTINGS_DEST"; then
     skip "Noctalia settings already match the repo"
 else
